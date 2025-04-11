@@ -1,30 +1,39 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { BriefcaseBusiness } from "lucide-react";
+import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleMenuClick = () => {
+    setIsOpen(!isOpen);
+  };
   return (
     <section>
-      <div className="h-16 flex justify-between items-center px-20 py-10">
+      <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 ">
         <div className="flex justify-center items-center gap-2.5">
-          <BriefcaseBusiness size={38} />
-          <div className="text-xl font-bold">Port X Builder</div>
+          <div className="flex justify-center items-center">
+            <BriefcaseBusiness size={28} />
+          </div>
+          <div className="font-extrabold text-xl">Port X Builder</div>
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex gap-10">
+        <div className="hidden absolute left-1/2 transform -translate-x-1/2 md:flex gap-5 lg:gap-10">
           <Link href={"#features"} className="cursor-pointer">
             Features
           </Link>
           <Link href={"#pricing"} className="cursor pointer">
             Pricing
           </Link>
-          <Link href={"#templates"} className="cursor pointer">
+          <Link href={"#template"} className="cursor pointer">
             Templates
           </Link>
         </div>
 
-        <div>
+        <div className="hidden md:block">
           <Button
             variant="outline"
             className="bg-white pointer text-primary-500 cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:bg-primary-50"
@@ -32,7 +41,49 @@ const Navbar = () => {
             Get Started
           </Button>
         </div>
+
+        <div className="md:hidden">
+          <button className="cursor-pointer">
+            {isOpen ? (
+              <X size={28} onClick={handleMenuClick} />
+            ) : (
+              <AlignJustify size={28} onClick={handleMenuClick} />
+            )}
+          </button>
+        </div>
       </div>
+      {isOpen && (
+        <div className="md:hidden absolute bg-white w-full h-full text-black mt-2 pt-12 space-y-4 flex justify-start items-center flex-col gap-10">
+          <Link
+            href={"#features"}
+            className="cursor-pointer"
+            onClick={() => setIsOpen(false)}
+          >
+            Features
+          </Link>
+
+          <Link
+            href="#pricing"
+            onClick={() => setIsOpen(false)}
+            className="cursor-pointer"
+          >
+            Pricing
+          </Link>
+          <Link
+            href="#templates"
+            onClick={() => setIsOpen(false)}
+            className="cursor-pointer"
+          >
+            Templates
+          </Link>
+          <Button
+            variant="outline"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
+          >
+            Get Started
+          </Button>
+        </div>
+      )}
     </section>
   );
 };
