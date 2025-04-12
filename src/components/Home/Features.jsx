@@ -55,10 +55,10 @@ function Features() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-12 mx-0 lg:mx-20">
           {featuresData.map((feature, index) => (
             <FeatureBox
-              key={index}
               Icon={feature.Icon}
               title={feature.title}
               description={feature.description}
+              index={index}
             />
           ))}
         </div>
