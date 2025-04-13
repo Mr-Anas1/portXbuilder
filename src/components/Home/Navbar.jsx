@@ -22,13 +22,22 @@ const Navbar = () => {
         </div>
 
         <div className="hidden absolute left-1/2 transform -translate-x-1/2 md:flex gap-5 lg:gap-10">
-          <Link href={"#features"} className="cursor-pointer">
+          <Link
+            href={"#features"}
+            className="cursor-pointer hover:text-yellow-300 transition-colors"
+          >
             Features
           </Link>
-          <Link href={"#pricing"} className="cursor pointer">
+          <Link
+            href={"#pricing"}
+            className="cursor-pointer hover:text-yellow-300 transition-colors"
+          >
             Pricing
           </Link>
-          <Link href={"#template"} className="cursor pointer">
+          <Link
+            href={"#template"}
+            className="cursor-pointer hover:text-yellow-300 transition-colors"
+          >
             Templates
           </Link>
         </div>

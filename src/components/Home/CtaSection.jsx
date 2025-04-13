@@ -3,13 +3,13 @@ import { Button } from "../ui/button";
 
 const CtaSection = () => {
   return (
-    <section className="px-20 lg:px-40 py-10 lg:py-20 bg-primary-500 text-white">
-      <div className="flex flex-col gap-6 items-center">
-        <h1 className="text-2xl text-center font-bold lg:text-4xl text-white">
+    <section className="py-28 bg-primary-600 relative overflow-hidden">
+      <div className="flex flex-col gap-10 items-center">
+        <h1 className="text-3xl text-center font-bold lg:text-5xl text-white">
           Ready to Showcase Your Work?
         </h1>
 
-        <p className="text-white text-center text-lg">
+        <p className="text-white text-center text-lg lg:text-xl max-w-2xl mx-auto ">
           Join thousands of professionals who trust PortXBuilder to showcase
           their work and attract clients.
         </p>

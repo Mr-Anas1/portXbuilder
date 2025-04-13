@@ -4,6 +4,7 @@ import Hero from "./Hero";
 import Features from "./Features";
 import PricingSectionCards from "./PricingSection";
 import CtaSection from "./CtaSection";
+import Footer from "./Footer";
 
 function Page() {
   return (
@@ -15,6 +16,7 @@ function Page() {
       <Features />
       <PricingSectionCards />
       <CtaSection />
+      <Footer />
     </section>
   );
 }
