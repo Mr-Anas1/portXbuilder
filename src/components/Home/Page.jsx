@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Features from "./Features";
 import PricingSectionCards from "./PricingSection";
+import CtaSection from "./CtaSection";
 
 function Page() {
   return (
@@ -13,6 +14,7 @@ function Page() {
       </div>
       <Features />
       <PricingSectionCards />
+      <CtaSection />
     </section>
   );
 }
