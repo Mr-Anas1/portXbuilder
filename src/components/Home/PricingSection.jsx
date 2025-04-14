@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,16 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { CheckIcon, MinusIcon, X } from "lucide-react";
 import React from "react";
 
@@ -104,7 +93,7 @@ const planFeatures = [
 
 export default function PricingSectionCards() {
   return (
-    <>
+    <section id="pricing">
       {/* Pricing */}
       <div className="flex flex-col my-16 px-5 gap-10 lg:mx-20">
         {/* Title */}
@@ -115,7 +104,7 @@ export default function PricingSectionCards() {
         </div>
         {/* End Title */}
         {/* Grid */}
-        <div className=" flex flex-col w-full md:flex-row justify-center items-center gap-6 lg:items-center">
+        <div className=" flex flex-col w-full md:flex-row justify-center items-center gap-6 lg:items-center mb-16">
           {/* Card */}
           <Card className="flex flex-col w-full transition duration-300 hover:scale-105">
             <CardHeader className="text-center pb-2">
@@ -236,7 +225,7 @@ export default function PricingSectionCards() {
           </Card>
           {/* End Card */}
           {/* Card */}
-          <Card className="flex flex-col  w-full transition duration-300 hover:scale-105">
+          <Card className="flex flex-col  w-full">
             <CardHeader className="text-center pb-2">
               <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
                 Ultimate
@@ -302,6 +291,6 @@ export default function PricingSectionCards() {
         {/* End Grid */}
       </div>
       {/* End Pricing */}
-    </>
+    </section>
   );
 }

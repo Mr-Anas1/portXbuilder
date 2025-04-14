@@ -4,9 +4,14 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
+import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { useClerk } from "@clerk/nextjs";
+import CustomUserSettings from "../ui/CustomUserSettings";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { openUserProfile } = useClerk();
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -43,14 +48,34 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <Button variant="outline" asChild>
-            <Link
-              href="/sign-up"
-              className="bg-white pointer text-primary-500 cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:bg-primary-50"
-            >
-              Get Started
-            </Link>
-          </Button>
+          <SignedOut>
+            <Button variant="outline" asChild>
+              <Link
+                href="/sign-up"
+                className="bg-white pointer text-primary-500 cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:bg-primary-50"
+              >
+                Get Started
+              </Link>
+            </Button>
+          </SignedOut>
+          <SignedIn>
+            <div className="flex justify-center items-center gap-4">
+              <Link
+                href="/dashboard"
+                className="cursor-pointer hover:text-yellow-300 transition-colors"
+              >
+                {" "}
+                Dashboard
+              </Link>
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonAvatarBox: "w-10 h-10",
+                  },
+                }}
+              />
+            </div>
+          </SignedIn>
         </div>
 
         <div className="md:hidden">
@@ -87,14 +112,27 @@ const Navbar = () => {
           >
             Templates
           </Link>
-          <Button variant="outline" asChild>
-            <Link
-              href="/sign-up"
-              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
-            >
-              Get Started
-            </Link>
-          </Button>
+          <div>
+            <SignedOut>
+              <Button variant="outline" asChild>
+                <Link
+                  href="/sign-up"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
+                >
+                  Get Started
+                </Link>
+              </Button>
+            </SignedOut>
+            <SignedIn>
+              <div className="flex justify-center items-center gap-12 flex-col">
+                <Link href="/dashboard" className="cursor-pointer">
+                  {" "}
+                  Dashboard
+                </Link>
+                <CustomUserSettings />
+              </div>
+            </SignedIn>
+          </div>
         </div>
       )}
     </section>
