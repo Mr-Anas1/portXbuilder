@@ -5,7 +5,7 @@ import Link from "next/link";
 const Footer = () => {
   const year = new Date().getFullYear();
   return (
-    <section className="bg-gray-900 text-gray-300 py-20">
+    <section className="bg-gray-900 text-gray-300 py-16">
       <div className="flex flex-col gap-6 justify-center items-center">
         <div className="flex flex-wrap gap-6 justify-center items-center text-gray-300">
           <Link
@@ -46,7 +46,7 @@ const Footer = () => {
           </Link>
         </div>
 
-        <div className="flex justify-center item-center gap-6 py-5 md: py-0">
+        <div className="flex justify-center item-center gap-6 py-5 md:py-0">
           <Linkedin className="h-6 w-6 cursor-pointer hover:text-yellow-300 transition-colors" />
           <Instagram className="h-6 w-6 cursor-pointer hover:text-yellow-300 transition-colors" />
           <TwitterIcon className="h-6 w-6 cursor-pointer hover:text-yellow-300 transition-colors" />

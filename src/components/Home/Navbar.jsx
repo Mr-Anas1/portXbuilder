@@ -23,19 +23,19 @@ const Navbar = () => {
 
         <div className="hidden absolute left-1/2 transform -translate-x-1/2 md:flex gap-5 lg:gap-10">
           <Link
-            href={"#features"}
+            href={"/#features"}
             className="cursor-pointer hover:text-yellow-300 transition-colors"
           >
             Features
           </Link>
           <Link
-            href={"#pricing"}
+            href={"/#pricing"}
             className="cursor-pointer hover:text-yellow-300 transition-colors"
           >
             Pricing
           </Link>
           <Link
-            href={"#template"}
+            href={"/#template"}
             className="cursor-pointer hover:text-yellow-300 transition-colors"
           >
             Templates
@@ -43,11 +43,13 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <Button
-            variant="outline"
-            className="bg-white pointer text-primary-500 cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:bg-primary-50"
-          >
-            Get Started
+          <Button variant="outline" asChild>
+            <Link
+              href="/sign-up"
+              className="bg-white pointer text-primary-500 cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:bg-primary-50"
+            >
+              Get Started
+            </Link>
           </Button>
         </div>
 
@@ -85,11 +87,13 @@ const Navbar = () => {
           >
             Templates
           </Link>
-          <Button
-            variant="outline"
-            className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
-          >
-            Get Started
+          <Button variant="outline" asChild>
+            <Link
+              href="/sign-up"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
+            >
+              Get Started
+            </Link>
           </Button>
         </div>
       )}
