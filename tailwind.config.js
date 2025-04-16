@@ -32,6 +32,8 @@ module.exports = {
           800: "#9d174d",
           900: "#831843",
         },
+        background: "#f3f3fa",
+        content: "#090917",
       },
     },
   },

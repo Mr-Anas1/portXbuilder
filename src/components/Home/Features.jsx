@@ -46,9 +46,9 @@ export const featuresData = [
 
 function Features() {
   return (
-    <section className="flex flex-col my-16 px-5 gap-10 " id="features">
+    <section className="flex flex-col my-24 px-5 gap-10 " id="features">
       <div>
-        <h1 className="text-center text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 mb-12">
+        <h1 className="text-center text-2xl md:text-3xl lg:text-4xl font-bold text-neutral-900 mb-20">
           Everything You Need, Built Right In
         </h1>
 
