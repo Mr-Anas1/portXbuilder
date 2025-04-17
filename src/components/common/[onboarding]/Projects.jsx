@@ -1,7 +1,43 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import ProjectCard from "../../ui/ProjectCard";
+import { Plus } from "lucide-react";
 
 const Projects = () => {
-  return <div>Projects</div>;
+  const [cards, setCards] = useState([0]);
+
+  const addCard = () => {
+    if (cards.length >= 3) return;
+    setCards((prev) => [...prev, prev.length]);
+  };
+  return (
+    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-6 shadow-lg flex flex-col justify-center items-center">
+      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+        Projects
+      </h2>
+      <div>
+        {cards.map((id) => (
+          <div key={id} className="animate-fade-in flex flex-col gap-1">
+            <ProjectCard />
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={addCard}
+        disabled={cards.length >= 3}
+        className={`mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300  hover:scale-105 hover:shadow-lg
+    ${
+      cards.length >= 3
+        ? "bg-gray-300 cursor-not-allowed hover:scale-100 hover:none"
+        : "bg-primary-500 hover:bg-primary-600 text-white"
+    }
+  `}
+      >
+        <Plus size={26} />
+      </button>
+    </section>
+  );
 };
 
 export default Projects;

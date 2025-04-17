@@ -3,13 +3,13 @@
 import React, { useState } from "react";
 import Welcome from "./Welcome";
 import BasicInfo from "./BasicInfo";
-import HeroSection from "./HeroSection";
 import Projects from "./Projects";
 import Social from "./Social";
 import Review from "./Review";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Navbar from "../Navbar/Page";
+import Footer from "@/components/Home/Footer";
 function CreatePortfolio() {
   const [page, setPage] = useState(0);
 
@@ -29,25 +29,23 @@ function CreatePortfolio() {
       case 1:
         return <BasicInfo />;
       case 2:
-        return <HeroSection />;
-      case 3:
         return <Projects />;
-      case 4:
+      case 3:
         return <Social />;
-      case 5:
+      case 4:
         return <Review />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
       <div className="absolute top-1/4 right-[10px] w-32 h-32 bg-secondary-400/20 rounded-full blur-2xl" />
       <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
-      <div className="h-screen overflow-hidden">
+      <div className="h-screen overflow-x-hidden">
         <Navbar />
 
-        <div className="text-center relative w-screen flex flex-col justify-center items-center gap-6 h-[calc(100vh-64px)]">
+        <div className="text-center relative w-screen flex flex-col justify-center items-center gap-6 my-12">
           {PageDisplay()}
 
           {page === 0 ? (
