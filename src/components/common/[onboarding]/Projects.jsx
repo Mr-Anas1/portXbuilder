@@ -12,14 +12,14 @@ const Projects = () => {
     setCards((prev) => [...prev, prev.length]);
   };
   return (
-    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-6 shadow-lg flex flex-col justify-center items-center">
+    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg flex flex-col justify-center items-center">
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
         Projects
       </h2>
       <div>
         {cards.map((id) => (
           <div key={id} className="animate-fade-in flex flex-col gap-1">
-            <ProjectCard />
+            <ProjectCard id={id} />
           </div>
         ))}
       </div>

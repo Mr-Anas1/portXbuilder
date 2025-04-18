@@ -18,7 +18,7 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
   return (
-    <section className="border-b border-gray-200">
+    <section className="border-b border-gray-200 relative">
       <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 ">
         <div
           className="flex justify-center items-center gap-2.5"

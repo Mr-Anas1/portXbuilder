@@ -13,10 +13,29 @@ import Footer from "@/components/Home/Footer";
 function CreatePortfolio() {
   const [page, setPage] = useState(0);
 
+  const [formData, setFormData] = useState({
+    name: "",
+    profession: "",
+    profileImage: "",
+    bio: "",
+    projects: [],
+    social: {
+      github: "",
+      linkedin: "",
+      twitter: "",
+      email: "",
+    },
+  });
+
+  const [isValid, setIsValid] = useState({
+    name: true,
+    profession: true,
+    bio: true,
+  });
+
   const FormTitles = [
     "Welcome",
     "Basic Information",
-    "Hero Section",
     "Projects",
     "Social",
     "Review",
@@ -27,7 +46,14 @@ function CreatePortfolio() {
       case 0:
         return <Welcome />;
       case 1:
-        return <BasicInfo />;
+        return (
+          <BasicInfo
+            formData={formData}
+            setFormData={setFormData}
+            isValid={isValid}
+            setIsValid={setIsValid}
+          />
+        );
       case 2:
         return <Projects />;
       case 3:
@@ -44,6 +70,7 @@ function CreatePortfolio() {
       <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
       <div className="h-screen overflow-x-hidden">
         <Navbar />
+        {console.log(formData)}
 
         <div className="text-center relative w-screen flex flex-col justify-center items-center gap-6 my-12">
           {PageDisplay()}

@@ -3,12 +3,12 @@ import { Box, LinkIcon, Palette } from "lucide-react";
 import FormInput from "./FormInput";
 import TextInput from "./TextInput";
 
-const ProjectCard = () => {
+const ProjectCard = ({ id }) => {
   return (
     <section>
       <div className="p-6 my-4 rounded-xl border border-gray-200 space-y-4 hover:border-primary-300 transition-all duration-300 hover:shadow-lg group">
         <h3 className="font-medium flex items-center">
-          <Box className="mr-2 text-primary-500" size={20} /> Project
+          <Box className="mr-2 text-primary-500" size={20} /> Project {id + 1}
         </h3>
         <FormInput title="" placeholder="Project Title" type="text" />
         <TextInput title="" placeholder="Project Description" rows={4} />
