@@ -33,6 +33,8 @@ function CreatePortfolio() {
     bio: true,
   });
 
+  const [proceed, setProceed] = useState(false);
+
   const FormTitles = [
     "Welcome",
     "Basic Information",
@@ -52,6 +54,7 @@ function CreatePortfolio() {
             setFormData={setFormData}
             isValid={isValid}
             setIsValid={setIsValid}
+            setProceed={setProceed}
           />
         );
       case 2:
@@ -99,7 +102,7 @@ function CreatePortfolio() {
                 className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 size="lg"
                 onClick={() => setPage((currentPage) => currentPage + 1)}
-                disabled={page == FormTitles.length - 1}
+                disabled={!proceed || page === FormTitles.length - 1}
               >
                 {console.log(FormTitles[page])}
                 Next

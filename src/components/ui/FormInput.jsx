@@ -7,6 +7,7 @@ const FormInput = ({
   onChange,
   name,
   isValid = true,
+  value,
 }) => {
   return (
     <div className="flex flex-col justify-start items-start mx-2 my-4 group">
@@ -17,6 +18,7 @@ const FormInput = ({
         name={name}
         type={type}
         placeholder={placeholder}
+        value={value}
         className={`rounded-lg px-4 py-2 w-full outline-none border transition-all duration-300 group-hover:border-primary-400 ${
           isValid
             ? "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"

@@ -4,29 +4,38 @@ import FormInput from "../../ui/FormInput";
 import TextInput from "../../ui/TextInput";
 import { useState } from "react";
 
-const BasicInfo = ({ formData, setFormData, isValid, setIsValid }) => {
-  // const [isValid, setIsValid] = useState({
-  //   name: true,
-  //   profession: true,
-  //   bio: true,
-  // });
-
+const BasicInfo = ({
+  formData,
+  setFormData,
+  isValid,
+  setIsValid,
+  setProceed,
+}) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     const validationRules = {
       name: /^[a-zA-Z\s]*$/,
       profession: /^[a-zA-Z\s]*$/,
-      bio: /^[a-zA-Z\s].{0,159}$/,
+      bio: /^.{0,160}$/,
       picture: /^.*$/,
     };
 
     const validInput = validationRules[name]?.test(value) ?? true;
 
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setIsValid((prev) => ({ ...prev, [name]: validInput }));
-    if (validInput) {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+
+    const allValid =
+      formData.name.trim() &&
+      formData.profession.trim() &&
+      formData.bio.trim() &&
+      validInput &&
+      validationRules["name"].test(formData.name) &&
+      validationRules["profession"].test(formData.profession) &&
+      validationRules["bio"].test(formData.bio);
+
+    setProceed(allValid);
   };
 
   return (
