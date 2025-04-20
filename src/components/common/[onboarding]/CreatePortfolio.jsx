@@ -18,7 +18,9 @@ function CreatePortfolio() {
     profession: "",
     profileImage: "",
     bio: "",
-    projects: [],
+    projects: [
+      { title: "", description: "", project_link: "", project_img: "" },
+    ],
     social: {
       github: "",
       linkedin: "",
