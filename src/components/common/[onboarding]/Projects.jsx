@@ -4,12 +4,34 @@ import React, { useState } from "react";
 import ProjectCard from "../../ui/ProjectCard";
 import { Plus } from "lucide-react";
 
-const Projects = () => {
+const Projects = ({ formData, setFormData }) => {
   const [cards, setCards] = useState([0]);
 
   const addCard = () => {
     if (cards.length >= 3) return;
     setCards((prev) => [...prev, prev.length]);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      projects: [
+        ...prevFormData.projects,
+        {
+          title: "",
+          description: "",
+          project_link: "",
+          project_img: "",
+        },
+      ],
+    }));
+  };
+
+  const removeCard = (indexToRemove) => {
+    setCards((prev) => prev.filter((_, index) => index !== indexToRemove));
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      projects: prevFormData.projects.filter(
+        (_, index) => index !== indexToRemove
+      ),
+    }));
   };
   return (
     <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg flex flex-col justify-center items-center">
@@ -19,7 +41,12 @@ const Projects = () => {
       <div>
         {cards.map((id) => (
           <div key={id} className="animate-fade-in flex flex-col gap-1">
-            <ProjectCard id={id} />
+            <ProjectCard
+              id={id}
+              formData={formData}
+              setFormData={setFormData}
+              removeCard={removeCard}
+            />
           </div>
         ))}
       </div>

@@ -18,13 +18,13 @@ function CreatePortfolio() {
     profession: "",
     profileImage: "",
     bio: "",
-    projects: [],
-    social: {
-      github: "",
-      linkedin: "",
-      twitter: "",
-      email: "",
-    },
+    projects: [
+      { title: "", description: "", project_link: "", project_img: "" },
+    ],
+    github: "",
+    linkedin: "",
+    twitter: "",
+    instagram: "",
   });
 
   const [isValid, setIsValid] = useState({
@@ -58,9 +58,9 @@ function CreatePortfolio() {
           />
         );
       case 2:
-        return <Projects />;
+        return <Projects formData={formData} setFormData={setFormData} />;
       case 3:
-        return <Social />;
+        return <Social formData={formData} setFormData={setFormData} />;
       case 4:
         return <Review />;
     }
@@ -86,14 +86,14 @@ function CreatePortfolio() {
               Get Started
               <ArrowRight className="ml-2" size={20} />
             </button>
-          ) : (
+          ) : page === 3 ? (
             <div className="flex gap-6 justify-center items-center">
               <Button
                 className="text-center relative flex flex-col justify-center items-center hover:bg-background hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 variant={"outline"}
                 size="lg"
                 onClick={() => setPage((currentPage) => currentPage - 1)}
-                disabled={page == 0}
+                disabled={page === 0}
               >
                 Back
               </Button>
@@ -104,7 +104,27 @@ function CreatePortfolio() {
                 onClick={() => setPage((currentPage) => currentPage + 1)}
                 disabled={!proceed || page === FormTitles.length - 1}
               >
-                {console.log(FormTitles[page])}
+                Create Portfolio
+              </Button>
+            </div>
+          ) : page === FormTitles.length - 1 ? null : (
+            <div className="flex gap-6 justify-center items-center">
+              <Button
+                className="text-center relative flex flex-col justify-center items-center hover:bg-background hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                variant={"outline"}
+                size="lg"
+                onClick={() => setPage((currentPage) => currentPage - 1)}
+                disabled={page === 0}
+              >
+                Back
+              </Button>
+
+              <Button
+                className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                size="lg"
+                onClick={() => setPage((currentPage) => currentPage + 1)}
+                disabled={!proceed || page === FormTitles.length - 1}
+              >
                 Next
               </Button>
             </div>
