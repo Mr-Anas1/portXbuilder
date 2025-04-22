@@ -21,7 +21,7 @@ const Navbar = () => {
     <section className="border-b border-gray-200 relative">
       <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 ">
         <div
-          className="flex justify-center items-center gap-2.5"
+          className="flex justify-center items-center gap-2.5 cursor-pointer"
           onClick={() => router.push("/")}
         >
           <div className="flex justify-center items-center">
@@ -68,7 +68,7 @@ const Navbar = () => {
             <div className="flex justify-center items-center gap-4">
               <Link
                 href="/dashboard"
-                className="cursor-pointer hover:text-yellow-300 transition-colors"
+                className="cursor-pointer hover:text-secondary-500 transition-colors"
               >
                 {" "}
                 Dashboard
