@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 const CtaSection = () => {
   return (
@@ -14,11 +15,13 @@ const CtaSection = () => {
           their work and attract clients.
         </p>
 
-        <Button
-          className="bg-white text-primary-500 rounded-full px-6 py-4 font-semibold text-base lg:text-lg hover:bg-primary-100 transition-all duration-300"
-          size="xl"
-        >
-          Create Your Portfolio Now
+        <Button size="xl">
+          <Link
+            href="/create"
+            className="bg-gradient-to-r bg-white text-primary-500 cursor-pointer text-md px-8 py-4 border-none hover:bg-primary-50 hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl rounded-full lg:text-lg"
+          >
+            Create Your Portfolio Now
+          </Link>
         </Button>
       </div>
     </section>

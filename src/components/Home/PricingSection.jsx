@@ -225,7 +225,7 @@ export default function PricingSectionCards() {
           </Card>
           {/* End Card */}
           {/* Card */}
-          <Card className="flex flex-col  w-full">
+          <Card className="flex flex-col  w-full transition duration-300 hover:scale-105">
             <CardHeader className="text-center pb-2">
               <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
                 Ultimate
