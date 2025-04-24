@@ -1,9 +1,77 @@
 "use client";
 
 import Navbar from "@/components/common/Navbar/Page";
-import { SignIn } from "@clerk/nextjs";
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const handleSignInClick = async (e) => {
+    e.preventDefault();
+
+    const { email, password } = formData;
+
+    const newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+    } else if (password.length > 20) {
+      newErrors.password = "Password must be less than 20 characters long";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      console.log("Sign In successful", formData);
+    }
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error("Error signing in:", error.message);
+        setErrors({ signIn: "Invalid email or password" });
+        return;
+      }
+      console.log("Login successful!", data);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error signing in:", error.message);
+      setErrors({ signIn: "An error occurred during sign in" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="flex flex-col min-h-screen bg-background">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -30,6 +98,8 @@ export default function Page() {
                   id="email"
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
                   required
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -42,12 +112,15 @@ export default function Page() {
                   id="password"
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
                   required
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </div>
 
               <button
                 type="submit"
                 className="w-full bg-primary-500 text-white font-semibold py-2 rounded-md hover:bg-primary-600 transition duration-200"
+                onClick={handleSignInClick}
               >
                 Sign In
               </button>
@@ -62,7 +135,7 @@ export default function Page() {
 
             <div className="flex items-center justify-center mt-4">
               <p className="text-sm text-gray-600">
-                New to our service?{" "}
+                Don't have an account?{" "}
                 <a href="/sign-up" className="text-primary-500 font-semibold">
                   Sign Up
                 </a>

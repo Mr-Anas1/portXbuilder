@@ -1,6 +1,83 @@
+"use client";
 import Navbar from "@/components/common/Navbar/Page";
+import { useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
+  const router = useRouter();
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value,
+    }));
+  };
+
+  const handleSignUpClick = async (e) => {
+    e.preventDefault();
+
+    const { name, email, password } = formData;
+    const newErrors = {};
+
+    // Form validation
+    if (!name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (name.length < 3) {
+      newErrors.name = "Name must be at least 3 characters long";
+    } else if (name.length > 50) {
+      newErrors.name = "Name must be less than 50 characters long";
+    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+      newErrors.name = "Name must contain only letters and spaces";
+    }
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+    } else if (password.length > 20) {
+      newErrors.password = "Password must be less than 20 characters long";
+    }
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        console.error("Signup failed:", error.message);
+        return;
+      }
+
+      console.log(
+        "Signup successful! Please check your email to verify your account before continuing."
+      );
+      router.push("/dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="flex flex-col min-h-screen bg-background">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -25,9 +102,13 @@ export default function Page() {
                 <input
                   type="text"
                   id="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                  required
                 />
+                {errors.name && (
+                  <p className="text-sm text-red-500">{errors.name}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
@@ -37,9 +118,13 @@ export default function Page() {
                 <input
                   type="email"
                   id="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                  required
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2">
@@ -49,16 +134,26 @@ export default function Page() {
                 <input
                   type="password"
                   id="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
-                  required
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password}</p>
+                )}
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-primary-500 text-white font-semibold py-2 rounded-md hover:bg-primary-600 transition duration-200"
+                className="w-full bg-primary-500 text-white font-semibold py-2 rounded-md hover:bg-primary-600 transition duration-200 flex items-center justify-center"
+                onClick={handleSignUpClick}
+                disabled={loading}
               >
-                Sign Up
+                {loading ? (
+                  <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-5 h-5"></span>
+                ) : (
+                  "Sign Up"
+                )}
               </button>
             </form>
 
