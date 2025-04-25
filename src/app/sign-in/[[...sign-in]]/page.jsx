@@ -4,6 +4,7 @@ import Navbar from "@/components/common/Navbar/Page";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const router = useRouter();
@@ -115,6 +116,12 @@ export default function Page() {
                   value={formData.password}
                   onChange={handleChange}
                 />
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary-600 hover:underline"
+                >
+                  Forgot password?
+                </Link>
               </div>
 
               <button
