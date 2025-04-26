@@ -17,10 +17,17 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!access_token) {
-      router.replace("/forgot-password");
-    }
-  }, [access_token, router]);
+    const checkUserSession = async () => {
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data.user) {
+        console.error("No active user session:", error?.message);
+        router.replace("/sign-in"); // Not logged in, redirect to login
+      }
+    };
+
+    checkUserSession();
+  }, [router]);
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
@@ -54,7 +61,6 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -62,7 +68,59 @@ const ResetPassword = () => {
         <form
           onSubmit={handleResetPassword}
           className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
-        ></form>
+        >
+          <h2 className="text-2xl font-semibold mb-6 text-center">
+            Reset Password
+          </h2>
+
+          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+          {successMessage && (
+            <div className="text-green-500 text-sm mb-4">{successMessage}</div>
+          )}
+
+          <div className="mb-4">
+            <label
+              htmlFor="new-password"
+              className="block text-sm font-semibold"
+            >
+              New Password
+            </label>
+            <input
+              type="password"
+              id="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              minLength="8"
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              htmlFor="confirm-password"
+              className="block text-sm font-semibold"
+            >
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="confirm-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary-600 text-white py-2 rounded-md hover:bg-primary-500 focus:outline-none"
+          >
+            {loading ? "Resetting..." : "Reset Password"}
+          </button>
+        </form>
       </div>
     </div>
   );
