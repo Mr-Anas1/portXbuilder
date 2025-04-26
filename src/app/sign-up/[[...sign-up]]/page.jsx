@@ -69,9 +69,13 @@ export default function Page() {
         return;
       }
 
+      // ✅ Save the email to localStorage
+      localStorage.setItem("signup_email", email);
+
       console.log(
         "Signup successful! Please check your email to verify your account before continuing."
       );
+
       router.push("/dashboard");
     } finally {
       setLoading(false);
