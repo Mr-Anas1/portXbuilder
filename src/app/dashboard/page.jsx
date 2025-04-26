@@ -1,12 +1,11 @@
 "use client";
+import Navbar from "@/components/common/Navbar/Page";
 import React, { useState, useEffect } from "react";
 
 const Dashboard = () => {
   return (
-    <section>
-      <div>
-        <h1>Dashboard</h1>
-      </div>
+    <section className="min-h-screen flex flex-col bg-background">
+      <Navbar />
     </section>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/common/Navbar/Page";
@@ -11,6 +11,21 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        router.replace("/dashboard"); // Redirect logged-in users
+      }
+    };
+
+    checkUser();
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,12 +42,17 @@ export default function ForgotPasswordPage() {
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Reset link sent! Check your email.");
+      setMessage(
+        "We've sent a password reset link if the email matches an account."
+      );
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 right-[10px] w-32 h-32 bg-secondary-400/20 rounded-full blur-2xl" />
+      <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
       <Navbar />
       <div className="flex flex-grow items-center justify-center p-4">
         <form

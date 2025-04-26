@@ -28,7 +28,7 @@ export default function Page() {
     const { name, email, password } = formData;
     const newErrors = {};
 
-    // Form validation
+    // Form validation logic (same as before)
     if (!name.trim()) {
       newErrors.name = "Name is required";
     } else if (name.length < 3) {
@@ -59,23 +59,36 @@ export default function Page() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // Check if a user is already logged in
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData) {
+        // If already logged in, redirect to dashboard
+        router.push("/sign-in");
+        return;
+      }
+
+      // Attempt to sign up
+      const { user, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) {
+        if (error.message === "Email already registered") {
+          // If email already exists, redirect to login page
+          router.push("/sign-in");
+          return;
+        }
         console.error("Signup failed:", error.message);
         return;
       }
 
-      // ✅ Save the email to localStorage
+      // Save email in localStorage for later use (confirmation)
       localStorage.setItem("signup_email", email);
 
       console.log(
         "Signup successful! Please check your email to verify your account before continuing."
       );
-
       router.push("/dashboard");
     } finally {
       setLoading(false);
