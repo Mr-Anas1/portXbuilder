@@ -3,6 +3,7 @@ import Navbar from "@/components/common/Navbar/Page";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Sidebar from "@/components/common/Sidebar/Page";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true); // Set to true initially
@@ -34,7 +35,7 @@ const Dashboard = () => {
   return (
     <section className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <div>Welcome, {user?.email}</div> {/* Display user info */}
+      <Sidebar />
     </section>
   );
 };
