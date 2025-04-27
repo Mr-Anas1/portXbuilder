@@ -3,11 +3,13 @@ import Navbar from "@/components/common/Navbar/Page";
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Page() {
   const router = useRouter();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -28,7 +30,6 @@ export default function Page() {
     const { name, email, password } = formData;
     const newErrors = {};
 
-    // Form validation logic (same as before)
     if (!name.trim()) {
       newErrors.name = "Name is required";
     } else if (name.length < 3) {
@@ -95,6 +96,18 @@ export default function Page() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+      },
+    });
+    if (error) {
+      console.error("Error signing in with Google:", error.message);
+    }
+  };
+
   return (
     <section className="flex flex-col min-h-screen bg-background">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -144,17 +157,24 @@ export default function Page() {
                 )}
               </div>
 
-              <div className="flex flex-col space-y-2">
+              <div className="relative flex flex-col space-y-2">
                 <label htmlFor="password" className="text-sm text-gray-600">
                   Password
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  className=" border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
                 />
+                <div
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </div>
+
                 {errors.password && (
                   <p className="text-sm text-red-500">{errors.password}</p>
                 )}
@@ -176,7 +196,10 @@ export default function Page() {
 
             <div className="w-full h-[1px] bg-gray-300"></div>
 
-            <div className="flex justify-center gap-2 items-center border my-6 border-gray-300 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-100 transition duration-200">
+            <div
+              className="flex justify-center gap-2 items-center border my-6 border-gray-300 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-100 transition duration-200"
+              onClick={handleGoogleSignIn}
+            >
               <img src="/google.svg" alt="Google Logo" className="w-5 h-5" />
               <p>Continue with Google</p>
             </div>

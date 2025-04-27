@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Navbar from "@/components/common/Navbar/Page";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 
 const ResetPassword = () => {
   const router = useRouter();
@@ -15,6 +16,7 @@ const ResetPassword = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -63,64 +65,83 @@ const ResetPassword = () => {
   };
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Navbar />
-      <div className="flex flex-grow items-center justify-center p-4">
-        <form
-          onSubmit={handleResetPassword}
-          className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
-        >
-          <h2 className="text-2xl font-semibold mb-6 text-center">
-            Reset Password
-          </h2>
-
-          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
-          {successMessage && (
-            <div className="text-green-500 text-sm mb-4">{successMessage}</div>
-          )}
-
-          <div className="mb-4">
-            <label
-              htmlFor="new-password"
-              className="block text-sm font-semibold"
-            >
-              New Password
-            </label>
-            <input
-              type="password"
-              id="new-password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              minLength="8"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              htmlFor="confirm-password"
-              className="block text-sm font-semibold"
-            >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirm-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary-600 text-white py-2 rounded-md hover:bg-primary-500 focus:outline-none"
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 right-[10px] w-32 h-32 bg-secondary-400/20 rounded-full blur-2xl" />
+      <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
+      <div className="flex flex-col min-h-screen bg-background">
+        <Navbar />
+        <div className="flex flex-grow items-center justify-center p-4">
+          <form
+            onSubmit={handleResetPassword}
+            className="bg-white p-8 rounded-xl shadow-md w-full max-w-md"
           >
-            {loading ? "Resetting..." : "Reset Password"}
-          </button>
-        </form>
+            <h2 className="text-2xl font-semibold mb-6 text-center">
+              Reset Password
+            </h2>
+
+            {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+            {successMessage && (
+              <div className="text-green-500 text-sm mb-4">
+                {successMessage}
+              </div>
+            )}
+
+            <div className="mb-4 relative">
+              <label
+                htmlFor="new-password"
+                className="block text-sm font-semibold"
+              >
+                New Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength="8"
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+              />
+              <div
+                className="absolute right-3 top-7 cursor-pointer"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </div>
+            </div>
+
+            <div className="mb-4 relative">
+              <label
+                htmlFor="confirm-password"
+                className="block text-sm font-semibold"
+              >
+                Confirm Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                id="confirm-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600"
+              />
+              <div
+                className="absolute right-3 top-7 cursor-pointer"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary-600 text-white py-2 rounded-md hover:bg-primary-500 focus:outline-none"
+            >
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

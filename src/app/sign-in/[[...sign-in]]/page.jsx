@@ -5,11 +5,14 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -73,6 +76,35 @@ export default function Page() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+
+    const { user, session, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      console.error("Google sign-in error:", error.message);
+      setLoading(false);
+    }
+
+    // Wait for session state change
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === "SIGNED_IN") {
+          console.log("User signed in:", session.user);
+          // Redirect to /dashboard after successful login
+          router.push("/dashboard");
+        }
+      }
+    );
+
+    // Clean up listener
+    return () => {
+      authListener?.unsubscribe();
+    };
+  };
+
   return (
     <section className="flex flex-col min-h-screen bg-background">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -104,18 +136,24 @@ export default function Page() {
                 />
               </div>
 
-              <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-2 relative">
                 <label htmlFor="password" className="text-sm text-gray-600">
                   Password
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
                   required
                   value={formData.password}
                   onChange={handleChange}
                 />
+                <div
+                  className="absolute right-3 top-7 cursor-pointer"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </div>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-primary-600 hover:underline"
@@ -135,9 +173,12 @@ export default function Page() {
 
             <div className="w-full h-[1px] bg-gray-300"></div>
 
-            <div className="flex justify-center gap-2 items-center border my-6 border-gray-300 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-100 transition duration-200">
+            <div
+              className="flex justify-center gap-2 items-center border my-6 border-gray-300 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-100 transition duration-200"
+              onClick={handleGoogleSignIn}
+            >
               <img src="/google.svg" alt="Google Logo" className="w-5 h-5" />
-              <p>Continue with Google</p>
+              {loading ? "Signing in..." : "Continue with Google"}
             </div>
 
             <div className="flex items-center justify-center mt-4">
