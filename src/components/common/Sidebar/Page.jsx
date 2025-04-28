@@ -17,11 +17,18 @@ import React from "react";
 import { useState } from "react";
 import { MinusCircle } from "lucide-react";
 
-const Page = () => {
-  const [activeSection, setActiveSection] = useState("navbar");
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [newSectionName, setNewSectionName] = useState("");
-
+const Page = ({
+  activeSection,
+  setActiveSection,
+  showOverlay,
+  setShowOverlay,
+  newSectionName,
+  setNewSectionName,
+  removeSection,
+  customSectionsCount,
+  sections,
+  setSections,
+}) => {
   const availableIcons = [
     GitBranch,
     User,
@@ -30,30 +37,6 @@ const Page = () => {
     FileText,
     MapPin,
   ];
-
-  const [sections, setSections] = useState([
-    { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
-    { id: "hero", label: "Hero", icon: Sparkles, isCustom: false },
-    { id: "projects", label: "Projects", icon: FolderKanban, isCustom: false },
-    { id: "contact", label: "Contact", icon: Contact, isCustom: false },
-    {
-      id: "footer",
-      label: "Footer",
-      icon: LayoutPanelTopIcon,
-      isCustom: false,
-    },
-  ]);
-
-  const removeSection = (id) => {
-    setSections((prevSection) =>
-      prevSection.filter((section) => section.id !== id)
-    );
-  };
-
-  const customSectionsCount = sections.filter(
-    (section) => section.isCustom
-  ).length;
-
   return (
     <section className="md:block w-[20%] h-[calc(100vh-80px)] fixed top-20 bg-background border-r border-t border-gray-200 hidden ">
       <div className="flex flex-col h-full">
