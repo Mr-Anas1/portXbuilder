@@ -55,7 +55,7 @@ const Page = () => {
   ).length;
 
   return (
-    <section className="w-[20%] h-[calc(100vh-80px)] fixed top-20 bg-background border-r border-t border-gray-200">
+    <section className="md:block w-[20%] h-[calc(100vh-80px)] fixed top-20 bg-background border-r border-t border-gray-200 hidden ">
       <div className="flex flex-col h-full">
         <div className="flex flex-col mx-4 h-full">
           <ul className="mt-4 space-y-2">
