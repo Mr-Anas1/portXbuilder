@@ -1,18 +1,60 @@
 import React from "react";
+import SidebarContent from "@/components/ui/SidebarContent";
+import AddSectionOverlay from "@/components/ui/AddSectionOverlay";
 
-const MobileSidebar = ({ setMobileSidebarOpen }) => {
+const MobileSidebar = ({
+  sections,
+  activeSection,
+  setActiveSection,
+  showOverlay,
+  setShowOverlay,
+  newSectionName,
+  setNewSectionName,
+  removeSection,
+  availableIcons,
+  mobileSidebarOpen,
+}) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div className="w-1/2 bg-white h-full shadow-lg p-4">
-        {/* Sidebar content */}
-        <button
-          onClick={() => setMobileSidebarOpen(false)}
-          className="mt-4 p-2 bg-red-500 text-white rounded"
-        >
-          Close
-        </button>
+    <section
+      className={`${
+        mobileSidebarOpen ? "block" : "hidden"
+      } md:hidden w-full h-[calc(100vh-80px)] fixed top-20 bg-background border-r border-t border-gray-200`}
+    >
+      <div className="flex flex-col h-full">
+        <SidebarContent
+          sections={sections}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          removeSection={removeSection}
+        />
+        <div className="flex items-center justify-center mb-16">
+          <button
+            className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in ${
+              sections.length >= 3
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+            }`}
+            onClick={() => setShowOverlay(true)}
+            disabled={sections.length >= 9}
+          >
+            Add Section
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* Conditionally render overlay */}
+      {showOverlay && (
+        <AddSectionOverlay
+          showOverlay={showOverlay}
+          setShowOverlay={setShowOverlay}
+          newSectionName={newSectionName}
+          setNewSectionName={setNewSectionName}
+          sections={sections}
+          availableIcons={availableIcons}
+          setSections={setSections}
+        />
+      )}
+    </section>
   );
 };
 
