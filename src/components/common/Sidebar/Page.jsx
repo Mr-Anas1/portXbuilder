@@ -5,104 +5,164 @@ import {
   LayoutGrid,
   LayoutPanelTopIcon,
   Sparkles,
+  GitBranch,
+  User,
+  Settings,
+  Calendar,
+  FileText,
+  MapPin,
 } from "lucide-react";
+
 import React from "react";
 import { useState } from "react";
+import { MinusCircle } from "lucide-react";
 
 const Page = () => {
   const [activeSection, setActiveSection] = useState("navbar");
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [newSectionName, setNewSectionName] = useState("");
+
+  const availableIcons = [
+    GitBranch,
+    User,
+    Settings,
+    Calendar,
+    FileText,
+    MapPin,
+  ];
+
+  const [sections, setSections] = useState([
+    { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
+    { id: "hero", label: "Hero", icon: Sparkles, isCustom: false },
+    { id: "projects", label: "Projects", icon: FolderKanban, isCustom: false },
+    { id: "contact", label: "Contact", icon: Contact, isCustom: false },
+    {
+      id: "footer",
+      label: "Footer",
+      icon: LayoutPanelTopIcon,
+      isCustom: false,
+    },
+  ]);
+
+  const removeSection = (id) => {
+    setSections((prevSection) =>
+      prevSection.filter((section) => section.id !== id)
+    );
+  };
+
+  const customSectionsCount = sections.filter(
+    (section) => section.isCustom
+  ).length;
+
   return (
-    <section className="w-[20%] h-screen fixed top-20  bg-background border-r border-t border-gray-200 ">
-      <div>
-        <div className="flex flex-col mx-4 justify-center h-full">
+    <section className="w-[20%] h-[calc(100vh-80px)] fixed top-20 bg-background border-r border-t border-gray-200">
+      <div className="flex flex-col h-full">
+        <div className="flex flex-col mx-4 h-full">
           <ul className="mt-4 space-y-2">
-            <li
-              id="navbar"
-              onClick={() => setActiveSection("navbar")}
-              className={`text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
-            ${
-              activeSection === "navbar"
-                ? "bg-primary-500 text-white hover:bg-primary-600"
-                : "hover:bg-primary-100"
-            }`}
-            >
-              <div>
-                <LayoutGrid />
-              </div>
-              <div className="font-semibold ">Navbar</div>
-            </li>
+            {sections.map((section) => {
+              const Icon = section.icon;
 
-            <li
-              id="hero"
-              onClick={() => setActiveSection("hero")}
-              className={`text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
-            ${
-              activeSection === "hero"
-                ? "bg-primary-500 text-white hover:bg-primary-600"
-                : "hover:bg-primary-100"
-            }`}
-            >
-              <div>
-                <Sparkles />
-              </div>
-              <div className="font-semibold ">Hero</div>
-            </li>
+              return (
+                <li
+                  key={section.id}
+                  id={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
+                  ${
+                    activeSection === section.id
+                      ? "bg-primary-500 text-white hover:bg-primary-600"
+                      : "hover:bg-primary-100"
+                  }`}
+                >
+                  <div>
+                    <Icon />
+                  </div>
+                  <div className="font-semibold">{section.label}</div>
 
-            <li
-              id="projects"
-              onClick={() => setActiveSection("projects")}
-              className={`text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
-            ${
-              activeSection === "projects"
-                ? "bg-primary-500 text-white hover:bg-primary-600"
-                : "hover:bg-primary-100"
-            }`}
-            >
-              <div>
-                <FolderKanban />
-              </div>
-              <div className="font-semibold ">projects</div>
-            </li>
-
-            <li
-              id="contact"
-              onClick={() => setActiveSection("contact")}
-              className={`text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
-            ${
-              activeSection === "contact"
-                ? "bg-primary-500 text-white hover:bg-primary-600"
-                : "hover:bg-primary-100"
-            }`}
-            >
-              <div>
-                <Contact />
-              </div>
-              <div className="font-semibold ">contact</div>
-            </li>
-
-            <li
-              id="footer"
-              onClick={() => setActiveSection("footer")}
-              className={`text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
-            ${
-              activeSection === "footer"
-                ? "bg-primary-500 text-white hover:bg-primary-600"
-                : "hover:bg-primary-100"
-            }`}
-            >
-              <div>
-                <LayoutPanelTopIcon />
-              </div>
-              <div className="font-semibold ">footer</div>
-            </li>
+                  {section.isCustom && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSection(section.id);
+                      }}
+                      className="absolute top-1/5 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    >
+                      <MinusCircle size={20} />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
-        <div>
-          <button className="px-4 py-2 rounded-md bg-red-500 text-white text-md">
+        <div className="flex items-center justify-center mb-16">
+          <button
+            className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in
+    ${
+      customSectionsCount >= 3
+        ? "bg-gray-300 cursor-not-allowed"
+        : "bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+    }`}
+            onClick={() => setShowOverlay(true)}
+            disabled={customSectionsCount >= 3}
+          >
             Add Section
           </button>
         </div>
       </div>
+
+      {showOverlay && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col gap-4 sm:w-[450px] w-[250px]">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Add New Section
+            </h2>
+            <input
+              type="text"
+              placeholder="Enter section name"
+              value={newSectionName}
+              onChange={(e) => setNewSectionName(e.target.value)}
+              className="border border-gray-300 rounded-md p-2 outline-none focus:ring-2 focus:ring-primary-500"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowOverlay(false)}
+                className="px-3 py-1 bg-gray-300 rounded-md text-gray-700 hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (newSectionName.trim() !== "") {
+                    const sanitizedSectionName = newSectionName
+                      .trim()
+                      .replace(/[^a-zA-Z0-9\s-]/g, "")
+                      .replace(/\s+/g, "-");
+
+                    const randomIcon =
+                      availableIcons[
+                        Math.floor(Math.random() * availableIcons.length)
+                      ];
+
+                    const newSection = {
+                      id: sanitizedSectionName.toLowerCase(),
+                      label: sanitizedSectionName,
+                      icon: randomIcon,
+                      isCustom: true,
+                    };
+                    setSections([...sections, newSection]);
+                    setNewSectionName("");
+                    setShowOverlay(false);
+                  }
+                }}
+                className="px-3 py-1 bg-primary-500 text-white rounded-md hover:bg-primary-600"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
