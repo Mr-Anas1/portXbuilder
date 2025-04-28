@@ -1,10 +1,5 @@
 "use client";
 import {
-  Contact,
-  FolderKanban,
-  LayoutGrid,
-  LayoutPanelTopIcon,
-  Sparkles,
   GitBranch,
   User,
   Settings,
@@ -12,9 +7,7 @@ import {
   FileText,
   MapPin,
 } from "lucide-react";
-
 import React from "react";
-import { useState } from "react";
 import { MinusCircle } from "lucide-react";
 
 const Page = ({
@@ -28,6 +21,7 @@ const Page = ({
   customSectionsCount,
   sections,
   setSections,
+  handleScrollToSection,
 }) => {
   const availableIcons = [
     GitBranch,
@@ -49,7 +43,10 @@ const Page = ({
                 <li
                   key={section.id}
                   id={section.id}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => {
+                    setActiveSection(section.id);
+                    handleScrollToSection(section.id);
+                  }}
                   className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
                   ${
                     activeSection === section.id

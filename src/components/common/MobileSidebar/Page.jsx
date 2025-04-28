@@ -11,6 +11,7 @@ import {
   Calendar,
   FileText,
   MapPin,
+  X,
 } from "lucide-react";
 import { useEffect } from "react";
 
@@ -53,72 +54,65 @@ const MobileSidebar = ({
   }, []);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
-      <div className="w-[60%] bg-white h-full shadow-lg p-4">
-        <div className="flex flex-col h-full">
-          <div className="flex flex-col mx-4 h-full">
-            <ul className="mt-4 space-y-2">
-              {sections.map((section) => {
-                const Icon = section.icon;
+      <div className="w-[50%] bg-background h-full shadow-lg p-4 relative">
+        <div className="flex flex-col mx-2 h-full mt-10">
+          <ul className="mt-4 space-y-2">
+            {sections.map((section) => {
+              const Icon = section.icon;
 
-                return (
-                  <li
-                    key={section.id}
-                    id={section.id}
-                    onClick={() => setActiveSection(section.id)}
-                    className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
+              return (
+                <li
+                  key={section.id}
+                  id={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
                   ${
                     activeSection === section.id
                       ? "bg-primary-500 text-white hover:bg-primary-600"
                       : "hover:bg-primary-100"
                   }`}
-                  >
-                    <div>
-                      <Icon />
-                    </div>
-                    <div className="font-semibold">{section.label}</div>
+                >
+                  <div>
+                    <Icon />
+                  </div>
+                  <div className="font-semibold">{section.label}</div>
 
-                    {section.isCustom && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSection(section.id);
-                        }}
-                        className="absolute top-1/5 right-2 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                      >
-                        <MinusCircle size={20} />
-                      </button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          <div className="flex items-center justify-center mb-16">
-            <button
-              className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in
-    ${
-      customSectionsCount >= 3
-        ? "bg-gray-300 cursor-not-allowed"
-        : "bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-    }`}
-              onClick={() => setShowOverlay(true)}
-              disabled={customSectionsCount >= 3}
-            >
-              Add Section
-            </button>
+                  {section.isCustom && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeSection(section.id);
+                      }}
+                      className="absolute top-1/5 right-2 text-red-500  transition-opacity duration-200"
+                    >
+                      <MinusCircle size={20} />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="flex items-center justify-center mb-16">
+          <button
+            className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in
+            ${
+              customSectionsCount >= 3
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+            }`}
+            onClick={() => setShowOverlay(true)}
+            disabled={customSectionsCount >= 3}
+          >
+            Add Section
+          </button>
 
-            <button
-              className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in
-    ${
-      customSectionsCount >= 3
-        ? "bg-gray-300 cursor-not-allowed"
-        : "bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-    }`}
-              onClick={() => setMobileSidebarOpen(false)}
-            >
-              Cancel
-            </button>
-          </div>
+          <button
+            className="absolute top-6 left-8"
+            onClick={() => setMobileSidebarOpen(false)}
+          >
+            <X size={26} className="text-black" />
+          </button>
         </div>
 
         {showOverlay && (
@@ -173,13 +167,6 @@ const MobileSidebar = ({
             </div>
           </div>
         )}
-
-        <button
-          onClick={() => setMobileSidebarOpen(false)}
-          className="mt-4 p-2 bg-red-500 text-white rounded"
-        >
-          Close
-        </button>
       </div>
     </div>
   );

@@ -12,8 +12,18 @@ import {
   LayoutPanelTopIcon,
   Sparkles,
 } from "lucide-react";
+import NavbarSection from "@/components/Navbars/NavbarSection";
+import HeroSection from "@/components/HeroSections/HeroSection";
+import ProjectsSection from "@/components/Projects/ProjectSection";
+import { useRef } from "react";
 
 const Dashboard = () => {
+  const navbarRef = useRef(null);
+  const heroRef = useRef(null);
+  const projectsRef = useRef(null);
+  const contactRef = useRef(null);
+  const footerRef = useRef(null);
+
   const [activeSection, setActiveSection] = useState("navbar");
   const [showOverlay, setShowOverlay] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
@@ -67,9 +77,29 @@ const Dashboard = () => {
     );
   }
 
+  const handleScrollToSection = (sectionId) => {
+    if (sectionId === "navbar" && navbarRef.current) {
+      navbarRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    if (sectionId === "hero" && heroRef.current) {
+      heroRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+    if (sectionId === "projects" && projectsRef.current) {
+      projectsRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (sectionId === "contact" && contactRef.current) {
+      contactRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+
+    if (sectionId === "footer" && footerRef.current) {
+      footerRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
-      <Navbar />
+      <Navbar isDashboard={true} />
       <div className="flex">
         <Sidebar
           activeSection={activeSection}
@@ -82,6 +112,7 @@ const Dashboard = () => {
           customSectionCount={customSectionsCount}
           sections={sections}
           setSections={setSections}
+          handleScrollToSection={handleScrollToSection}
         />
         {mobileSidebarOpen && (
           <MobileSidebar
@@ -98,6 +129,32 @@ const Dashboard = () => {
             setSections={setSections}
           />
         )}
+        <div className="flex-1 ml-[20%] p-4 overflow-y-auto">
+          <section ref={navbarRef} id="navbar" className="min-h-screen py-12">
+            <NavbarSection />
+          </section>
+
+          <section ref={heroRef} id="hero" className="min-h-screen py-12">
+            <HeroSection />
+          </section>
+
+          <section
+            ref={projectsRef}
+            id="projects"
+            className="min-h-screen py-12"
+          >
+            <ProjectsSection />
+          </section>
+
+          <section ref={contactRef} id="contact" className="min-h-screen py-12">
+            <ProjectsSection />
+          </section>
+
+          <section ref={footerRef} id="footer" className="min-h-screen py-12">
+            <ProjectsSection />
+          </section>
+        </div>
+
         <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 md:hidden">
           <button
             className={
