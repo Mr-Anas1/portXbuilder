@@ -59,7 +59,7 @@ const Page = ({
                   </div>
                   <div className="font-semibold">{section.label}</div>
 
-                  {section.isCustom && (
+                  {/* {section.isCustom && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -69,12 +69,15 @@ const Page = ({
                     >
                       <MinusCircle size={20} />
                     </button>
-                  )}
+                  )} */}
                 </li>
               );
             })}
           </ul>
         </div>
+
+        {/* ADD SECTION FEATURE */}
+
         {/* <div className="flex items-center justify-center mb-16">
           <button
             className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in

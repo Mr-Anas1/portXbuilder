@@ -44,8 +44,8 @@ const Navbar = ({ isDashboard }) => {
   };
 
   return (
-    <section className="border-b border-gray-200 relative">
-      <div className={`${isDashboard ? "fixed w-screen" : " "}`}>
+    <section className="border-b border-gray-200 relative ">
+      <div className={`${isDashboard ? "fixed w-screen z-50" : " "} `}>
         <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 relative ">
           <div
             className="flex justify-center items-center gap-2.5 cursor-pointer"

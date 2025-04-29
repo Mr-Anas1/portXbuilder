@@ -29,6 +29,7 @@ const MobileSidebar = ({
   customSectionsCount,
   sections,
   setSections,
+  handleScrollToSection,
 }) => {
   const availableIcons = [
     GitBranch,
@@ -64,7 +65,11 @@ const MobileSidebar = ({
                 <li
                   key={section.id}
                   id={section.id}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => {
+                    setActiveSection(section.id);
+                    handleScrollToSection(section.id);
+                    setMobileSidebarOpen(false);
+                  }}
                   className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
                   ${
                     activeSection === section.id
@@ -77,7 +82,7 @@ const MobileSidebar = ({
                   </div>
                   <div className="font-semibold">{section.label}</div>
 
-                  {section.isCustom && (
+                  {/* {section.isCustom && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -87,7 +92,7 @@ const MobileSidebar = ({
                     >
                       <MinusCircle size={20} />
                     </button>
-                  )}
+                  )} */}
                 </li>
               );
             })}
