@@ -75,7 +75,7 @@ const Page = ({
             })}
           </ul>
         </div>
-        <div className="flex items-center justify-center mb-16">
+        {/* <div className="flex items-center justify-center mb-16">
           <button
             className={`px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in
     ${
@@ -88,10 +88,10 @@ const Page = ({
           >
             Add Section
           </button>
-        </div>
+        </div> */}
       </div>
 
-      {showOverlay && (
+      {/* {showOverlay && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col gap-4 sm:w-[450px] w-[250px]">
             <h2 className="text-lg font-semibold text-gray-800">
@@ -142,7 +142,7 @@ const Page = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </section>
   );
 };
