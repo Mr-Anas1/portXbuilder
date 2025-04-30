@@ -162,30 +162,36 @@ const Dashboard = () => {
           />
         )}
 
-        <div className="flex-1 ml-[20%] p-4 overflow-y-auto">
-          <section ref={navbarRef} id="navbar" className="min-h-screen py-12">
-            <selectedComponent.navbar />
-          </section>
+        <div className="flex-1 mt-16 border-1">
+          <div className="flex-1 ml-[0] md:ml-[20%] py-4 overflow-y-auto  ">
+            <section ref={navbarRef} id="navbar" className="min-h-full">
+              <selectedComponent.navbar />
+            </section>
 
-          <section ref={heroRef} id="hero" className="min-h-screen py-12">
-            <selectedComponent.hero />
-          </section>
+            <section ref={heroRef} id="hero" className="min-h-screen py-12">
+              <selectedComponent.hero />
+            </section>
 
-          <section
-            ref={projectsRef}
-            id="projects"
-            className="min-h-screen py-12"
-          >
-            <selectedComponent.projects />
-          </section>
+            <section
+              ref={projectsRef}
+              id="projects"
+              className="min-h-screen py-12"
+            >
+              <selectedComponent.projects />
+            </section>
 
-          <section ref={contactRef} id="contact" className="min-h-screen py-12">
-            <selectedComponent.contact />
-          </section>
+            <section
+              ref={contactRef}
+              id="contact"
+              className="min-h-screen py-12"
+            >
+              <selectedComponent.contact />
+            </section>
 
-          <section ref={footerRef} id="footer" className="min-h-screen py-12">
-            <selectedComponent.footer />
-          </section>
+            <section ref={footerRef} id="footer" className="min-h-screen py-12">
+              <selectedComponent.footer />
+            </section>
+          </div>
         </div>
 
         <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 md:hidden">

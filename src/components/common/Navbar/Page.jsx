@@ -45,7 +45,11 @@ const Navbar = ({ isDashboard }) => {
 
   return (
     <section className="border-b border-gray-200 relative ">
-      <div className={`${isDashboard ? "fixed w-screen z-50" : " "} `}>
+      <div
+        className={`${
+          isDashboard ? "fixed w-screen z-50 bg-background" : " "
+        } `}
+      >
         <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 relative ">
           <div
             className="flex justify-center items-center gap-2.5 cursor-pointer"
@@ -162,7 +166,7 @@ const Navbar = ({ isDashboard }) => {
         </div>
       </div>
       {isOpen && (
-        <div className="md:hidden fixed inset-0 z-[999] h-full  overflow-hidden  bg-background w-full text-black mt-2 pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
+        <div className="md:hidden fixed inset-0 z-[999] h-full  overflow-hidden  bg-background w-full text-black  pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
           {!user ? (
             <div>
               <Link
@@ -194,7 +198,11 @@ const Navbar = ({ isDashboard }) => {
           <div>
             {user ? (
               <div className="flex justify-center items-center gap-12 flex-col">
-                <Link href="/dashboard" className="cursor-pointer">
+                <Link
+                  href="/dashboard"
+                  className="cursor-pointer"
+                  onClick={() => setIsOpen(false)}
+                >
                   {" "}
                   Dashboard
                 </Link>
