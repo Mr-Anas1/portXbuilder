@@ -50,7 +50,7 @@ const Navbar = ({ isDashboard }) => {
           isDashboard ? "fixed w-screen z-50 bg-background" : " "
         } `}
       >
-        <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 relative ">
+        <div className="h-16 flex justify-between items-center px-5 md:px-10 lg:px-20 py-10 relative border-b border-gray-200">
           <div
             className="flex justify-center items-center gap-2.5 cursor-pointer"
             onClick={() => router.push("/")}

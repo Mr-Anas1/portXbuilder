@@ -7,6 +7,7 @@ import Sidebar from "@/components/common/Sidebar/Page";
 import MobileSidebar from "@/components/common/MobileSidebar/Page";
 import {
   Contact,
+  Drama,
   FolderKanban,
   LayoutGrid,
   LayoutPanelTopIcon,
@@ -23,10 +24,12 @@ import { heroComponents } from "@/components/HeroSections/index";
 import { projectsComponents } from "@/components/Projects/index";
 import { contactComponents } from "@/components/ContactSection/index";
 import { footerComponents } from "@/components/FooterSection/index";
+import { aboutComponents } from "@/components/AboutSection/index";
 
 const Dashboard = () => {
   const navbarRef = useRef(null);
   const heroRef = useRef(null);
+  const aboutRef = useRef(null);
   const projectsRef = useRef(null);
   const contactRef = useRef(null);
   const footerRef = useRef(null);
@@ -41,6 +44,7 @@ const Dashboard = () => {
   const [selectedComponent, setSelectedComponent] = useState({
     navbar: navbarComponents[0],
     hero: heroComponents[0],
+    about: aboutComponents[0],
     projects: projectsComponents[0],
     contact: contactComponents[0],
     footer: footerComponents[0],
@@ -49,6 +53,7 @@ const Dashboard = () => {
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
     { id: "hero", label: "Hero", icon: Sparkles, isCustom: false },
+    { id: "about", label: "About", icon: Drama, isCustom: false },
     { id: "projects", label: "Projects", icon: FolderKanban, isCustom: false },
     { id: "contact", label: "Contact", icon: Contact, isCustom: false },
     {
@@ -70,6 +75,7 @@ const Dashboard = () => {
     setSelectedComponent({
       navbar: getRandomComponent(navbarComponents),
       hero: getRandomComponent(heroComponents),
+      about: getRandomComponent(aboutComponents),
       projects: getRandomComponent(projectsComponents),
       contact: getRandomComponent(contactComponents),
       footer: getRandomComponent(footerComponents),
@@ -112,9 +118,15 @@ const Dashboard = () => {
     if (sectionId === "navbar" && navbarRef.current) {
       navbarRef.current.scrollIntoView({ behavior: "smooth" });
     }
+
     if (sectionId === "hero" && heroRef.current) {
       heroRef.current.scrollIntoView({ behavior: "smooth" });
     }
+
+    if (sectionId === "about" && aboutRef.current) {
+      aboutRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+
     if (sectionId === "projects" && projectsRef.current) {
       projectsRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -162,54 +174,59 @@ const Dashboard = () => {
           />
         )}
 
-        <div className="flex-1 mt-16 border-1">
-          <div className="flex-1 ml-[0] md:ml-[20%] py-4 overflow-y-auto  ">
-            <section ref={navbarRef} id="navbar" className="min-h-full">
-              <selectedComponent.navbar />
-            </section>
+        <div className="flex-1 mt-16">
+          <div className="flex-1 ml-[0] md:ml-[20%] py-4 px-4">
+            {/* Fixed outline container */}
+            <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-gray-300 rounded-xl  bg-white shadow-sm">
+              <section ref={navbarRef} id="navbar" className="min-h-full">
+                <selectedComponent.navbar />
+              </section>
 
-            <section ref={heroRef} id="hero" className="min-h-screen py-12">
-              <selectedComponent.hero />
-            </section>
+              <section ref={heroRef} id="hero" className="min-h-screen py-12">
+                <selectedComponent.hero />
+              </section>
 
-            <section
-              ref={projectsRef}
-              id="projects"
-              className="min-h-screen py-12"
-            >
-              <selectedComponent.projects />
-            </section>
+              <section ref={aboutRef} id="about" className="min-h-screen py-12">
+                <selectedComponent.about />
+              </section>
 
-            <section
-              ref={contactRef}
-              id="contact"
-              className="min-h-screen py-12"
-            >
-              <selectedComponent.contact />
-            </section>
+              <section
+                ref={projectsRef}
+                id="projects"
+                className="min-h-screen py-12"
+              >
+                <selectedComponent.projects />
+              </section>
 
-            <section ref={footerRef} id="footer" className="min-h-screen py-12">
-              <selectedComponent.footer />
-            </section>
+              <section
+                ref={contactRef}
+                id="contact"
+                className="min-h-screen py-12"
+              >
+                <selectedComponent.contact />
+              </section>
+
+              <section
+                ref={footerRef}
+                id="footer"
+                className="min-h-screen py-12"
+              >
+                <selectedComponent.footer />
+              </section>
+            </div>
           </div>
         </div>
 
-        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 md:hidden">
+        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4">
           <button
-            className={
-              "px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-            }
+            className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
           >
             Edit
           </button>
-        </div>
 
-        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2">
           <button
-            className={
-              "px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-            }
+            className="px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
             onClick={handleComponentChange}
           >
             Change
