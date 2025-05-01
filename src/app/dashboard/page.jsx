@@ -13,11 +13,6 @@ import {
   LayoutPanelTopIcon,
   Sparkles,
 } from "lucide-react";
-import NavbarSection1 from "@/components/Navbars/NavbarSection1";
-import HeroSection1 from "@/components/HeroSections/HeroSection1";
-import ProjectsSection1 from "@/components/Projects/ProjectSection1";
-import ContactSection1 from "@/components/ContactSection/ContactSection1";
-import FooterSection1 from "@/components/FooterSection/FooterSection1";
 import { useRef } from "react";
 import { navbarComponents } from "@/components/Navbars/index";
 import { heroComponents } from "@/components/HeroSections/index";
@@ -25,6 +20,7 @@ import { projectsComponents } from "@/components/Projects/index";
 import { contactComponents } from "@/components/ContactSection/index";
 import { footerComponents } from "@/components/FooterSection/index";
 import { aboutComponents } from "@/components/AboutSection/index";
+import { previewThemes } from "@/components/ui/previewThemes";
 
 const Dashboard = () => {
   const navbarRef = useRef(null);
@@ -140,6 +136,8 @@ const Dashboard = () => {
     }
   };
 
+  const theme = previewThemes["default"];
+
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
       <Navbar isDashboard={true} />
@@ -179,7 +177,7 @@ const Dashboard = () => {
             {/* Fixed outline container */}
             <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-gray-300 rounded-xl  bg-white shadow-sm">
               <section ref={navbarRef} id="navbar" className="min-h-full">
-                <selectedComponent.navbar />
+                <selectedComponent.navbar theme={theme} />
               </section>
 
               <section ref={heroRef} id="hero" className="min-h-screen py-12">
