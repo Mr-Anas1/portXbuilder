@@ -2,24 +2,30 @@
 
 import React, { useState } from "react";
 import { Menu, X, Github, Linkedin } from "lucide-react";
+import { previewThemes } from "@/components/ui/previewThemes";
 
-const NavbarSection2 = () => {
+const NavbarSection2 = ({ selectedTheme = "default" }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const theme = previewThemes[selectedTheme];
   const navLinks = ["Home", "About", "Projects", "Contact"];
 
   return (
-    <div className="h-20 w-full bg-white shadow-md z-50 px-6 py-4" id="navbar">
+    <div
+      className={`h-20 w-full ${theme.bg} ${theme.shadow} z-50 px-6 py-4`}
+      id="navbar"
+    >
       <div className="max-w-7xl h-full mx-auto flex items-center justify-between">
         {/* Left: Name */}
-        <div className="text-xl font-bold text-gray-800">John Wick</div>
+        <div className={`text-xl font-bold ${theme.text}`}>John Wick</div>
 
         {/* Center: Nav Links (Desktop) */}
-        <ul className="hidden md:flex gap-8 text-gray-700 font-medium text-sm">
+        <ul
+          className={`hidden md:flex gap-8 font-medium text-sm ${theme.text}`}
+        >
           {navLinks.map((link, i) => (
             <li
               key={i}
-              className="cursor-pointer transition-all duration-300 hover:text-blue-600 hover:scale-105"
+              className={`cursor-pointer transition-all duration-300 ${theme.hoverText} hover:scale-105`}
             >
               {link}
             </li>
@@ -27,18 +33,18 @@ const NavbarSection2 = () => {
         </ul>
 
         {/* Right: Social Icons (Desktop) */}
-        <div className="hidden md:flex gap-4 text-gray-600">
+        <div className={`hidden md:flex gap-4 ${theme.text}`}>
           <a
             href="https://github.com"
             target="_blank"
-            className="hover:text-blue-600 transition"
+            className={`transition ${theme.hoverText}`}
           >
             <Github />
           </a>
           <a
             href="https://linkedin.com"
             target="_blank"
-            className="hover:text-blue-600 transition"
+            className={`transition ${theme.hoverText}`}
           >
             <Linkedin />
           </a>
@@ -47,7 +53,7 @@ const NavbarSection2 = () => {
         {/* Hamburger Icon (Mobile) */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-gray-700"
+          className={`md:hidden ${theme.text}`}
         >
           {isOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
@@ -59,23 +65,23 @@ const NavbarSection2 = () => {
           {navLinks.map((link, i) => (
             <span
               key={i}
-              className="text-gray-700 hover:text-blue-600 transition duration-300 text-sm"
+              className={`transition duration-300 text-sm ${theme.text} ${theme.hoverText}`}
             >
               {link}
             </span>
           ))}
-          <div className="flex gap-4 text-gray-600">
+          <div className={`flex gap-4 ${theme.text}`}>
             <a
               href="https://github.com"
               target="_blank"
-              className="hover:text-blue-600 transition"
+              className={`transition ${theme.hoverText}`}
             >
               <Github />
             </a>
             <a
               href="https://linkedin.com"
               target="_blank"
-              className="hover:text-blue-600 transition"
+              className={`transition ${theme.hoverText}`}
             >
               <Linkedin />
             </a>
