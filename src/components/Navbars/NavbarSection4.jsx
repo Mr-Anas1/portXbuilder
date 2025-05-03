@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 
-const NavbarSection4 = ({ theme }) => {
+const NavbarSection4 = ({ theme, handleScrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = ["Home", "About", "Works"];
 
@@ -18,10 +18,14 @@ const NavbarSection4 = ({ theme }) => {
         <ul
           className={`hidden md:flex gap-8 items-center text-sm font-medium ${theme.text}`}
         >
-          {navLinks.map((link) => (
+          {navLinks.map((link, index) => (
             <li
-              key={link}
+              key={index}
               className="inline-block min-w-[40px] text-center transition-all duration-300 cursor-pointer hover:font-semibold"
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection(link.toLowerCase());
+              }}
             >
               {link}
             </li>
@@ -58,10 +62,14 @@ const NavbarSection4 = ({ theme }) => {
           isOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        {navLinks.map((link) => (
+        {navLinks.map((link, index) => (
           <div
-            key={link}
-            onClick={toggleMenu}
+            key={index}
+            onClick={(e) => {
+              e.preventDefault();
+              handleScrollToSection(link.toLowerCase());
+              toggleMenu(); // Close the menu after selection
+            }}
             className="transition duration-200 cursor-pointer"
           >
             {link}

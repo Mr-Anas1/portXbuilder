@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-const NavbarSection3 = ({ theme }) => {
+const NavbarSection3 = ({ theme, handleScrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const navLinks = ["Home", "Projects", "About"];
+  const navLinks = ["Home", "About", "Projects"];
 
   return (
     <div className={`z-50 ${theme.bg} ${theme.shadow}`} id="navbar">
@@ -22,10 +22,14 @@ const NavbarSection3 = ({ theme }) => {
         <ul
           className={`hidden md:flex gap-8 text-sm font-medium ${theme.text}`}
         >
-          {navLinks.map((link) => (
+          {navLinks.map((link, i) => (
             <li
-              key={link}
+              key={i}
               className="hover:underline underline-offset-4 transition-all duration-200 cursor-pointer hover:scale-105"
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection(link.toLowerCase());
+              }}
             >
               {link}
             </li>
@@ -75,10 +79,14 @@ const NavbarSection3 = ({ theme }) => {
         <div
           className={`flex flex-col justify-center items-center flex-grow gap-8 text-xl font-medium ${theme.text}`}
         >
-          {navLinks.map((link) => (
+          {navLinks.map((link, i) => (
             <div
-              key={link}
-              onClick={toggleMenu}
+              key={i}
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection(link.toLowerCase());
+                toggleMenu(); // Close the menu after selection
+              }}
               className="underline-offset-4 transition-all duration-200 cursor-pointer"
             >
               {link}

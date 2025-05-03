@@ -3,7 +3,7 @@ export const previewThemes = {
     bg: "bg-white",
     text: "text-gray-900",
     subtext: "text-gray-600",
-    accentText: "text-black",
+    accentText: "text-sky-600", // more lively and matched with theme
     buttonBg: "bg-sky-400",
     buttonText: "text-white",
     buttonHover: "hover:bg-sky-500",
@@ -14,6 +14,7 @@ export const previewThemes = {
     label3Bg: "bg-green-400",
     label3Text: "text-white",
   },
+
   dark: {
     bg: "bg-[#1a1a1a]",
     text: "text-white",

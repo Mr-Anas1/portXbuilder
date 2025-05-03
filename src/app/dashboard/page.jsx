@@ -24,7 +24,7 @@ import { previewThemes } from "@/components/ui/previewThemes";
 
 const Dashboard = () => {
   const navbarRef = useRef(null);
-  const heroRef = useRef(null);
+  const homeRef = useRef(null);
   const aboutRef = useRef(null);
   const projectsRef = useRef(null);
   const contactRef = useRef(null);
@@ -39,7 +39,7 @@ const Dashboard = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState({
     navbar: navbarComponents[0],
-    hero: heroComponents[0],
+    home: heroComponents[0],
     about: aboutComponents[0],
     projects: projectsComponents[0],
     contact: contactComponents[0],
@@ -48,7 +48,7 @@ const Dashboard = () => {
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
-    { id: "hero", label: "Hero", icon: Sparkles, isCustom: false },
+    { id: "home", label: "Home", icon: Sparkles, isCustom: false },
     { id: "about", label: "About", icon: Drama, isCustom: false },
     { id: "projects", label: "Projects", icon: FolderKanban, isCustom: false },
     { id: "contact", label: "Contact", icon: Contact, isCustom: false },
@@ -70,7 +70,7 @@ const Dashboard = () => {
   const handleComponentChange = () => {
     setSelectedComponent({
       navbar: getRandomComponent(navbarComponents),
-      hero: getRandomComponent(heroComponents),
+      home: getRandomComponent(heroComponents),
       about: getRandomComponent(aboutComponents),
       projects: getRandomComponent(projectsComponents),
       contact: getRandomComponent(contactComponents),
@@ -115,8 +115,8 @@ const Dashboard = () => {
       navbarRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
-    if (sectionId === "hero" && heroRef.current) {
-      heroRef.current.scrollIntoView({ behavior: "smooth" });
+    if (sectionId === "home" && homeRef.current) {
+      homeRef.current.scrollIntoView({ behavior: "smooth" });
     }
 
     if (sectionId === "about" && aboutRef.current) {
@@ -136,7 +136,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["dark"];
+  const theme = previewThemes["default"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -183,8 +183,8 @@ const Dashboard = () => {
                 />
               </section>
 
-              <section ref={heroRef} id="hero">
-                <selectedComponent.hero theme={theme} />
+              <section ref={homeRef} id="home">
+                <selectedComponent.home theme={theme} />
               </section>
 
               <section ref={aboutRef} id="about" className="min-h-screen">

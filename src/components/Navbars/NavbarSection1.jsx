@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 
-const NavbarSection1 = ({ theme }) => {
+const NavbarSection1 = ({ theme, handleScrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const { bg, shadow, text } = theme;
+  const navLinks = ["Projects", "Contact"]; // Define navigation links
 
   return (
     <section className={`${bg} ${shadow} h-20`} id="navbar">
@@ -14,18 +15,19 @@ const NavbarSection1 = ({ theme }) => {
 
         {/* Desktop links */}
         <div className="hidden md:flex space-x-6">
-          <a
-            href="#projects"
-            className={`${text} transition transform hover:scale-105 duration-200`}
-          >
-            Projects
-          </a>
-          <a
-            href="#contact"
-            className={`${text} transition transform hover:scale-105 duration-200`}
-          >
-            Contact
-          </a>
+          {navLinks.map((link, i) => (
+            <a
+              key={i}
+              href={`#${link.toLowerCase()}`} // Linking to the section
+              className={`${text} transition transform hover:scale-105 duration-200`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection(link.toLowerCase()); // Scroll to section
+              }}
+            >
+              {link}
+            </a>
+          ))}
         </div>
 
         {/* Mobile menu toggle */}
@@ -44,18 +46,19 @@ const NavbarSection1 = ({ theme }) => {
         }`}
       >
         <div className="flex flex-col items-center space-y-3 py-4">
-          <a
-            href="#projects"
-            className={`${text} transition transform hover:scale-105 duration-200`}
-          >
-            Projects
-          </a>
-          <a
-            href="#contact"
-            className={`${text} transition transform hover:scale-105 duration-200`}
-          >
-            Contact
-          </a>
+          {navLinks.map((link, i) => (
+            <a
+              key={i}
+              href={`#${link.toLowerCase()}`} // Linking to the section
+              className={`${text} transition transform hover:scale-105 duration-200`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection(link.toLowerCase()); // Scroll to section
+              }}
+            >
+              {link}
+            </a>
+          ))}
         </div>
       </div>
     </section>
