@@ -136,7 +136,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["default"];
+  const theme = previewThemes["dark"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -176,39 +176,30 @@ const Dashboard = () => {
           <div className="flex-1 ml-[0] md:ml-[20%] py-4 px-4">
             {/* Fixed outline container */}
             <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-gray-300 rounded-xl  bg-white shadow-sm">
-              <section ref={navbarRef} id="navbar" className="min-h-full">
-                <selectedComponent.navbar theme={theme} />
+              <section ref={navbarRef} id="navbar">
+                <selectedComponent.navbar
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                />
               </section>
 
-              <section ref={heroRef} id="hero" className="min-h-screen py-12">
-                <selectedComponent.hero />
+              <section ref={heroRef} id="hero">
+                <selectedComponent.hero theme={theme} />
               </section>
 
-              <section ref={aboutRef} id="about" className="min-h-screen py-12">
+              <section ref={aboutRef} id="about" className="min-h-screen">
                 <selectedComponent.about />
               </section>
 
-              <section
-                ref={projectsRef}
-                id="projects"
-                className="min-h-screen py-12"
-              >
+              <section ref={projectsRef} id="projects" className="min-h-screen">
                 <selectedComponent.projects />
               </section>
 
-              <section
-                ref={contactRef}
-                id="contact"
-                className="min-h-screen py-12"
-              >
+              <section ref={contactRef} id="contact" className="min-h-screen">
                 <selectedComponent.contact />
               </section>
 
-              <section
-                ref={footerRef}
-                id="footer"
-                className="min-h-screen py-12"
-              >
+              <section ref={footerRef} id="footer" className="min-h-screen">
                 <selectedComponent.footer />
               </section>
             </div>

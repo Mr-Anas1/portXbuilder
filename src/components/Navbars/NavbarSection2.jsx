@@ -4,9 +4,8 @@ import React, { useState } from "react";
 import { Menu, X, Github, Linkedin } from "lucide-react";
 import { previewThemes } from "@/components/ui/previewThemes";
 
-const NavbarSection2 = ({ selectedTheme = "default" }) => {
+const NavbarSection2 = ({ theme, handleScrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const theme = previewThemes[selectedTheme];
   const navLinks = ["Home", "About", "Projects", "Contact"];
 
   return (
@@ -26,6 +25,7 @@ const NavbarSection2 = ({ selectedTheme = "default" }) => {
             <li
               key={i}
               className={`cursor-pointer transition-all duration-300 ${theme.hoverText} hover:scale-105`}
+              onClick={() => handleScrollToSection(link.toLowerCase())}
             >
               {link}
             </li>
