@@ -83,6 +83,10 @@ export default function HeroSection3({ theme }) {
                 animationDelay: "0.5s",
                 animationFillMode: "both",
               }}
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection("projects");
+              }}
             >
               Browse Projects
             </a>

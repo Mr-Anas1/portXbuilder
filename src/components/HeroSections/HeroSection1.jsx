@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-export default function HeroSection1({ theme }) {
+export default function HeroSection1({ theme, handleScrollToSection }) {
   return (
     <section className={`w-full px-12 py-16 md:py-24 ${theme.bg}`} id="hero">
       <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10">
@@ -20,6 +20,10 @@ export default function HeroSection1({ theme }) {
           <div className="mt-6 flex items-center justify-center md:justify-start gap-4">
             <button
               className={`px-6 py-3 rounded-full shadow-md transition ${theme.buttonBg} ${theme.buttonText} ${theme.buttonHover}`}
+              onClick={(e) => {
+                e.preventDefault();
+                handleScrollToSection("contact");
+              }}
             >
               Hire Me!
             </button>

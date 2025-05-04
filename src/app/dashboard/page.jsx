@@ -136,7 +136,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["neon"];
+  const theme = previewThemes["default"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -184,11 +184,14 @@ const Dashboard = () => {
               </section>
 
               <section ref={homeRef} id="home">
-                <selectedComponent.home theme={theme} />
+                <selectedComponent.home
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                />
               </section>
 
-              <section ref={aboutRef} id="about" className="min-h-screen">
-                <selectedComponent.about />
+              <section ref={aboutRef} id="about">
+                <selectedComponent.about theme={theme} />
               </section>
 
               <section ref={projectsRef} id="projects" className="min-h-screen">

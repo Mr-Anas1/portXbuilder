@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function HeroSection4({ theme }) {
+export default function HeroSection4({ theme, handleScrollToSection }) {
   const [text, setText] = useState("");
   const name = "Mohamed Anas";
   const [isTyping, setIsTyping] = useState(true);
@@ -49,6 +49,10 @@ export default function HeroSection4({ theme }) {
           <a
             href="#contact"
             className={`${theme.buttonBg} ${theme.buttonHover} ${theme.buttonText} transition font-medium px-6 py-3 rounded-md shadow-lg hover:scale-105 transform duration-300`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleScrollToSection("contact");
+            }}
           >
             Contact
           </a>

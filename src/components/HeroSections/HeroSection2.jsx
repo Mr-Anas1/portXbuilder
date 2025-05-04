@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function HeroSection2({ theme }) {
+export default function HeroSection2({ theme, handleScrollToSection }) {
   const fullText = "Mohamed Anas";
   const [displayedText, setDisplayedText] = useState("");
 
@@ -45,6 +45,10 @@ export default function HeroSection2({ theme }) {
           <a
             href="#contact"
             className={`mt-8 inline-flex items-center text-lg font-medium group ${theme.accentText}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handleScrollToSection("contact");
+            }}
           >
             Let’s Collaborate
             <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
