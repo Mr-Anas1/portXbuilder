@@ -136,7 +136,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["default"];
+  const theme = previewThemes["neon"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -206,7 +206,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4">
+        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 ">
           <button
             className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}

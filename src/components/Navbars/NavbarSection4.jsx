@@ -10,9 +10,9 @@ const NavbarSection4 = ({ theme, handleScrollToSection }) => {
 
   return (
     <nav className={`w-full z-50 ${theme.bg} ${theme.shadow}`} id="navbar">
-      <div className="flex items-center justify-between px-6 py-4 md:px-12">
+      <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
         {/* Logo */}
-        <div className={`text-xl font-bold z-50 ${theme.text}`}>John Wick</div>
+        <div className={`text-xl font-bold  ${theme.text}`}>John Wick</div>
 
         {/* Desktop Nav */}
         <ul
@@ -54,13 +54,11 @@ const NavbarSection4 = ({ theme, handleScrollToSection }) => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden fixed inset-0 ${
+        className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
+          isOpen ? "max-h-96 py-8" : "max-h-0"
+        } w-full flex flex-col items-center justify-center gap-8 text-xl font-medium ${
           theme.bg
-        } flex flex-col items-center justify-center gap-10 text-xl font-medium ${
-          theme.text
-        } transform transition-transform duration-300 ${
-          isOpen ? "translate-y-0" : "-translate-y-full"
-        }`}
+        } ${theme.text}`}
       >
         {navLinks.map((link, index) => (
           <div
@@ -68,16 +66,16 @@ const NavbarSection4 = ({ theme, handleScrollToSection }) => {
             onClick={(e) => {
               e.preventDefault();
               handleScrollToSection(link.toLowerCase());
-              toggleMenu(); // Close the menu after selection
+              toggleMenu();
             }}
-            className="transition duration-200 cursor-pointer"
+            className="transition duration-200 cursor-pointer hover:font-semibold"
           >
             {link}
           </div>
         ))}
         <button
           onClick={toggleMenu}
-          className={`px-6 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition`}
+          className={`px-6 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105`}
         >
           Contact <ArrowRight size={16} />
         </button>

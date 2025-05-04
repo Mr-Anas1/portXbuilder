@@ -19,7 +19,7 @@ export default function HeroSection2({ theme }) {
 
   return (
     <section
-      className={`w-full min-h-screen flex items-center px-6 md:px-28 ${theme.bg}`}
+      className={`w-full h-[calc(100vh-64px)] flex items-center px-6 md:px-28 ${theme.bg}`}
       id="hero"
     >
       <div className="flex-1">

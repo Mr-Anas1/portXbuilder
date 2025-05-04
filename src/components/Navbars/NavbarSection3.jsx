@@ -3,9 +3,7 @@ import { Menu, X } from "lucide-react";
 
 const NavbarSection3 = ({ theme, handleScrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
-
   const toggleMenu = () => setIsOpen(!isOpen);
-
   const navLinks = ["Home", "About", "Projects"];
 
   return (
@@ -38,7 +36,7 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
 
         {/* Desktop Contact Button */}
         <button
-          className={`hidden md:block cursor-pointer bg-black text-white px-6 py-2 rounded-full text-sm transition-all duration-200 hover:scale-105 hover:shadow-md`}
+          className={`hidden md:block cursor-pointer ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded-full text-sm transition-all duration-200 hover:scale-105 ${theme.buttonHover}`}
         >
           Contact
         </button>
@@ -64,7 +62,7 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
         }`}
       >
         {/* Top bar with logo and close icon */}
-        <div className="w-full flex justify-between items-center px-6 py-4 border-b">
+        <div className="w-full flex justify-between items-center px-6 py-4 border-b border-gray-300 dark:border-gray-700">
           <div
             className={`text-2xl font-serif italic font-semibold ${theme.text}`}
           >
@@ -94,7 +92,7 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
           ))}
           <button
             onClick={toggleMenu}
-            className="mt-4 bg-black text-white px-8 py-2 rounded-full transition-all duration-200"
+            className={`${theme.buttonBg} ${theme.buttonText} mt-4 px-8 py-2 rounded-full transition-all duration-200 ${theme.buttonHover}`}
           >
             Contact
           </button>

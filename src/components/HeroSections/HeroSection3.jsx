@@ -40,29 +40,31 @@ export default function HeroSection3({ theme }) {
       `}</style>
 
       <section
-        className={`w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-24 py-12 gap-10 ${theme.bg}`}
+        className={`w-full h-[calc(100vh-64px)] flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-12 lg:px-24 py-8 sm:py-12 gap-6 sm:gap-10 ${theme.bg}`}
       >
         {/* Left Content */}
         <div
           className="flex-1 w-full text-center md:text-left animate-fadeInDown"
           style={{ animation: "fadeInDown 0.8s ease-out" }}
         >
-          <div className="flex flex-col gap-4 items-center md:items-start">
-            <h1 className={`text-4xl md:text-6xl font-bold ${theme.text}`}>
-              Hello, I’m{" "}
-              <span className={`font-bold ${theme.accentText} `}>
+          <div className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
+            <h1
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${theme.text}`}
+            >
+              Hello, I'm{" "}
+              <span className={`font-bold ${theme.accentText}`}>
                 Mohamed Anas
               </span>
             </h1>
 
             <h2
-              className={`text-2xl md:text-3xl font-semibold ${theme.subtext}`}
+              className={`text-xl sm:text-2xl md:text-3xl font-semibold ${theme.subtext}`}
             >
               A Passionate Frontend Developer
             </h2>
 
             <p
-              className={`${theme.subtext} max-w-md`}
+              className={`${theme.subtext} max-w-md text-sm sm:text-base`}
               style={{
                 animation: "fadeInUp 1s ease-out",
                 animationDelay: "0.3s",
@@ -75,7 +77,7 @@ export default function HeroSection3({ theme }) {
 
             <a
               href="#projects"
-              className={`mt-4 ${theme.buttonBg} ${theme.buttonHover} ${theme.buttonText} font-medium px-6 py-3 rounded-md shadow-lg transition`}
+              className={`mt-4 ${theme.buttonBg} ${theme.buttonHover} ${theme.buttonText} font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-md shadow-lg transition text-sm sm:text-base`}
               style={{
                 animation: "fadeInUp 1s ease-out",
                 animationDelay: "0.5s",
@@ -92,7 +94,7 @@ export default function HeroSection3({ theme }) {
           className="flex-1 w-full flex justify-center md:justify-end relative"
           style={{ animation: "scaleIn 0.8s ease-in-out" }}
         >
-          <div className="relative w-[500px] h-[500px] mx-auto mt-20">
+          <div className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] mx-auto mt-8 sm:mt-12 md:mt-20">
             <Image
               src="/images/bg-2.png"
               alt="Background Decoration"
@@ -105,9 +107,9 @@ export default function HeroSection3({ theme }) {
               <Image
                 src="/images/no-bg.png"
                 alt="User"
-                width={500}
-                height={550}
-                className="rounded-xl object-contain"
+                width={280}
+                height={308}
+                className="rounded-xl object-contain w-full h-full"
                 priority
               />
             </div>
