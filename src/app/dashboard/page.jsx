@@ -20,7 +20,7 @@ import { projectsComponents } from "@/components/Projects/index";
 import { contactComponents } from "@/components/ContactSection/index";
 import { footerComponents } from "@/components/FooterSection/index";
 import { aboutComponents } from "@/components/AboutSection/index";
-import { previewThemes } from "@/components/ui/previewThemes";
+import previewThemes from "@/components/ui/previewThemes";
 
 const Dashboard = () => {
   const navbarRef = useRef(null);

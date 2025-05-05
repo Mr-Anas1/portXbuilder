@@ -5,6 +5,7 @@ const AboutUsSection1 = ({ theme }) => {
   return (
     <section
       className={`min-h-screen flex flex-col md:flex-row ${theme.bg} ${theme.text}`}
+      id="about"
     >
       {/* Left Section with Highlighted Intro */}
       <div
