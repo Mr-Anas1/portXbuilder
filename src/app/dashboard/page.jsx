@@ -194,8 +194,8 @@ const Dashboard = () => {
                 <selectedComponent.about theme={theme} />
               </section>
 
-              <section ref={projectsRef} id="projects" className="min-h-screen">
-                <selectedComponent.projects />
+              <section ref={projectsRef} id="project">
+                <selectedComponent.projects theme={theme} />
               </section>
 
               <section ref={contactRef} id="contact" className="min-h-screen">
