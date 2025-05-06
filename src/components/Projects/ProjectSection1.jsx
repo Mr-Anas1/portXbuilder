@@ -25,7 +25,7 @@ export default function ProjectSection1({ theme }) {
           {ProjectData.map((project) => (
             <div
               key={project.id}
-              className={`group ${theme.card1Bg} ${theme.card1Text} rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full max-w-sm`}
+              className={`group ${theme.bg} ${theme.card1Text} rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full max-w-sm`}
             >
               <div className="relative overflow-hidden h-56">
                 <img
@@ -43,6 +43,7 @@ export default function ProjectSection1({ theme }) {
                 <a
                   href={project.link}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${theme.buttonBg} ${theme.buttonText} text-sm font-medium ${theme.buttonHover} transition-colors duration-300`}
+                  target="_blank"
                 >
                   View project →
                 </a>
