@@ -1,5 +1,6 @@
 export const ProjectData = [
   {
+    id: 1,
     image: "/images/1.png",
     title: "Portfolio Website",
     description:
@@ -7,6 +8,7 @@ export const ProjectData = [
     link: "https://yourportfolio.com",
   },
   {
+    id: 2,
     image: "/images/2.png",
     title: "E-Commerce Platform",
     description:
@@ -14,6 +16,7 @@ export const ProjectData = [
     link: "https://ecommerceproject.com",
   },
   {
+    id: 3,
     image: "/images/3.png",
     title: "Blog CMS",
     description:
