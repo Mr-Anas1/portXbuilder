@@ -7,9 +7,9 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
   const navLinks = ["Home", "About", "Projects"];
 
   return (
-    <div className={`z-50 ${theme.bg} ${theme.shadow}`} id="navbar">
+    <div className={`${theme.bg} ${theme.shadow}`} id="navbar">
       {/* Header Bar */}
-      <div className="flex justify-between items-center px-6 py-4 relative z-50">
+      <div className="flex justify-between items-center px-6 py-4 relative">
         <div
           className={`text-2xl font-serif italic font-semibold ${theme.text}`}
         >
@@ -42,7 +42,7 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
         </button>
 
         {/* Mobile Menu Icon */}
-        <div className="md:hidden z-50">
+        <div className="md:hidden ">
           <button onClick={toggleMenu} className="focus:outline-none">
             {isOpen ? (
               <X size={28} className={theme.text} />
@@ -57,7 +57,7 @@ const NavbarSection3 = ({ theme, handleScrollToSection }) => {
       <div
         className={`fixed inset-0 ${
           theme.bg
-        } transition-transform duration-300 ease-in-out z-40 flex flex-col items-center ${
+        } transition-transform duration-300 ease-in-out flex flex-col items-center ${
           isOpen ? "translate-y-0" : "-translate-y-full"
         }`}
       >

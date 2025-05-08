@@ -10,7 +10,7 @@ const NavbarSection2 = ({ theme, handleScrollToSection }) => {
 
   return (
     <div
-      className={`h-20 w-full ${theme.bg} ${theme.shadow} z-50 px-6 py-4`}
+      className={`h-20 w-full ${theme.bg} ${theme.shadow}  px-6 py-4`}
       id="navbar"
     >
       <div className="max-w-7xl h-full mx-auto flex items-center justify-between">

@@ -11,6 +11,7 @@ import {
   FolderKanban,
   LayoutGrid,
   LayoutPanelTopIcon,
+  Pen,
   Sparkles,
 } from "lucide-react";
 import { useRef } from "react";
@@ -21,6 +22,7 @@ import { contactComponents } from "@/components/ContactSection/index";
 import { footerComponents } from "@/components/FooterSection/index";
 import { aboutComponents } from "@/components/AboutSection/index";
 import previewThemes from "@/components/ui/previewThemes";
+import SectionWrapper from "@/components/ui/SectionWrapper";
 
 const Dashboard = () => {
   const navbarRef = useRef(null);
@@ -76,6 +78,13 @@ const Dashboard = () => {
       contact: getRandomComponent(contactComponents),
       footer: getRandomComponent(footerComponents),
     });
+  };
+
+  const changeSingleComponent = (key, componentsArray) => {
+    setSelectedComponent((prev) => ({
+      ...prev,
+      [key]: getRandomComponent(componentsArray),
+    }));
   };
 
   const removeSection = (id) => {
@@ -136,7 +145,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["forest"];
+  const theme = previewThemes["default"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -175,36 +184,62 @@ const Dashboard = () => {
         <div className="flex-1 mt-16">
           <div className="flex-1 ml-[0] md:ml-[20%] py-4 px-4">
             {/* Fixed outline container */}
-            <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-gray-300 rounded-xl  bg-white shadow-sm">
-              <section ref={navbarRef} id="navbar">
-                <selectedComponent.navbar
-                  theme={theme}
-                  handleScrollToSection={handleScrollToSection}
-                />
-              </section>
+            <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
+              <SectionWrapper
+                id="navbar"
+                innerRef={navbarRef}
+                Component={selectedComponent.navbar}
+                theme={theme}
+                handleScrollToSection={handleScrollToSection}
+                changeFunction={changeSingleComponent}
+                componentList={navbarComponents}
+              />
 
-              <section ref={homeRef} id="home">
-                <selectedComponent.home
-                  theme={theme}
-                  handleScrollToSection={handleScrollToSection}
-                />
-              </section>
+              <SectionWrapper
+                id="home"
+                innerRef={homeRef}
+                Component={selectedComponent.home}
+                theme={theme}
+                handleScrollToSection={handleScrollToSection}
+                changeFunction={changeSingleComponent}
+                componentList={heroComponents}
+              />
 
-              <section ref={aboutRef} id="about">
-                <selectedComponent.about theme={theme} />
-              </section>
+              <SectionWrapper
+                id="about"
+                innerRef={aboutRef}
+                Component={selectedComponent.about}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={aboutComponents}
+              />
 
-              <section ref={projectsRef} id="project">
-                <selectedComponent.projects theme={theme} />
-              </section>
+              <SectionWrapper
+                id="projects"
+                innerRef={projectsRef}
+                Component={selectedComponent.projects}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={projectsComponents}
+              />
 
-              <section ref={contactRef} id="contact">
-                <selectedComponent.contact theme={theme} />
-              </section>
+              <SectionWrapper
+                id="contact"
+                innerRef={contactRef}
+                Component={selectedComponent.contact}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={contactComponents}
+              />
 
-              <section ref={footerRef} id="footer">
-                <selectedComponent.footer theme={theme} />
-              </section>
+              <SectionWrapper
+                id="footer"
+                innerRef={footerRef}
+                Component={selectedComponent.footer}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={footerComponents}
+              />
             </div>
           </div>
         </div>

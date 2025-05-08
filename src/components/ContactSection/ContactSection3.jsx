@@ -7,7 +7,7 @@ import { cloneElement } from "react";
 const ContactSection3 = ({ theme }) => {
   return (
     <section
-      className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} min-h-screen `}
+      className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen `}
       id="contact"
     >
       <p className={`text-sm font-semibold ${theme.subtext}`}>

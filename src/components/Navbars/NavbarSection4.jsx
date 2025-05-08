@@ -9,7 +9,7 @@ const NavbarSection4 = ({ theme, handleScrollToSection }) => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <nav className={`w-full z-50 ${theme.bg} ${theme.shadow}`} id="navbar">
+    <nav className={`w-full  ${theme.bg} ${theme.shadow}`} id="navbar">
       <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
         {/* Logo */}
         <div className={`text-xl font-bold  ${theme.text}`}>John Wick</div>
@@ -41,7 +41,7 @@ const NavbarSection4 = ({ theme, handleScrollToSection }) => {
         </ul>
 
         {/* Mobile Menu Icon */}
-        <div className="md:hidden z-50">
+        <div className="md:hidden ">
           <button onClick={toggleMenu}>
             {isOpen ? (
               <X size={26} className={theme.text} />

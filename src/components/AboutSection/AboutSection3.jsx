@@ -34,7 +34,9 @@ export default function AboutSection3({ theme }) {
   // Get the theme colors
 
   return (
-    <section className="min-h-screen  mx-auto px-6 py-16 md:px-20 bg-white flex flex-col lg:flex-row gap-10 items-center">
+    <section
+      className={`min-h-screen  mx-auto px-6 py-16 md:px-20  flex flex-col lg:flex-row gap-10 items-center ${theme.bg}`}
+    >
       <div className="w-full lg:w-1/3">
         <h2 className={`text-4xl md:text-5xl font-bold ${theme.accentText}`}>
           About Me
