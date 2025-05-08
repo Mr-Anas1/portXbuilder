@@ -136,7 +136,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["default"];
+  const theme = previewThemes["forest"];
 
   return (
     <section className="relative min-h-screen flex flex-col bg-background">
@@ -202,8 +202,8 @@ const Dashboard = () => {
                 <selectedComponent.contact theme={theme} />
               </section>
 
-              <section ref={footerRef} id="footer" className="min-h-screen">
-                <selectedComponent.footer />
+              <section ref={footerRef} id="footer">
+                <selectedComponent.footer theme={theme} />
               </section>
             </div>
           </div>

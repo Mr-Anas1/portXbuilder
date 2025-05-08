@@ -1,14 +1,12 @@
-import React from "react";
-
-const FooterSection1 = () => {
+const Footer = ({ theme }) => {
   return (
-    <section
-      id="hero"
-      className="min-h-screen flex items-center justify-center"
+    <footer
+      className={`w-full py-4 text-center text-sm ${theme.subtext} ${theme.bg}`}
+      id="footer"
     >
-      <h1 className="text-4xl font-bold">Footer 1 Section</h1>
-    </section>
+      © 2025 Mohamed Anas – All rights reserved.
+    </footer>
   );
 };
 
-export default FooterSection1;
+export default Footer;

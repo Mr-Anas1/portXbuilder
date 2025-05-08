@@ -3,7 +3,7 @@
 export default function AboutSection3({ theme }) {
   return (
     <section
-      className={`w-full h-screen flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
+      className={`w-full min-h-screen flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
     >
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
         {/* Left Side: WHO? */}

@@ -6,7 +6,7 @@ export default function AboutSection1({ theme }) {
   return (
     <section
       id="about"
-      className={`min-h-[60vh] md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-20 transition-opacity duration-1000 ${theme.bg}`}
+      className={`md:min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-16 py-20 transition-opacity duration-1000 ${theme.bg} min-h-screen `}
     >
       {/* Left Section */}
       <div className="w-full md:w-1/2 text-center md:text-left mb-12 md:mb-0">

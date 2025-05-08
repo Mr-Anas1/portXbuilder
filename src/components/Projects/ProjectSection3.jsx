@@ -3,10 +3,12 @@ import { ProjectData } from "@/Helpers/ProjectData";
 
 const ProjectSection3 = ({ theme }) => {
   return (
-    <section
-      className={`max-w-6xl mx-auto px-4 py-12 ${theme.bg} ${theme.text}`}
-    >
-      <h1 className="text-4xl font-bold text-center mb-12">My Projects</h1>
+    <section className={` px-4 py-12 ${theme.bg} ${theme.text} min-h-screen `}>
+      <h1
+        className={`text-4xl md:text-5xl font-bold text-center mb-12 ${theme.accentText}`}
+      >
+        My Projects
+      </h1>
       {ProjectData.map((project, index) => (
         <div
           key={index}

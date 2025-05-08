@@ -4,22 +4,15 @@ import { ProjectData } from "../../Helpers/ProjectData";
 export default function ProjectSection1({ theme }) {
   return (
     <section
-      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text}`}
+      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen `}
       id="project"
     >
       <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-4">Recent projects</h2>
-        <p className="text-lg md:text-xl max-w-2xl mx-auto mb-12">
-          Below you can see some examples of my recent work. Check out my
-          complete{" "}
-          <a href="#" className={`underline ${theme.accentText}`}>
-            portfolio
-          </a>
-          . Have a project you would like to discuss?{" "}
-          <a href="#" className={`underline ${theme.label2Text}`}>
-            Let’s make something great together!
-          </a>
-        </p>
+        <h2
+          className={`text-4xl md:text-5xl font-bold mb-8 ${theme.accentText}`}
+        >
+          Recent projects
+        </h2>
 
         <div className="flex flex-wrap justify-center gap-10">
           {ProjectData.map((project) => (
