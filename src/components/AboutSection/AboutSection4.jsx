@@ -1,26 +1,38 @@
 "use client";
 
-export default function AboutSection3({ theme }) {
+export default function AboutSection3({ theme, isMobileLayout }) {
   return (
     <section
       className={`w-full min-h-screen flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
     >
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+      <div
+        className={`max-w-7xl mx-auto flex ${
+          isMobileLayout ? "flex-col" : "md:flex-row"
+        } items-center gap-12`}
+      >
         {/* Left Side: WHO? */}
-        <div className="w-full md:w-1/2 flex items-center justify-center">
+        <div
+          className={`w-full ${
+            isMobileLayout ? "" : "md:w-1/2"
+          } flex items-center justify-center`}
+        >
           <h2
-            className={`text-6xl md:text-8xl font-bold ${theme.accentText} tracking-wide`}
+            className={`${
+              isMobileLayout ? "text-5xl" : "text-6xl md:text-8xl"
+            } font-bold ${theme.accentText} tracking-wide`}
           >
             WHO <span className={theme.text}>?</span>
           </h2>
         </div>
 
         {/* Right Side: About Content */}
-        <div className={`w-full md:w-1/2 space-y-6 ${theme.text}`}>
-          <h3 className="text-center md:text-start text-3xl md:text-4xl font-semibold">
-            About me
-          </h3>
-          <p className="text-center md:text-start text-lg leading-relaxed">
+        <div
+          className={`w-full ${
+            isMobileLayout ? "text-center" : "md:w-1/2 text-start"
+          } space-y-6 ${theme.text}`}
+        >
+          <h3 className="text-3xl md:text-4xl font-semibold">About me</h3>
+          <p className="text-lg leading-relaxed">
             I'm{" "}
             <span className={`${theme.accentText} font-medium`}>
               Mohamed Anas
@@ -32,7 +44,13 @@ export default function AboutSection3({ theme }) {
           </p>
 
           {/* Skills Tags */}
-          <div className="text-center md:text-start flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+          <div
+            className={`flex flex-wrap gap-4 pt-4 ${
+              isMobileLayout
+                ? "justify-center text-center"
+                : "justify-start text-start"
+            }`}
+          >
             {["HTML", "CSS", "JS", "React", "Git", "UI/UX"].map(
               (skill, index) => (
                 <span

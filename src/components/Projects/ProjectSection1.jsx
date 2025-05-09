@@ -1,24 +1,36 @@
 "use client";
 import { ProjectData } from "../../Helpers/ProjectData";
 
-export default function ProjectSection1({ theme }) {
+export default function ProjectSection1({ theme, isMobileLayout }) {
   return (
     <section
-      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen `}
+      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
+        theme.text
+      } min-h-screen ${isMobileLayout ? "md:px-2" : ""}`}
       id="project"
     >
       <div className="max-w-7xl mx-auto text-center">
         <h2
-          className={`text-4xl md:text-5xl font-bold mb-8 ${theme.accentText}`}
+          className={`text-4xl md:text-5xl font-bold mb-12 ${theme.accentText}`}
         >
           Recent projects
         </h2>
 
-        <div className="flex flex-wrap justify-center gap-10">
+        <div
+          className={`${
+            isMobileLayout
+              ? "flex flex-col items-center gap-8"
+              : "flex flex-wrap justify-center gap-10"
+          }`}
+        >
           {ProjectData.map((project) => (
             <div
               key={project.id}
-              className={`group ${theme.bg} ${theme.card1Text} rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full max-w-sm`}
+              className={`group ${theme.bg} ${
+                theme.card1Text
+              } rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full ${
+                isMobileLayout ? "max-w-[90%]" : "max-w-sm"
+              }`}
             >
               <div className="relative overflow-hidden h-56">
                 <img

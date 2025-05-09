@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-export default function HeroSection2({ theme, handleScrollToSection }) {
+export default function HeroSection2({
+  theme,
+  handleScrollToSection,
+  isMobileLayout,
+}) {
   const fullText = "Mohamed Anas";
   const [displayedText, setDisplayedText] = useState("");
 
@@ -17,14 +21,24 @@ export default function HeroSection2({ theme, handleScrollToSection }) {
     return () => clearInterval(interval);
   }, []);
 
+  const isMobile = isMobileLayout;
+
   return (
     <section
-      className={`w-full h-[calc(100vh-64px)] flex items-center px-6 md:px-28 ${theme.bg}`}
+      className={`w-full ${
+        isMobile
+          ? "h-[calc(100vh-64px)] py-16 px-6"
+          : "h-[calc(100vh-64px)] px-6 md:px-28"
+      } flex items-center ${theme.bg}`}
       id="hero"
     >
       <div className="flex-1">
         <h1
-          className={`text-4xl text-center md:text-6xl lg:text-8xl font-bold leading-tight ${theme.text}`}
+          className={`${
+            isMobile
+              ? "text-3xl text-center "
+              : "text-4xl md:text-6xl lg:text-8xl text-center md:text-left"
+          } font-bold leading-tight ${theme.text}`}
         >
           Hi, I’m{" "}
           <span
@@ -34,9 +48,17 @@ export default function HeroSection2({ theme, handleScrollToSection }) {
           </span>
         </h1>
 
-        <div className="flex flex-col items-center">
+        <div
+          className={`flex flex-col ${
+            isMobile ? "items-center" : "items-start"
+          } mt-6`}
+        >
           <p
-            className={`mt-6 text-lg md:text-xl max-w-2xl text-center md:text-left ${theme.subtext}`}
+            className={`${
+              isMobile
+                ? "text-base text-center"
+                : "text-lg md:text-xl text-left"
+            } max-w-2xl ${theme.subtext}`}
           >
             With 5 years of experience as a product designer in Japan, I bring a
             unique blend of creativity and technical expertise to the table.

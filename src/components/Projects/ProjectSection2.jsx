@@ -1,29 +1,49 @@
 "use client";
 import { ProjectData } from "@/Helpers/ProjectData";
 
-export default function ProjectSection2({ theme }) {
+export default function ProjectSection2({ theme, isMobileLayout }) {
   return (
     <section
-      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen `}
+      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
+        theme.text
+      } min-h-screen flex justify-center items-center  ${
+        isMobileLayout ? "md:px-2" : ""
+      }`}
       id="project"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto w-full">
         {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <h2 className={`text-3xl md:text-4xl font-bold ${theme.accentText}`}>
+        <div
+          className={`flex justify-center md:justify-start items-center mb-12 ${
+            isMobileLayout ? "md:justify-center" : ""
+          } `}
+        >
+          <h2
+            className={`text-3xl md:text-5xl font-bold text-center md:text-start ${
+              theme.accentText
+            }  ${isMobileLayout ? "md:text-center" : ""}`}
+          >
             Latest Projects
           </h2>
         </div>
 
-        {/* Projects - Stepped layout */}
-        <div className="flex gap-10 flex-col items-center md:flex-row">
+        {/* Projects */}
+        <div
+          className={`flex ${
+            isMobileLayout ? "flex-col items-center gap-8" : "flex-row gap-10"
+          }`}
+        >
           {ProjectData.map((project) => (
             <a
               key={project.id}
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className={`w-full max-w-md md:max-w-xl rounded-2xl overflow-hidden shadow-md ${theme.bg} transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg`}
+              className={`rounded-2xl overflow-hidden shadow-md ${
+                theme.bg
+              } transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg w-full ${
+                isMobileLayout ? "max-w-[90%]" : "max-w-xl"
+              }`}
             >
               <img
                 src={project.image}

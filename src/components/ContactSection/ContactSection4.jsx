@@ -2,7 +2,8 @@
 
 import React from "react";
 import { socialLinks } from "@/Helpers/SocialLinks";
-const ContactSection4 = ({ theme }) => {
+
+const ContactSection4 = ({ theme, isMobileLayout }) => {
   return (
     <section
       className={`w-full min-h-screen flex flex-col ${theme.bg} ${theme.text}`}
@@ -20,7 +21,11 @@ const ContactSection4 = ({ theme }) => {
 
       {/* Bottom Half */}
       <div className="flex-1 flex items-center justify-center px-4 py-10">
-        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+        <div
+          className={`w-full max-w-6xl grid ${
+            isMobileLayout ? "grid-cols-1" : "grid-cols-1 md:grid-cols-3"
+          } gap-10 text-center`}
+        >
           {/* Email */}
           <div>
             <p className="font-semibold text-lg mb-1">Email Address</p>
@@ -38,7 +43,11 @@ const ContactSection4 = ({ theme }) => {
           {/* Social Icons */}
           <div>
             <p className="font-semibold text-lg mb-3">Connect With Me</p>
-            <div className="flex justify-center gap-5 flex-wrap">
+            <div
+              className={`flex justify-center gap-5 flex-wrap ${
+                isMobileLayout ? "justify-start gap-4" : "justify-center gap-5"
+              }`}
+            >
               {socialLinks.map((link, index) => (
                 <a
                   key={index}

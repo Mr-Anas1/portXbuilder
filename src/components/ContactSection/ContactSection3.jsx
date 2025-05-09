@@ -4,10 +4,10 @@ import { FaEnvelope } from "react-icons/fa6";
 import { socialLinks } from "@/Helpers/SocialLinks";
 import { cloneElement } from "react";
 
-const ContactSection3 = ({ theme }) => {
+const ContactSection3 = ({ theme, isMobileLayout }) => {
   return (
     <section
-      className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen `}
+      className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen`}
       id="contact"
     >
       <p className={`text-sm font-semibold ${theme.subtext}`}>
@@ -25,7 +25,11 @@ const ContactSection3 = ({ theme }) => {
       </a>
 
       {/* Social Icons */}
-      <div className="flex flex-wrap justify-center gap-6 mt-6 ">
+      <div
+        className={`flex flex-wrap justify-center gap-6 mt-6 ${
+          isMobileLayout ? "justify-start gap-4" : "justify-center gap-6"
+        }`}
+      >
         {socialLinks.map((item, idx) => (
           <a
             key={idx}

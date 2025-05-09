@@ -8,6 +8,8 @@ const SectionWrapper = ({
   handleScrollToSection,
   changeFunction,
   componentList,
+  isMobileLayout,
+  setIsMobileLayout,
 }) => {
   return (
     <section
@@ -15,7 +17,12 @@ const SectionWrapper = ({
       id={id}
       className="relative group border-2 border-transparent hover:border-primary-500 transition-all duration-300"
     >
-      <Component theme={theme} handleScrollToSection={handleScrollToSection} />
+      <Component
+        theme={theme}
+        handleScrollToSection={handleScrollToSection}
+        isMobileLayout={isMobileLayout}
+        setIsMobileLayout={setIsMobileLayout}
+      />
 
       {/* Desktop: floating 'Change' button on hover */}
       <button

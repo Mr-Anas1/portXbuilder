@@ -1,104 +1,90 @@
+"use client";
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
-const NavbarSection3 = ({ theme, handleScrollToSection }) => {
+const NavbarSection3 = ({ theme, handleScrollToSection, isMobileLayout }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = () => setIsOpen(!isOpen);
   const navLinks = ["Home", "About", "Projects"];
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <div className={`${theme.bg} ${theme.shadow}`} id="navbar">
-      {/* Header Bar */}
-      <div className="flex justify-between items-center px-6 py-4 relative">
-        <div
-          className={`text-2xl font-serif italic font-semibold ${theme.text}`}
-        >
+    <nav className={`w-full ${theme.bg} ${theme.shadow}`} id="navbar">
+      <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
+        {/* Logo */}
+        <div className={`text-xl font-bold font-serif italic ${theme.text}`}>
           John Wick
         </div>
 
-        {/* Desktop Nav */}
-        <ul
-          className={`hidden md:flex gap-8 text-sm font-medium ${theme.text}`}
-        >
-          {navLinks.map((link, i) => (
-            <li
-              key={i}
-              className="hover:underline underline-offset-4 transition-all duration-200 cursor-pointer hover:scale-105"
-              onClick={(e) => {
-                e.preventDefault();
-                handleScrollToSection(link.toLowerCase());
-              }}
-            >
-              {link}
+        {/* Desktop Navigation */}
+        {!isMobileLayout && (
+          <ul
+            className={`flex gap-8 items-center text-sm font-medium ${theme.text}`}
+          >
+            {navLinks.map((link, index) => (
+              <li
+                key={index}
+                className="inline-block min-w-[40px] text-center transition-all duration-300 cursor-pointer hover:font-semibold"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleScrollToSection(link.toLowerCase());
+                }}
+              >
+                {link}
+              </li>
+            ))}
+            <li>
+              <button
+                className={`px-5 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105 ${theme.buttonHover}`}
+              >
+                Contact <ArrowRight size={16} />
+              </button>
             </li>
-          ))}
-        </ul>
+          </ul>
+        )}
 
-        {/* Desktop Contact Button */}
-        <button
-          className={`hidden md:block cursor-pointer ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded-full text-sm transition-all duration-200 hover:scale-105 ${theme.buttonHover}`}
-        >
-          Contact
-        </button>
-
-        {/* Mobile Menu Icon */}
-        <div className="md:hidden ">
-          <button onClick={toggleMenu} className="focus:outline-none">
+        {/* Mobile Icon */}
+        {isMobileLayout && (
+          <button onClick={toggleMenu}>
             {isOpen ? (
-              <X size={28} className={theme.text} />
+              <X size={26} className={theme.text} />
             ) : (
-              <Menu size={28} className={theme.text} />
+              <Menu size={26} className={theme.text} />
             )}
           </button>
-        </div>
+        )}
       </div>
 
-      {/* Mobile Menu Overlay */}
-      <div
-        className={`fixed inset-0 ${
-          theme.bg
-        } transition-transform duration-300 ease-in-out flex flex-col items-center ${
-          isOpen ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        {/* Top bar with logo and close icon */}
-        <div className="w-full flex justify-between items-center px-6 py-4 border-b border-gray-300 dark:border-gray-700">
-          <div
-            className={`text-2xl font-serif italic font-semibold ${theme.text}`}
-          >
-            Madison.
-          </div>
-          <button onClick={toggleMenu} className="focus:outline-none">
-            <X size={28} className={theme.text} />
-          </button>
-        </div>
-
-        {/* Mobile Nav Links */}
+      {/* Mobile Dropdown */}
+      {isMobileLayout && (
         <div
-          className={`flex flex-col justify-center items-center flex-grow gap-8 text-xl font-medium ${theme.text}`}
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            isOpen ? "max-h-96 py-8" : "max-h-0"
+          } w-full flex flex-col items-center justify-center gap-8 text-xl font-medium ${
+            theme.bg
+          } ${theme.text}`}
         >
-          {navLinks.map((link, i) => (
+          {navLinks.map((link, index) => (
             <div
-              key={i}
+              key={index}
               onClick={(e) => {
                 e.preventDefault();
                 handleScrollToSection(link.toLowerCase());
-                toggleMenu(); // Close the menu after selection
+                toggleMenu();
               }}
-              className="underline-offset-4 transition-all duration-200 cursor-pointer"
+              className="transition duration-200 cursor-pointer hover:font-semibold"
             >
               {link}
             </div>
           ))}
           <button
             onClick={toggleMenu}
-            className={`${theme.buttonBg} ${theme.buttonText} mt-4 px-8 py-2 rounded-full transition-all duration-200 ${theme.buttonHover}`}
+            className={`px-6 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105 ${theme.buttonHover}`}
           >
-            Contact
+            Contact <ArrowRight size={16} />
           </button>
         </div>
-      </div>
-    </div>
+      )}
+    </nav>
   );
 };
 

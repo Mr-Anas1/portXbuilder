@@ -3,7 +3,7 @@ import React from "react";
 import { socialLinks } from "@/Helpers/SocialLinks";
 import { cloneElement } from "react";
 
-const ContactSection2 = ({ theme }) => {
+const ContactSection2 = ({ theme, isMobileLayout }) => {
   return (
     <section
       className={`${theme.bg} ${theme.text} min-h-screen px-4 flex flex-col justify-center items-center`}
@@ -17,7 +17,13 @@ const ContactSection2 = ({ theme }) => {
           Get in touch with us or follow our social profiles
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-16 max-w-6xl mx-auto">
+        <div
+          className={`grid ${
+            isMobileLayout
+              ? "grid-cols-2 gap-6"
+              : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-16"
+          } max-w-6xl mx-auto`}
+        >
           {socialLinks.map((item, idx) => (
             <a
               key={idx}

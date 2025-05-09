@@ -12,6 +12,7 @@ import {
   LayoutGrid,
   LayoutPanelTopIcon,
   Pen,
+  Smartphone,
   Sparkles,
 } from "lucide-react";
 import { useRef } from "react";
@@ -47,6 +48,7 @@ const Dashboard = () => {
     contact: contactComponents[0],
     footer: footerComponents[0],
   });
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
@@ -61,6 +63,12 @@ const Dashboard = () => {
       isCustom: false,
     },
   ]);
+
+  // For changing into mobile component
+
+  const handleMobileLayoutClick = () => {
+    setIsMobileLayout((prev) => !prev);
+  };
 
   // For randomly change component
 
@@ -181,8 +189,12 @@ const Dashboard = () => {
           />
         )}
 
-        <div className="flex-1 mt-16">
-          <div className="flex-1 ml-[0] md:ml-[20%] py-4 px-4">
+        <div className="flex-1 mt-16 ">
+          <div
+            className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
+              isMobileLayout ? "max-w-[430px] mx-auto md:ml-[45%]" : ""
+            }`}
+          >
             {/* Fixed outline container */}
             <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
               <SectionWrapper
@@ -193,6 +205,8 @@ const Dashboard = () => {
                 handleScrollToSection={handleScrollToSection}
                 changeFunction={changeSingleComponent}
                 componentList={navbarComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
               />
 
               <SectionWrapper
@@ -203,6 +217,7 @@ const Dashboard = () => {
                 handleScrollToSection={handleScrollToSection}
                 changeFunction={changeSingleComponent}
                 componentList={heroComponents}
+                isMobileLayout={isMobileLayout}
               />
 
               <SectionWrapper
@@ -212,6 +227,8 @@ const Dashboard = () => {
                 theme={theme}
                 changeFunction={changeSingleComponent}
                 componentList={aboutComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
               />
 
               <SectionWrapper
@@ -221,6 +238,7 @@ const Dashboard = () => {
                 theme={theme}
                 changeFunction={changeSingleComponent}
                 componentList={projectsComponents}
+                isMobileLayout={isMobileLayout}
               />
 
               <SectionWrapper
@@ -230,6 +248,7 @@ const Dashboard = () => {
                 theme={theme}
                 changeFunction={changeSingleComponent}
                 componentList={contactComponents}
+                isMobileLayout={isMobileLayout}
               />
 
               <SectionWrapper
@@ -239,12 +258,13 @@ const Dashboard = () => {
                 theme={theme}
                 changeFunction={changeSingleComponent}
                 componentList={footerComponents}
+                isMobileLayout={isMobileLayout}
               />
             </div>
           </div>
         </div>
 
-        <div className="fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 ">
+        <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
           <button
             className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
             onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
@@ -257,6 +277,13 @@ const Dashboard = () => {
             onClick={handleComponentChange}
           >
             Change
+          </button>
+
+          <button
+            className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
+            onClick={handleMobileLayoutClick}
+          >
+            <Smartphone />
           </button>
         </div>
       </div>

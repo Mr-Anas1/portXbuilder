@@ -1,15 +1,21 @@
 "use client";
 import React from "react";
 
-const AboutUsSection1 = ({ theme }) => {
+const AboutUsSection1 = ({ theme, isMobileLayout }) => {
   return (
     <section
-      className={`min-h-screen flex flex-col md:flex-row ${theme.bg} ${theme.text}`}
+      className={`min-h-screen flex flex-col ${
+        isMobileLayout ? "" : "md:flex-row"
+      } ${theme.bg} ${theme.text}`}
       id="about"
     >
       {/* Left Section with Highlighted Intro */}
       <div
-        className={`w-full md:w-1/2 flex flex-col justify-center px-8 py-16 md:px-16 ${theme.buttonBg} text-white`}
+        className={`w-full ${
+          isMobileLayout ? "md:px-6" : "md:w-1/2"
+        } flex flex-col justify-center px-8 py-16 md:px-16 ${
+          theme.buttonBg
+        } text-white`}
       >
         <p className="text-sm uppercase font-medium mb-2">Hello, I'm George!</p>
         <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
@@ -21,7 +27,11 @@ const AboutUsSection1 = ({ theme }) => {
       </div>
 
       {/* Right Section with More Info */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-8 py-16 md:px-16">
+      <div
+        className={`w-full ${
+          isMobileLayout ? "md:px-6" : "md:w-1/2"
+        } flex flex-col justify-center px-8 py-16 md:px-16`}
+      >
         <h2 className={`text-2xl font-semibold mb-4 ${theme.accentText || ""}`}>
           What I Do
         </h2>

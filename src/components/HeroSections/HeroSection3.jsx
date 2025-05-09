@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { previewThemes } from "../ui/previewThemes";
 
-export default function HeroSection3({ theme }) {
+export default function HeroSection3({
+  theme,
+  handleScrollToSection,
+  isMobileLayout,
+}) {
   return (
     <>
       <style jsx>{`
@@ -40,16 +43,34 @@ export default function HeroSection3({ theme }) {
       `}</style>
 
       <section
-        className={`w-full h-[calc(100vh-64px)] flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-12 lg:px-24 py-8 sm:py-12 gap-6 sm:gap-10 ${theme.bg}`}
+        className={`w-full ${
+          isMobileLayout
+            ? "py-12 px-6"
+            : "h-[calc(100vh-64px)] py-8 px-4 sm:px-6 md:px-12 lg:px-24"
+        } flex flex-col-reverse ${
+          isMobileLayout ? "" : "md:flex-row"
+        } items-center justify-between gap-6 sm:gap-10 ${theme.bg}`}
       >
         {/* Left Content */}
         <div
-          className="flex-1 w-full text-center md:text-left animate-fadeInDown"
-          style={{ animation: "fadeInDown 0.8s ease-out" }}
+          className={`flex-1 w-full ${
+            isMobileLayout ? "text-center" : "text-left animate-fadeInDown"
+          }`}
+          style={
+            isMobileLayout ? {} : { animation: "fadeInDown 0.8s ease-out" }
+          }
         >
-          <div className="flex flex-col gap-3 sm:gap-4 items-center md:items-start">
+          <div
+            className={`flex flex-col gap-3 sm:gap-4 ${
+              isMobileLayout ? "items-center" : "items-start"
+            }`}
+          >
             <h1
-              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold ${theme.text}`}
+              className={`font-bold ${theme.text} ${
+                isMobileLayout
+                  ? "text-3xl"
+                  : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
+              }`}
             >
               Hello, I'm{" "}
               <span className={`font-bold ${theme.accentText}`}>
@@ -58,15 +79,19 @@ export default function HeroSection3({ theme }) {
             </h1>
 
             <h2
-              className={`text-xl sm:text-2xl md:text-3xl font-semibold ${theme.subtext}`}
+              className={`font-semibold ${theme.subtext} ${
+                isMobileLayout ? "text-lg" : "text-xl sm:text-2xl md:text-3xl"
+              }`}
             >
               A Passionate Frontend Developer
             </h2>
 
             <p
-              className={`${theme.subtext} max-w-md text-sm sm:text-base`}
+              className={`${theme.subtext} max-w-md ${
+                isMobileLayout ? "text-sm text-center" : "text-base text-left"
+              }`}
               style={{
-                animation: "fadeInUp 1s ease-out",
+                animation: isMobileLayout ? "none" : "fadeInUp 1s ease-out",
                 animationDelay: "0.3s",
                 animationFillMode: "both",
               }}
@@ -79,7 +104,7 @@ export default function HeroSection3({ theme }) {
               href="#projects"
               className={`mt-4 ${theme.buttonBg} ${theme.buttonHover} ${theme.buttonText} font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-md shadow-lg transition text-sm sm:text-base`}
               style={{
-                animation: "fadeInUp 1s ease-out",
+                animation: isMobileLayout ? "none" : "fadeInUp 1s ease-out",
                 animationDelay: "0.5s",
                 animationFillMode: "both",
               }}
@@ -95,10 +120,20 @@ export default function HeroSection3({ theme }) {
 
         {/* Right Side Image */}
         <div
-          className="flex-1 w-full flex justify-center md:justify-end relative"
-          style={{ animation: "scaleIn 0.8s ease-in-out" }}
+          className={`flex-1 w-full flex justify-center  ${
+            isMobileLayout ? "" : "md:justify-start"
+          }`}
+          style={
+            isMobileLayout ? {} : { animation: "scaleIn 0.8s ease-in-out" }
+          }
         >
-          <div className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] mx-auto mt-8 sm:mt-12 md:mt-20">
+          <div
+            className={`relative ${
+              isMobileLayout
+                ? "w-[250px] h-[250px]"
+                : "w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px]"
+            } mx-auto mt-8 sm:mt-2 md:mt-2`}
+          >
             <Image
               src="/images/bg-2.png"
               alt="Background Decoration"
@@ -106,7 +141,6 @@ export default function HeroSection3({ theme }) {
               className="object-cover z-0 rounded-xl"
               priority
             />
-
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <Image
                 src="/images/no-bg.png"

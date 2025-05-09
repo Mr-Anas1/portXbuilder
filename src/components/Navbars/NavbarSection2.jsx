@@ -2,75 +2,83 @@
 
 import React, { useState } from "react";
 import { Menu, X, Github, Linkedin } from "lucide-react";
-import { previewThemes } from "@/components/ui/previewThemes";
 
-const NavbarSection2 = ({ theme, handleScrollToSection }) => {
+const NavbarSection2 = ({ theme, handleScrollToSection, isMobileLayout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = ["Home", "About", "Projects", "Contact"];
+  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <div
-      className={`h-20 w-full ${theme.bg} ${theme.shadow}  px-6 py-4`}
-      id="navbar"
-    >
-      <div className="max-w-7xl h-full mx-auto flex items-center justify-between">
-        {/* Left: Name */}
+    <nav className={`w-full ${theme.bg} ${theme.shadow}`} id="navbar">
+      <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
+        {/* Logo */}
         <div className={`text-xl font-bold ${theme.text}`}>John Wick</div>
 
-        {/* Center: Nav Links (Desktop) */}
-        <ul
-          className={`hidden md:flex gap-8 font-medium text-sm ${theme.text}`}
-        >
-          {navLinks.map((link, i) => (
-            <li
-              key={i}
-              className={`cursor-pointer transition-all duration-300 ${theme.hoverText} hover:scale-105`}
-              onClick={() => handleScrollToSection(link.toLowerCase())}
+        {/* Desktop Nav Links */}
+        {!isMobileLayout && (
+          <ul className={`flex gap-8 font-medium text-sm ${theme.text}`}>
+            {navLinks.map((link, i) => (
+              <li
+                key={i}
+                className={`cursor-pointer transition duration-300 ${theme.hoverText} hover:scale-105`}
+                onClick={() => handleScrollToSection(link.toLowerCase())}
+              >
+                {link}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Desktop Socials */}
+        {!isMobileLayout && (
+          <div className={`flex gap-4 ${theme.text}`}>
+            <a
+              href="https://github.com"
+              target="_blank"
+              className={`transition ${theme.hoverText}`}
             >
-              {link}
-            </li>
-          ))}
-        </ul>
+              <Github />
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              className={`transition ${theme.hoverText}`}
+            >
+              <Linkedin />
+            </a>
+          </div>
+        )}
 
-        {/* Right: Social Icons (Desktop) */}
-        <div className={`hidden md:flex gap-4 ${theme.text}`}>
-          <a
-            href="https://github.com"
-            target="_blank"
-            className={`transition ${theme.hoverText}`}
-          >
-            <Github />
-          </a>
-          <a
-            href="https://linkedin.com"
-            target="_blank"
-            className={`transition ${theme.hoverText}`}
-          >
-            <Linkedin />
-          </a>
-        </div>
-
-        {/* Hamburger Icon (Mobile) */}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className={`md:hidden ${theme.text}`}
-        >
-          {isOpen ? <X size={26} /> : <Menu size={26} />}
-        </button>
+        {/* Mobile Toggle Button */}
+        {isMobileLayout && (
+          <button onClick={toggleMenu} className={`${theme.text}`}>
+            {isOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+        )}
       </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden flex flex-col items-center gap-4 mt-4 animate-fadeIn">
+      {/* Mobile Dropdown */}
+      {isMobileLayout && (
+        <div
+          className={`overflow-hidden transition-all duration-500 ease-in-out ${
+            isOpen ? "max-h-96 py-6" : "max-h-0"
+          } flex flex-col items-center gap-6 text-sm font-medium ${theme.bg} ${
+            theme.text
+          }`}
+        >
           {navLinks.map((link, i) => (
             <span
               key={i}
-              className={`transition duration-300 text-sm ${theme.text} ${theme.hoverText}`}
+              onClick={() => {
+                handleScrollToSection(link.toLowerCase());
+                toggleMenu();
+              }}
+              className={`cursor-pointer transition duration-200 ${theme.hoverText}`}
             >
               {link}
             </span>
           ))}
-          <div className={`flex gap-4 ${theme.text}`}>
+          <div className="flex gap-6">
             <a
               href="https://github.com"
               target="_blank"
@@ -88,7 +96,7 @@ const NavbarSection2 = ({ theme, handleScrollToSection }) => {
           </div>
         </div>
       )}
-    </div>
+    </nav>
   );
 };
 

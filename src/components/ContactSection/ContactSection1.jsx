@@ -1,10 +1,10 @@
 "use client";
-import React from "react";
-import { FaSlack, FaEnvelope } from "react-icons/fa6";
-import { socialLinks } from "../../Helpers/SocialLinks";
-import { FaPhone } from "react-icons/fa";
 
-const ContactSection1 = ({ theme }) => {
+import React from "react";
+import { FaEnvelope, FaPhone } from "react-icons/fa6";
+import { socialLinks } from "../../Helpers/SocialLinks";
+
+const ContactSection1 = ({ theme, isMobileLayout }) => {
   const contactItems = [
     {
       icon: <FaPhone className={`text-2xl ${theme.accentText}`} />,
@@ -23,18 +23,20 @@ const ContactSection1 = ({ theme }) => {
 
   return (
     <section
-      className={`${theme.bg} ${theme.text} py-16 px-4 text-center min-h-screen flex flex-col items-center justify-center`}
       id="contact"
+      className={`${theme.bg} ${theme.text} py-16 px-4 flex flex-col items-center justify-center text-center min-h-screen`}
     >
+      {/* Heading */}
       <h2 className={`text-4xl font-semibold mb-2 ${theme.accentText}`}>
         CONTACT
       </h2>
-      <div className={`w-8 h-[2px] ${theme.accentText} mx-auto mb-8`} />
+      <div className={`w-8 h-[2px] ${theme.accentText} mx-auto mb-10`} />
 
+      {/* Contact Box */}
       <div
-        className={`w-full max-w-xl mx-auto rounded-xl shadow-lg px-6 py-10 ${theme.bg} ${theme.text}`}
+        className={`w-full max-w-xl mx-auto rounded-xl shadow-lg px-6 py-10 ${theme.bg} ${theme.text} transition-all duration-300`}
       >
-        <div className="flex flex-col gap-y-6">
+        <div className="flex flex-col gap-8">
           {contactItems.map((item, index) => (
             <div key={index} className="flex items-start gap-4">
               {item.icon}
@@ -43,12 +45,14 @@ const ContactSection1 = ({ theme }) => {
                 {item.isLink ? (
                   <a
                     href={item.href}
-                    className={`font-medium transition border-b border-transparent hover:${theme.accentText} hover:border-current`}
+                    className={`font-medium transition-all border-b border-transparent hover:${theme.accentText} hover:border-current`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     {item.content}
                   </a>
                 ) : (
-                  <p className={`transition hover:${theme.accentText}`}>
+                  <p className={`transition-all hover:${theme.accentText}`}>
                     {item.content}
                   </p>
                 )}
@@ -58,13 +62,14 @@ const ContactSection1 = ({ theme }) => {
         </div>
 
         {/* Social Icons */}
-        <div className="pt-8 flex justify-center gap-6 flex-wrap">
+        <div className="pt-10 flex justify-center gap-6 flex-wrap">
           {socialLinks.map((link, index) => (
             <a
               key={index}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={link.label || "Social link"}
             >
               {React.cloneElement(link.icon, {
                 className: `text-2xl ${theme.text} hover:${theme.accentText} transition-all duration-300`,
