@@ -36,20 +36,6 @@ export default function AboutSection3({
   isMobileLayout,
   setIsMobileLayout,
 }) {
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 767px)");
-
-    setIsMobileLayout(mediaQuery.matches);
-
-    const handleResize = (e) => {
-      setIsMobileLayout(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleResize);
-
-    return () => mediaQuery.removeEventListener("change", handleResize);
-  }, [setIsMobileLayout]);
-
   return (
     <section
       className={`min-h-screen mx-auto px-6 py-16 md:px-20 flex flex-col ${

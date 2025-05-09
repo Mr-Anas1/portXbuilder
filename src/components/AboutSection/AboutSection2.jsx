@@ -8,7 +8,7 @@ export default function AboutSection1({ theme, isMobileLayout }) {
       id="about"
       className={`flex flex-col ${
         isMobileLayout ? "md:px-4" : "md:flex-row"
-      } items-center justify-between px-6 md:px-16 py-20 transition-opacity duration-1000 ${
+      } items-center justify-center gap-5 px-6 md:px-16 py-20 transition-opacity duration-1000 ${
         theme.bg
       } min-h-screen`}
     >
