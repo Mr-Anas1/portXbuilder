@@ -73,7 +73,7 @@ const MobileSidebar = ({
                   className={`relative group text-md cursor-pointer flex items-center gap-2 text-gray-800 h-12 p-2 rounded-md transition-all duration-200 ease-in
                   ${
                     activeSection === section.id
-                      ? "bg-primary-500 text-white hover:bg-primary-600"
+                      ? "hover:bg-primary-100"
                       : "hover:bg-primary-100"
                   }`}
                 >
