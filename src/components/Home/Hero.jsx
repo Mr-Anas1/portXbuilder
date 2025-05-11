@@ -1,3 +1,4 @@
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "../ui/button";
 import Link from "next/link";
 
@@ -19,7 +20,7 @@ const Hero = () => {
 
       <Button variant="outline">
         <Link
-          href="/create"
+          href="/sign-up"
           className="bg-gradient-to-r from-primary-600 to-secondary-600 pointer text-white cursor-pointer text-md px-8 py-4 border-none hover:bg-primary-50 hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl rounded-full lg:text-lg"
         >
           Create

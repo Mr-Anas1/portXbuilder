@@ -32,7 +32,7 @@ export default function ProjectSection1({ theme, isMobileLayout }) {
                 isMobileLayout ? "max-w-[90%]" : "max-w-sm"
               }`}
             >
-              <div className="relative overflow-hidden h-56">
+              <div className="relataive overflow-hidden h-56">
                 <img
                   src={project.image}
                   alt={project.title}

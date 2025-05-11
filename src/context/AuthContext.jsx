@@ -46,9 +46,11 @@ export const AuthProvider = ({ children }) => {
             .single()
             .then(({ data, error }) => {
               if (!error) setUserData(data);
+              setLoading(false);
             });
         } else {
           setUserData(null);
+          setLoading(false);
         }
       }
     );

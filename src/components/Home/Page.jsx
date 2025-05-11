@@ -38,6 +38,7 @@ function Page() {
       </div>
     );
   }
+
   return (
     <section className="flex flex-col min-h-screen bg-background">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />

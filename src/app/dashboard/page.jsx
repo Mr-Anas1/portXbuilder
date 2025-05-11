@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Sidebar from "@/components/common/Sidebar/Page";
 import MobileSidebar from "@/components/common/MobileSidebar/Page";
+import { useAuth } from "@/context/AuthContext";
 import {
   Contact,
   Drama,
@@ -24,8 +25,10 @@ import { footerComponents } from "@/components/FooterSection/index";
 import { aboutComponents } from "@/components/AboutSection/index";
 import previewThemes from "@/components/ui/previewThemes";
 import SectionWrapper from "@/components/ui/SectionWrapper";
+import { usePortfolioRedirect } from "@/context/usePortfolioRedirect";
 
 const Dashboard = () => {
+  const { user, loading } = useAuth();
   const navbarRef = useRef(null);
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
@@ -36,8 +39,6 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("navbar");
   const [showOverlay, setShowOverlay] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
   const router = useRouter();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState({
@@ -49,7 +50,6 @@ const Dashboard = () => {
     footer: footerComponents[0],
   });
   const [isMobileLayout, setIsMobileLayout] = useState(false);
-
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
     { id: "home", label: "Home", icon: Sparkles, isCustom: false },
@@ -63,6 +63,14 @@ const Dashboard = () => {
       isCustom: false,
     },
   ]);
+
+  usePortfolioRedirect();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/sign-in");
+    }
+  }, [loading, user, router]);
 
   // For changing into mobile component
 
@@ -105,21 +113,15 @@ const Dashboard = () => {
     (section) => section.isCustom
   ).length;
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) {
-        console.error("No active user session:", error?.message);
-        router.push("/sign-in");
-      } else {
-        setUser(data.user);
-      }
-      setLoading(false);
-    };
-    fetchUser();
-  }, [router]);
-
   if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>

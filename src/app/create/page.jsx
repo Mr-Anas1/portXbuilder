@@ -1,8 +1,28 @@
+"use client";
 import CreatePortfolio from "@/components/common/[onboarding]/CreatePortfolio";
-import React from "react";
+import React, { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
-const page = () => {
+const Page = () => {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/sign-in");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return <CreatePortfolio />;
 };
 
-export default page;
+export default Page;
