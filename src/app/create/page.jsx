@@ -22,7 +22,11 @@ const Page = () => {
     );
   }
 
-  return <CreatePortfolio />;
+  return (
+    <div className="-z-50">
+      <CreatePortfolio />
+    </div>
+  );
 };
 
 export default Page;

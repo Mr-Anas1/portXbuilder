@@ -44,7 +44,7 @@ const Navbar = ({ isDashboard }) => {
   };
 
   return (
-    <section className="border-b border-gray-200 relative ">
+    <section className="border-b border-gray-200 relative z-50">
       <div
         className={`${
           isDashboard ? "fixed w-screen z-50 bg-background" : " "

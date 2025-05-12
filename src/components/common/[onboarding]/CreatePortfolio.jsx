@@ -8,8 +8,9 @@ import Social from "./Social";
 import Review from "./Review";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import Navbar from "../Navbar/Page";
 import Footer from "@/components/Home/Footer";
+import Navbar from "../Navbar/Page";
+
 function CreatePortfolio() {
   const [page, setPage] = useState(0);
 
@@ -75,7 +76,7 @@ function CreatePortfolio() {
         <Navbar />
         {console.log(formData)}
 
-        <div className="text-center relative w-screen flex flex-col justify-center items-center gap-6 my-12">
+        <div className="text-center h-[calc(100vh-86px)] relative w-screen flex flex-col justify-center items-center gap-6 ">
           {PageDisplay()}
 
           {page === 0 ? (

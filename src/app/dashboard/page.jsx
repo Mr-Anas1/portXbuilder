@@ -35,7 +35,8 @@ const Dashboard = () => {
   const projectsRef = useRef(null);
   const contactRef = useRef(null);
   const footerRef = useRef(null);
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasPortfolio, setHasPortfolio] = useState(false);
   const [activeSection, setActiveSection] = useState("navbar");
   const [showOverlay, setShowOverlay] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
@@ -71,6 +72,51 @@ const Dashboard = () => {
       router.push("/sign-in");
     }
   }, [loading, user, router]);
+
+  useEffect(() => {
+    const checkPortfolio = async () => {
+      if (loading || !user) {
+        return;
+      }
+
+      setIsLoading(true); // Show spinner while checking portfolio
+
+      // Query portfolio table for the user
+      const { data, error } = await supabase
+        .from("portfolios")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) {
+        console.error(error.message);
+      } else {
+        setHasPortfolio(!!data); // Set whether portfolio exists
+      }
+
+      setIsLoading(false); // Hide spinner after check
+    };
+
+    checkPortfolio();
+  }, [user, loading]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!hasPortfolio) {
+        router.push("/create"); // Redirect to create page if no portfolio
+      }
+    }
+  }, [isLoading, hasPortfolio, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // If user has no portfolio, redirect to /create
 
   // For changing into mobile component
 
@@ -157,26 +203,12 @@ const Dashboard = () => {
 
   const theme = previewThemes["default"];
 
-  return (
-    <section className="relative min-h-screen flex flex-col bg-background">
-      <Navbar isDashboard={true} />
-      <div className="flex">
-        <Sidebar
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          showOverlay={showOverlay}
-          setShowOverlay={setShowOverlay}
-          newSectionName={newSectionName}
-          setNewSectionName={setNewSectionName}
-          removeSection={removeSection}
-          customSectionCount={customSectionsCount}
-          sections={sections}
-          setSections={setSections}
-          handleScrollToSection={handleScrollToSection}
-        />
-        {mobileSidebarOpen && (
-          <MobileSidebar
-            setMobileSidebarOpen={setMobileSidebarOpen}
+  if (hasPortfolio) {
+    return (
+      <section className="relative min-h-screen flex flex-col bg-background">
+        <Navbar isDashboard={true} />
+        <div className="flex">
+          <Sidebar
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             showOverlay={showOverlay}
@@ -189,108 +221,124 @@ const Dashboard = () => {
             setSections={setSections}
             handleScrollToSection={handleScrollToSection}
           />
-        )}
+          {mobileSidebarOpen && (
+            <MobileSidebar
+              setMobileSidebarOpen={setMobileSidebarOpen}
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
+              showOverlay={showOverlay}
+              setShowOverlay={setShowOverlay}
+              newSectionName={newSectionName}
+              setNewSectionName={setNewSectionName}
+              removeSection={removeSection}
+              customSectionCount={customSectionsCount}
+              sections={sections}
+              setSections={setSections}
+              handleScrollToSection={handleScrollToSection}
+            />
+          )}
 
-        <div className="flex-1 mt-16 ">
-          <div
-            className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
-              isMobileLayout ? "max-w-[430px] mx-auto md:ml-[45%]" : ""
-            }`}
-          >
-            {/* Fixed outline container */}
-            <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
-              <SectionWrapper
-                id="navbar"
-                innerRef={navbarRef}
-                Component={selectedComponent.navbar}
-                theme={theme}
-                handleScrollToSection={handleScrollToSection}
-                changeFunction={changeSingleComponent}
-                componentList={navbarComponents}
-                isMobileLayout={isMobileLayout}
-                setIsMobileLayout={setIsMobileLayout}
-              />
+          <div className="flex-1 mt-16 ">
+            <div
+              className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
+                isMobileLayout ? "max-w-[430px] mx-auto md:ml-[45%]" : ""
+              }`}
+            >
+              {/* Fixed outline container */}
+              <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
+                <SectionWrapper
+                  id="navbar"
+                  innerRef={navbarRef}
+                  Component={selectedComponent.navbar}
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                  changeFunction={changeSingleComponent}
+                  componentList={navbarComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                />
 
-              <SectionWrapper
-                id="home"
-                innerRef={homeRef}
-                Component={selectedComponent.home}
-                theme={theme}
-                handleScrollToSection={handleScrollToSection}
-                changeFunction={changeSingleComponent}
-                componentList={heroComponents}
-                isMobileLayout={isMobileLayout}
-              />
+                <SectionWrapper
+                  id="home"
+                  innerRef={homeRef}
+                  Component={selectedComponent.home}
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                  changeFunction={changeSingleComponent}
+                  componentList={heroComponents}
+                  isMobileLayout={isMobileLayout}
+                />
 
-              <SectionWrapper
-                id="about"
-                innerRef={aboutRef}
-                Component={selectedComponent.about}
-                theme={theme}
-                changeFunction={changeSingleComponent}
-                componentList={aboutComponents}
-                isMobileLayout={isMobileLayout}
-                setIsMobileLayout={setIsMobileLayout}
-              />
+                <SectionWrapper
+                  id="about"
+                  innerRef={aboutRef}
+                  Component={selectedComponent.about}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={aboutComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                />
 
-              <SectionWrapper
-                id="projects"
-                innerRef={projectsRef}
-                Component={selectedComponent.projects}
-                theme={theme}
-                changeFunction={changeSingleComponent}
-                componentList={projectsComponents}
-                isMobileLayout={isMobileLayout}
-              />
+                <SectionWrapper
+                  id="projects"
+                  innerRef={projectsRef}
+                  Component={selectedComponent.projects}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={projectsComponents}
+                  isMobileLayout={isMobileLayout}
+                />
 
-              <SectionWrapper
-                id="contact"
-                innerRef={contactRef}
-                Component={selectedComponent.contact}
-                theme={theme}
-                changeFunction={changeSingleComponent}
-                componentList={contactComponents}
-                isMobileLayout={isMobileLayout}
-              />
+                <SectionWrapper
+                  id="contact"
+                  innerRef={contactRef}
+                  Component={selectedComponent.contact}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={contactComponents}
+                  isMobileLayout={isMobileLayout}
+                />
 
-              <SectionWrapper
-                id="footer"
-                innerRef={footerRef}
-                Component={selectedComponent.footer}
-                theme={theme}
-                changeFunction={changeSingleComponent}
-                componentList={footerComponents}
-                isMobileLayout={isMobileLayout}
-              />
+                <SectionWrapper
+                  id="footer"
+                  innerRef={footerRef}
+                  Component={selectedComponent.footer}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={footerComponents}
+                  isMobileLayout={isMobileLayout}
+                />
+              </div>
             </div>
           </div>
+
+          <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
+            <button
+              className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            >
+              Edit
+            </button>
+
+            <button
+              className="px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+              onClick={handleComponentChange}
+            >
+              Change
+            </button>
+
+            <button
+              className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
+              onClick={handleMobileLayoutClick}
+            >
+              <Smartphone />
+            </button>
+          </div>
         </div>
-
-        <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
-          <button
-            className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          >
-            Edit
-          </button>
-
-          <button
-            className="px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
-            onClick={handleComponentChange}
-          >
-            Change
-          </button>
-
-          <button
-            className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
-            onClick={handleMobileLayoutClick}
-          >
-            <Smartphone />
-          </button>
-        </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  }
 };
 
 export default Dashboard;
