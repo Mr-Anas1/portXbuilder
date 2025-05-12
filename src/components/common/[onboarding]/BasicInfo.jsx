@@ -33,7 +33,7 @@ const BasicInfo = ({
       age: /^(?:1[01][0-9]|120|[1-9]?[0-9])$/,
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       phone: /^\+?[0-9\s\-()]{7,20}$/,
-      location: /^[A-Z]{2}$/, // Assuming ISO country code like "US", "IN"
+      location: /^[a-zA-Z\s]{2,}$/,
     };
 
     const validInput = validationRules[name]?.test(value) ?? true;
@@ -48,13 +48,15 @@ const BasicInfo = ({
       formData.age.trim() &&
       formData.email.trim() &&
       formData.phone.trim() &&
+      formData.location.trim() &&
       validInput &&
       validationRules["name"].test(formData.name) &&
       validationRules["profession"].test(formData.profession) &&
       validationRules["bio"].test(formData.bio) &&
       validationRules["age"].test(formData.age) &&
       validationRules["email"].test(formData.email) &&
-      validationRules["phone"].test(formData.phone);
+      validationRules["phone"].test(formData.phone) &&
+      validationRules["location"].test(formData.location);
 
     setProceed(allValid);
     console.log(formData);
@@ -127,14 +129,13 @@ const BasicInfo = ({
             Country
           </label>
           <ReactFlagsSelect
-            selected={Object.keys(countryLabels).find(
-              (code) => countryLabels[code] === selectedCountry
-            )}
+            selected={selectedCountry}
             searchable
             className="flag-group custom-flags-select w-full rounded-xl text-gray-700 hover:border-primary-600 transition-all duration-300"
             customLabels={countryLabels}
             onSelect={(code) => {
               const countryName = countryLabels[code];
+              setSelectedCountry(code);
               handleInputChange("location", countryName);
             }}
           />
