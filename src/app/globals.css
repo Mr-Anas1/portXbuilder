@@ -9,11 +9,16 @@ html {
 }
 
 #rfs-btn {
-    @apply w-full rounded-xl text-gray-700 hover:border-primary-600 transition-all duration-300;
+    @apply w-full rounded-md text-gray-500 group-hover:border-primary-500 transition-all duration-300;
     /* Add any other Tailwind styles you need */
 }
 
+.ReactFlagsSelect-module_selectValue__152eS {
+    transition: color 0.5s ease;
+    /* always apply this */
+}
+
 .flag-group:hover .ReactFlagsSelect-module_selectValue__152eS {
-    @apply text-primary-600;
-    /* or any Tailwind text color like text-blue-600 */
+    color: #8b5cf6;
+    /* text-primary-500 */
 }

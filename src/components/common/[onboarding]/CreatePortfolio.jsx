@@ -9,6 +9,7 @@ import Review from "./Review";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Navbar from "../Navbar/Page";
+import { supabase } from "@/lib/supabaseClient";
 
 function CreatePortfolio() {
   const [page, setPage] = useState(0);
@@ -76,6 +77,71 @@ function CreatePortfolio() {
     }
   };
 
+  const handleCreatePortfolio = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.error("No user logged in");
+      return;
+    }
+
+    let profileImagePath = "";
+
+    if (formData.profileImage) {
+      const file = formData.profileImage;
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `profile-images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("profile-images")
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error("Error uploading image:", uploadError.message);
+        return;
+      }
+
+      // Optionally get the public URL
+      const { data: urlData } = supabase.storage
+        .from("profile-images")
+        .getPublicUrl(filePath);
+
+      profileImagePath = urlData?.publicUrl || filePath;
+    }
+
+    const { error } = await supabase.from("portfolios").upsert(
+      {
+        user_id: user.id,
+        name: formData.name,
+        age: formData.age,
+        profession: formData.profession,
+        profileImage: profileImagePath,
+        bio: formData.bio,
+        email: formData.email,
+        location: formData.location,
+        phone: formData.phone,
+        github: formData.github,
+        linkedin: formData.linkedin,
+        x: formData.x,
+        instagram: formData.instagram,
+        facebook: formData.facebook,
+        projects: formData.projects,
+      },
+      {
+        onConflict: "user_id",
+      }
+    );
+
+    if (error) {
+      console.error("Error inserting data:", error.message);
+    } else {
+      console.log("Portfolio created successfully");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background relative overflow-x-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -111,7 +177,7 @@ function CreatePortfolio() {
               <Button
                 className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 size="lg"
-                onClick={() => setPage((currentPage) => currentPage + 1)}
+                onClick={handleCreatePortfolio}
                 disabled={!proceed || page === FormTitles.length - 1}
               >
                 Create Portfolio

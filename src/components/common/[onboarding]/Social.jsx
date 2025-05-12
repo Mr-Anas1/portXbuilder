@@ -1,5 +1,5 @@
 import React from "react";
-import { Github, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Github, Instagram, Linkedin, Twitter } from "lucide-react";
 
 const Social = ({ formData, setFormData }) => {
   const handleChange = (e) => {
@@ -39,8 +39,8 @@ const Social = ({ formData, setFormData }) => {
               type="text"
               className="w-full pl-10 pr-4 py-2 outline-none rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 group-hover:border-primary-400"
               placeholder="X profile URL or username"
-              name="twitter"
-              value={formData.twitter}
+              name="x"
+              value={formData.x}
               onChange={handleChange}
             />
           </div>
@@ -73,6 +73,22 @@ const Social = ({ formData, setFormData }) => {
               placeholder="Instagram profile URL or username"
               name="instagram"
               value={formData.instagram}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+        <div className="group">
+          <div className="relative">
+            <Facebook
+              className="absolute left-3 top-2.5 text-gray-500 group-hover:text-primary-600 transition-colors"
+              size={20}
+            />
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 outline-none rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300 group-hover:border-primary-400"
+              placeholder="Facebook profile URL or username"
+              name="facebook"
+              value={formData.facebook}
               onChange={handleChange}
             />
           </div>

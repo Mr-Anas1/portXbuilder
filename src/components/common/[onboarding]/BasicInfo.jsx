@@ -20,10 +20,16 @@ const BasicInfo = ({
   setProceed,
 }) => {
   const [selectedCountry, setSelectedCountry] = useState("");
+
   const handleInputChange = (eOrName, valueOptional) => {
     const name = typeof eOrName === "string" ? eOrName : eOrName.target.name;
-    const value =
-      typeof eOrName === "string" ? valueOptional : eOrName.target.value;
+    const isFileInput = eOrName?.target?.type === "file";
+
+    const value = isFileInput
+      ? eOrName.target.files[0]
+      : typeof eOrName === "string"
+      ? valueOptional
+      : eOrName.target.value;
 
     const validationRules = {
       name: /^[a-zA-Z\s]*$/,
@@ -36,30 +42,37 @@ const BasicInfo = ({
       location: /^[a-zA-Z\s]{2,}$/,
     };
 
-    const validInput = validationRules[name]?.test(value) ?? true;
+    const validInput = isFileInput
+      ? true
+      : validationRules[name]?.test(value) ?? true;
 
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Create new formData for validation
+    const newFormData = {
+      ...formData,
+      [name]: value,
+    };
+
+    setFormData(newFormData);
     setIsValid((prev) => ({ ...prev, [name]: validInput }));
 
     const allValid =
-      formData.name.trim() &&
-      formData.profession.trim() &&
-      formData.bio.trim() &&
-      formData.age.trim() &&
-      formData.email.trim() &&
-      formData.phone.trim() &&
-      formData.location.trim() &&
-      validInput &&
-      validationRules["name"].test(formData.name) &&
-      validationRules["profession"].test(formData.profession) &&
-      validationRules["bio"].test(formData.bio) &&
-      validationRules["age"].test(formData.age) &&
-      validationRules["email"].test(formData.email) &&
-      validationRules["phone"].test(formData.phone) &&
-      validationRules["location"].test(formData.location);
+      newFormData.name?.trim() &&
+      newFormData.profession?.trim() &&
+      newFormData.bio?.trim() &&
+      newFormData.age?.trim() &&
+      newFormData.email?.trim() &&
+      newFormData.phone?.trim() &&
+      newFormData.location?.trim() &&
+      newFormData.profileImage && // this might be 'picture' instead?
+      validationRules["name"].test(newFormData.name) &&
+      validationRules["profession"].test(newFormData.profession) &&
+      validationRules["bio"].test(newFormData.bio) &&
+      validationRules["age"].test(newFormData.age) &&
+      validationRules["email"].test(newFormData.email) &&
+      validationRules["phone"].test(newFormData.phone) &&
+      validationRules["location"].test(newFormData.location);
 
-    setProceed(allValid);
-    console.log(formData);
+    setProceed(!!allValid);
   };
 
   return (
@@ -104,15 +117,6 @@ const BasicInfo = ({
           onChange={handleInputChange}
           isValid={isValid.email}
         />
-        {/* <FormInput
-          name="location"
-          title="Location"
-          placeholder="India"
-          type="text"
-          value={formData.location}
-          onChange={handleInputChange}
-          isValid={isValid.location}
-        /> */}
 
         <FormInput
           name="phone"
@@ -124,14 +128,14 @@ const BasicInfo = ({
           isValid={isValid.phone}
         />
 
-        <div className="flex flex-col justify-start items-start mx-2 my-4 group">
-          <label className="block text-sm font-medium text-gray-700 mb-1 group-hover:text-primary-600 transition-colors">
+        <div className="flex flex-col justify-start items-start mx-2 my-4 group flag-group ">
+          <label className="block text-sm font-medium text-gray-700 mb-1 group-hover:text-primary-500 group-hover:border-primary-500 transition-colors">
             Country
           </label>
           <ReactFlagsSelect
             selected={selectedCountry}
             searchable
-            className="flag-group custom-flags-select w-full rounded-xl text-gray-700 hover:border-primary-600 transition-all duration-300"
+            className="flag-group custom-flags-select w-full rounded-xl text-gray-700 group-hover:border-primary-500 transition-all duration-300"
             customLabels={countryLabels}
             onSelect={(code) => {
               const countryName = countryLabels[code];
@@ -150,6 +154,30 @@ const BasicInfo = ({
           onChange={handleInputChange}
           isValid={isValid.bio}
         />
+
+        <div className="flex flex-col justify-start items-start mx-2 my-4 group">
+          <label className="block text-sm font-medium text-gray-700 mb-1 group-hover:text-primary-600 transition-colors">
+            Profile Image
+          </label>
+
+          <input
+            id="profileImage"
+            name="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={handleInputChange}
+            className="hidden"
+          />
+
+          <label
+            htmlFor="profileImage"
+            className="cursor-pointer rounded-lg px-4 py-2 w-full border text-gray-500 border-gray-300 group-hover:border-primary-500 group-hover:text-primary-500 transition-all duration-300 text-center"
+          >
+            {formData.profileImage
+              ? formData.profileImage.name
+              : "Upload Profile Image"}
+          </label>
+        </div>
       </div>
     </section>
   );
