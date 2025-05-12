@@ -8,7 +8,6 @@ import Social from "./Social";
 import Review from "./Review";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import Footer from "@/components/Home/Footer";
 import Navbar from "../Navbar/Page";
 
 function CreatePortfolio() {
@@ -16,16 +15,26 @@ function CreatePortfolio() {
 
   const [formData, setFormData] = useState({
     name: "",
+    age: "",
     profession: "",
     profileImage: "",
     bio: "",
+    email: "",
+    location: "",
+    phone: "",
     projects: [
-      { title: "", description: "", project_link: "", project_img: "" },
+      {
+        project_title: "",
+        project_description: "",
+        project_link: "",
+        project_img: "",
+      },
     ],
     github: "",
     linkedin: "",
-    twitter: "",
+    x: "",
     instagram: "",
+    facebook: "",
   });
 
   const [isValid, setIsValid] = useState({
@@ -76,7 +85,7 @@ function CreatePortfolio() {
         <Navbar />
         {console.log(formData)}
 
-        <div className="text-center h-[calc(100vh-86px)] relative w-screen flex flex-col justify-center items-center gap-6 ">
+        <div className="text-center my-12 min-h-[calc(100vh-86px)] relative w-screen flex flex-col justify-center items-center gap-6 ">
           {PageDisplay()}
 
           {page === 0 ? (

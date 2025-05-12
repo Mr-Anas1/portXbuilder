@@ -7,3 +7,13 @@ html {
     scroll-behavior: smooth;
     background-color: #f3f3fa;
 }
+
+#rfs-btn {
+    @apply w-full rounded-xl text-gray-700 hover:border-primary-600 transition-all duration-300;
+    /* Add any other Tailwind styles you need */
+}
+
+.flag-group:hover .ReactFlagsSelect-module_selectValue__152eS {
+    @apply text-primary-600;
+    /* or any Tailwind text color like text-blue-600 */
+}
