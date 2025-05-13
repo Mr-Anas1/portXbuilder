@@ -40,6 +40,7 @@ const BasicInfo = ({
       email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       phone: /^\+?[0-9\s\-()]{7,20}$/,
       location: /^[a-zA-Z\s]{2,}$/,
+      experience: /^(?:1[01][0-9]|120|[1-9]?[0-9])$/,
     };
 
     const validInput = isFileInput
@@ -63,7 +64,8 @@ const BasicInfo = ({
       newFormData.email?.trim() &&
       newFormData.phone?.trim() &&
       newFormData.location?.trim() &&
-      newFormData.profileImage && // this might be 'picture' instead?
+      newFormData.experience?.trim() &&
+      newFormData.profileImage &&
       validationRules["name"].test(newFormData.name) &&
       validationRules["profession"].test(newFormData.profession) &&
       validationRules["bio"].test(newFormData.bio) &&
@@ -71,6 +73,7 @@ const BasicInfo = ({
       validationRules["email"].test(newFormData.email) &&
       validationRules["phone"].test(newFormData.phone) &&
       validationRules["location"].test(newFormData.location);
+    validationRules["experience"].test(newFormData.experience);
 
     setProceed(!!allValid);
   };
@@ -91,15 +94,6 @@ const BasicInfo = ({
           isValid={isValid.name}
         />
         <FormInput
-          name="profession"
-          title="Profession"
-          placeholder="Software Developer"
-          type="text"
-          value={formData.profession}
-          onChange={handleInputChange}
-          isValid={isValid.profession}
-        />
-        <FormInput
           name="age"
           title="Age"
           placeholder="21"
@@ -108,6 +102,7 @@ const BasicInfo = ({
           onChange={handleInputChange}
           isValid={isValid.age}
         />
+
         <FormInput
           name="email"
           title="Email"
@@ -127,7 +122,6 @@ const BasicInfo = ({
           onChange={handleInputChange}
           isValid={isValid.phone}
         />
-
         <div className="flex flex-col justify-start items-start mx-2 my-4 group flag-group ">
           <label className="block text-sm font-medium text-gray-700 mb-1 group-hover:text-primary-500 group-hover:border-primary-500 transition-colors">
             Country
@@ -144,6 +138,26 @@ const BasicInfo = ({
             }}
           />
         </div>
+
+        <FormInput
+          name="profession"
+          title="Profession"
+          placeholder="Software Developer"
+          type="text"
+          value={formData.profession}
+          onChange={handleInputChange}
+          isValid={isValid.profession}
+        />
+
+        <FormInput
+          name="experience"
+          title="Experience"
+          placeholder="Years of experience"
+          type="text"
+          value={formData.experience}
+          onChange={handleInputChange}
+          isValid={isValid.experience}
+        />
 
         <TextInput
           name="bio"

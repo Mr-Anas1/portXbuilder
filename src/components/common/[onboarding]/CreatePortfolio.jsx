@@ -10,15 +10,24 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Navbar from "../Navbar/Page";
 import { supabase } from "@/lib/supabaseClient";
+import { generateFields } from "@/lib/generateFields";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 function CreatePortfolio() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const [page, setPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasPortfolio, setHasPortfolio] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
     age: "",
     profession: "",
     profileImage: "",
+    experience: "",
     bio: "",
     email: "",
     location: "",
@@ -36,6 +45,11 @@ function CreatePortfolio() {
     x: "",
     instagram: "",
     facebook: "",
+
+    home_title: "",
+    home_subtitle: "",
+    about_me: "",
+    skills: [],
   });
 
   const [isValid, setIsValid] = useState({
@@ -45,6 +59,29 @@ function CreatePortfolio() {
   });
 
   const [proceed, setProceed] = useState(false);
+
+  useEffect(() => {
+    const checkPortfolio = async () => {
+      if (loading || !user) return;
+
+      const { data, error } = await supabase
+        .from("portfolios")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle(); // safer than .single() for optional results
+
+      if (error) {
+        console.error("Error checking portfolio:", error.message);
+        return;
+      }
+
+      if (data) {
+        router.push("/dashboard"); // Redirect if portfolio exists
+      }
+    };
+
+    checkPortfolio();
+  }, [user, loading, router, supabase]);
 
   const FormTitles = [
     "Welcome",
@@ -87,38 +124,59 @@ function CreatePortfolio() {
       return;
     }
 
-    let profileImagePath = "";
-
-    if (formData.profileImage) {
-      const file = formData.profileImage;
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `profile-images/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("profile-images")
-        .upload(filePath, file);
-
-      if (uploadError) {
-        console.error("Error uploading image:", uploadError.message);
+    try {
+      if (
+        !formData ||
+        !formData.name ||
+        !formData.profession ||
+        !formData.age ||
+        !formData.experience
+      ) {
+        console.error("Missing required fields");
         return;
       }
 
-      // Optionally get the public URL
-      const { data: urlData } = supabase.storage
-        .from("profile-images")
-        .getPublicUrl(filePath);
+      const aiFields = await generateFields({
+        name: formData.name,
+        profession: formData.profession,
+        age: formData.age,
+        experience: formData.experience,
+      });
 
-      profileImagePath = urlData?.publicUrl || filePath;
-    }
+      if (!aiFields) {
+        console.error("Failed to generate AI fields");
+        return;
+      }
 
-    const { error } = await supabase.from("portfolios").upsert(
-      {
+      let profileImagePath = "";
+      if (formData.profileImage) {
+        const file = formData.profileImage;
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `profile-images/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("profile-images")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError.message);
+          return;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from("profile-images")
+          .getPublicUrl(filePath);
+
+        profileImagePath = urlData?.publicUrl || filePath;
+      }
+
+      const fullData = {
         user_id: user.id,
         name: formData.name,
         age: formData.age,
         profession: formData.profession,
-        profileImage: profileImagePath,
+        experience: formData.experience,
         bio: formData.bio,
         email: formData.email,
         location: formData.location,
@@ -129,16 +187,34 @@ function CreatePortfolio() {
         instagram: formData.instagram,
         facebook: formData.facebook,
         projects: formData.projects,
-      },
-      {
-        onConflict: "user_id",
-      }
-    );
+        profileImage: profileImagePath,
+        ...aiFields,
+      };
 
-    if (error) {
-      console.error("Error inserting data:", error.message);
-    } else {
-      console.log("Portfolio created successfully");
+      const { error: insertError } = await supabase
+        .from("portfolios")
+        .upsert(fullData, {
+          onConflict: "user_id",
+        });
+
+      if (insertError) {
+        console.error(
+          "Error inserting/updating portfolio:",
+          insertError.message
+        );
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        ...aiFields,
+        profileImage: profileImagePath,
+      }));
+
+      console.log("Portfolio created successfully with AI fields!");
+      router.push("/dashboard");
+    } catch (err) {
+      console.error("Unexpected error:", err.message || err);
     }
   };
 
@@ -149,7 +225,6 @@ function CreatePortfolio() {
       <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
       <div className="h-screen overflow-x-hidden">
         <Navbar />
-        {console.log(formData)}
 
         <div className="text-center my-12 min-h-[calc(100vh-86px)] relative w-screen flex flex-col justify-center items-center gap-6 ">
           {PageDisplay()}
