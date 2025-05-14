@@ -1,8 +1,13 @@
 // src/app/layout.js
 
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { PortfolioProvider } from "@/context/PortfolioContext";
+import { SessionContextProvider } from "@supabase/auth-helpers-react";
+import { supabase } from "@/lib/supabaseClient";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +19,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "Your App",
-  description: "Awesome stuff",
-};
+// export const metadata = {
+//   title: "Your App",
+//   description: "Awesome stuff",
+// };
 
 export default function RootLayout({ children }) {
   return (
@@ -25,7 +30,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <SessionContextProvider supabaseClient={supabase}>
+          <AuthProvider>
+            <PortfolioProvider>{children}</PortfolioProvider>
+          </AuthProvider>
+        </SessionContextProvider>
       </body>
     </html>
   );

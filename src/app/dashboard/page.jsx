@@ -79,9 +79,8 @@ const Dashboard = () => {
         return;
       }
 
-      setIsLoading(true); // Show spinner while checking portfolio
+      setIsLoading(true);
 
-      // Query portfolio table for the user
       const { data, error } = await supabase
         .from("portfolios")
         .select("id")
@@ -91,10 +90,10 @@ const Dashboard = () => {
       if (error) {
         console.error(error.message);
       } else {
-        setHasPortfolio(!!data); // Set whether portfolio exists
+        setHasPortfolio(!!data);
       }
 
-      setIsLoading(false); // Hide spinner after check
+      setIsLoading(false);
     };
 
     checkPortfolio();
@@ -103,7 +102,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (!isLoading) {
       if (!hasPortfolio) {
-        router.push("/create"); // Redirect to create page if no portfolio
+        router.push("/create");
       }
     }
   }, [isLoading, hasPortfolio, router]);
@@ -115,8 +114,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
-  // If user has no portfolio, redirect to /create
 
   // For changing into mobile component
 

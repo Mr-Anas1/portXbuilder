@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 export default function HeroSection1({
   theme,
@@ -8,6 +9,10 @@ export default function HeroSection1({
   isMobileLayout,
 }) {
   const isMobile = isMobileLayout;
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
 
   return (
     <section
@@ -34,8 +39,9 @@ export default function HeroSection1({
               isMobile ? "text-2xl" : "text-4xl md:text-5xl"
             } font-bold leading-tight ${theme.text}`}
           >
-            Designing for <br />
-            <span className={theme.accentText}>Amazing People</span>
+            {/* Designing for <br />
+            <span className={theme.accentText}>Amazing People</span> */}
+            {portfolio.home_title}
           </h1>
           <p
             className={`mt-4 ${isMobile ? "text-base" : "text-lg"} ${
