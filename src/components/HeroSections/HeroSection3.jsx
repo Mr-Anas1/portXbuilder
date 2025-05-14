@@ -1,5 +1,6 @@
 "use client";
 
+import { usePortfolio } from "@/context/PortfolioContext";
 import Image from "next/image";
 
 export default function HeroSection3({
@@ -7,6 +8,10 @@ export default function HeroSection3({
   handleScrollToSection,
   isMobileLayout,
 }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <>
       <style jsx>{`
@@ -74,7 +79,7 @@ export default function HeroSection3({
             >
               Hello, I'm{" "}
               <span className={`font-bold ${theme.accentText}`}>
-                Mohamed Anas
+                {portfolio.name}
               </span>
             </h1>
 
@@ -83,7 +88,7 @@ export default function HeroSection3({
                 isMobileLayout ? "text-lg" : "text-xl sm:text-2xl md:text-3xl"
               }`}
             >
-              A Passionate Frontend Developer
+              A Passionate {portfolio.profession}
             </h2>
 
             <p

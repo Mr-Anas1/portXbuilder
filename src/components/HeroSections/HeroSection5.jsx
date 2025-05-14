@@ -1,4 +1,5 @@
 "use client";
+import { usePortfolio } from "@/context/PortfolioContext";
 import React from "react";
 
 export default function HomeSection5({
@@ -6,6 +7,10 @@ export default function HomeSection5({
   handleScrollToSection,
   isMobileLayout,
 }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       className={`min-h-screen flex flex-col ${
@@ -30,7 +35,7 @@ export default function HomeSection5({
             isMobileLayout ? "text-3xl" : "text-5xl"
           } font-semibold leading-snug mt-2`}
         >
-          Hello! I’m <br /> Mohamed Anas
+          Hello! I’m <br /> {portfolio.name}
         </h1>
       </div>
 
@@ -41,10 +46,10 @@ export default function HomeSection5({
         }`}
       >
         <p className="text-xl font-medium">
-          A Website designer based in <br /> India.
+          A {portfolio.profession} based in <br /> {portfolio.location}.
         </p>
         <p className={`text-sm mt-2 ${theme.subtext}`}>
-          Passionate creating great experiences for Web Development.
+          {portfolio.home_subtitle}
         </p>
 
         <div

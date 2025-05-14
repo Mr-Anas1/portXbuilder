@@ -1,5 +1,6 @@
 "use client";
 
+import { usePortfolio } from "@/context/PortfolioContext";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -8,8 +9,12 @@ export default function HeroSection4({
   handleScrollToSection,
   isMobileLayout,
 }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   const [text, setText] = useState("");
-  const name = "Mohamed Anas";
+  const name = portfolio.name;
   const [isTyping, setIsTyping] = useState(true);
 
   useEffect(() => {
@@ -65,7 +70,7 @@ export default function HeroSection4({
               ></span>
             </span>{" "}
             <br />
-            Frontend Developer
+            {portfolio.profession}
           </h1>
 
           <a
@@ -99,7 +104,7 @@ export default function HeroSection4({
         <div className="relative w-full h-full">
           <Image
             src="/images/no-bg.png"
-            alt="Profile picture of Mohamed Anas"
+            alt="Profile picture"
             width={550}
             height={550}
             className="w-full h-full object-cover rounded-[42%_58%_70%_30%_/_40%_45%_55%_60%]"

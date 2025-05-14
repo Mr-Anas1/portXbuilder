@@ -39,8 +39,6 @@ export default function HeroSection1({
               isMobile ? "text-2xl" : "text-4xl md:text-5xl"
             } font-bold leading-tight ${theme.text}`}
           >
-            {/* Designing for <br />
-            <span className={theme.accentText}>Amazing People</span> */}
             {portfolio.home_title}
           </h1>
           <p
@@ -48,7 +46,7 @@ export default function HeroSection1({
               theme.subtext
             }`}
           >
-            Designing user interfaces for over 10 years as visual designer
+            {portfolio.home_subtitle}
           </p>
           <div
             className={`mt-6 flex items-center ${

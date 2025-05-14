@@ -1,5 +1,6 @@
 "use client";
 
+import { usePortfolio } from "@/context/PortfolioContext";
 import { useEffect, useState } from "react";
 
 export default function HeroSection2({
@@ -7,9 +8,6 @@ export default function HeroSection2({
   handleScrollToSection,
   isMobileLayout,
 }) {
-  const fullText = "Mohamed Anas";
-  const [displayedText, setDisplayedText] = useState("");
-
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
@@ -22,6 +20,12 @@ export default function HeroSection2({
   }, []);
 
   const isMobile = isMobileLayout;
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
+  const fullText = portfolio.name;
+  const [displayedText, setDisplayedText] = useState("");
 
   return (
     <section
@@ -60,8 +64,7 @@ export default function HeroSection2({
                 : "text-lg md:text-xl text-left"
             } max-w-2xl ${theme.subtext}`}
           >
-            With 5 years of experience as a product designer in Japan, I bring a
-            unique blend of creativity and technical expertise to the table.
+            {portfolio.bio}
           </p>
 
           <a
