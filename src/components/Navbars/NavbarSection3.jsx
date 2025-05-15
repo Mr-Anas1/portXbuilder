@@ -1,18 +1,24 @@
 "use client";
 import React, { useState } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const NavbarSection3 = ({ theme, handleScrollToSection, isMobileLayout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = ["Home", "About", "Projects"];
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
+
   return (
     <nav className={`w-full ${theme.bg} ${theme.shadow}`} id="navbar">
       <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
         {/* Logo */}
         <div className={`text-xl font-bold font-serif italic ${theme.text}`}>
-          John Wick
+          {portfolio.name}
         </div>
 
         {/* Desktop Navigation */}

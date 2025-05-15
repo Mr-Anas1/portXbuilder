@@ -6,36 +6,39 @@ import {
   faCode,
   faEnvelope,
 } from "@fortawesome/free-solid-svg-icons";
-import { useEffect } from "react";
-
-const aboutData = [
-  {
-    icon: <FontAwesomeIcon icon={faUser} size="lg" />,
-    label: "Name",
-    value: "Sebastian Brooks",
-  },
-  {
-    icon: <FontAwesomeIcon icon={faCode} size="lg" />,
-    label: "Role",
-    value: "Frontend Developer",
-  },
-  {
-    icon: <FontAwesomeIcon icon={faMapMarkerAlt} size="lg" />,
-    label: "Location",
-    value: "Jakarta, Indonesia",
-  },
-  {
-    icon: <FontAwesomeIcon icon={faEnvelope} size="lg" />,
-    label: "Email",
-    value: "sebastian@email.com",
-  },
-];
+import { usePortfolio } from "@/context/PortfolioContext";
 
 export default function AboutSection3({
   theme,
   isMobileLayout,
   setIsMobileLayout,
 }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
+  const aboutData = [
+    {
+      icon: <FontAwesomeIcon icon={faUser} size="lg" />,
+      label: "Name",
+      value: portfolio.name,
+    },
+    {
+      icon: <FontAwesomeIcon icon={faCode} size="lg" />,
+      label: "Role",
+      value: portfolio.profession,
+    },
+    {
+      icon: <FontAwesomeIcon icon={faMapMarkerAlt} size="lg" />,
+      label: "Location",
+      value: portfolio.location,
+    },
+    {
+      icon: <FontAwesomeIcon icon={faEnvelope} size="lg" />,
+      label: "Email",
+      value: portfolio.email,
+    },
+  ];
   return (
     <section
       className={`min-h-screen mx-auto px-6 py-16 md:px-20 flex flex-col ${
@@ -111,9 +114,7 @@ export default function AboutSection3({
               isMobileLayout ? "text-center" : ""
             }`}
           >
-            I'm a passionate frontend developer with a knack for crafting
-            pixel-perfect UI and engaging user experiences. I love experimenting
-            with animations, bento layouts, and clean responsive designs.
+            {portfolio.about_me}
           </p>
         </div>
       </div>

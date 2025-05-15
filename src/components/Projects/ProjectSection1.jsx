@@ -1,7 +1,49 @@
 "use client";
+import { usePortfolio } from "@/context/PortfolioContext";
 import { ProjectData } from "../../Helpers/ProjectData";
 
 export default function ProjectSection1({ theme, isMobileLayout }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading projects...</p>;
+
+  // Normalize fallback project data
+  const formattedProjectData = ProjectData.map((project) => ({
+    project_img: project.image,
+    project_title: project.title,
+    project_description: project.description,
+    project_link: project.link,
+  }));
+
+  // Use DB data if available, else fallback
+  const rawProjects = portfolio?.projects?.length
+    ? portfolio.projects
+    : formattedProjectData;
+
+  // Filter out invalid entries
+  const projectsToRender = rawProjects.filter(
+    (p) => p.project_title && p.project_img
+  );
+
+  if (!projectsToRender || projectsToRender.length === 0) {
+    return (
+      <section
+        className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
+        id="project"
+      >
+        <h2
+          className={`text-4xl md:text-5xl font-bold mb-6 text-center ${theme.accentText}`}
+        >
+          Recent projects
+        </h2>
+
+        <p className="text-xl md:text-2xl text-gray-500 text-center max-w-xl">
+          Still working on my projects. Stay tuned for some awesome work!
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section
       className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
@@ -23,32 +65,35 @@ export default function ProjectSection1({ theme, isMobileLayout }) {
               : "flex flex-wrap justify-center gap-10"
           }`}
         >
-          {ProjectData.map((project) => (
+          {projectsToRender.map((project, index) => (
             <div
-              key={project.id}
+              key={project.project_title || index}
               className={`group ${theme.bg} ${
                 theme.card1Text
               } rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 w-full ${
                 isMobileLayout ? "max-w-[90%]" : "max-w-sm"
               }`}
             >
-              <div className="relataive overflow-hidden h-56">
+              <div className="relative overflow-hidden h-56">
                 <img
-                  src={project.image}
-                  alt={project.title}
+                  src={project.project_img}
+                  alt={project.project_title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
               <div className="p-5 text-left">
-                <h4 className="text-xl font-bold mb-2">{project.title}</h4>
+                <h4 className="text-xl font-bold mb-2">
+                  {project.project_title}
+                </h4>
                 <p className={`text-sm ${theme.subtext} mb-4`}>
-                  {project.description}
+                  {project.project_description}
                 </p>
                 <a
-                  href={project.link}
+                  href={project.project_link}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${theme.buttonBg} ${theme.buttonText} text-sm font-medium ${theme.buttonHover} transition-colors duration-300`}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   View project →
                 </a>

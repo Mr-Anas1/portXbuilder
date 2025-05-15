@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useEffect } from "react";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const NavbarSection1 = ({
   theme,
@@ -10,6 +11,10 @@ const NavbarSection1 = ({
   isMobileLayout,
   setIsMobileLayout,
 }) => {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)");
 
@@ -34,7 +39,7 @@ const NavbarSection1 = ({
     <nav className={`w-full ${bg} ${shadow}`} id="navbar">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6 h-20">
         {/* Logo */}
-        <div className={`text-xl font-bold ${text}`}>John Wick</div>
+        <div className={`text-xl font-bold ${text}`}>{portfolio.name}</div>
 
         {/* Desktop Navigation */}
         {!isMobileLayout && (

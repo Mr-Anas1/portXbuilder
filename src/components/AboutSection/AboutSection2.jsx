@@ -1,8 +1,13 @@
 "use client";
 
+import { usePortfolio } from "@/context/PortfolioContext";
 import { useEffect, useState } from "react";
 
 export default function AboutSection1({ theme, isMobileLayout }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       id="about"
@@ -34,22 +39,22 @@ export default function AboutSection1({ theme, isMobileLayout }) {
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          👋 Hi! I'm Sebastian Brooks
+          👋 Hi! I'm {portfolio.name}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🎨 A passionate Website Designer from Jakarta, Indonesia.
+          🎨 {portfolio.bio}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🧠 I specialize in crafting clean UI/UX for digital products.
+          🧠 I specialize in {portfolio.skills.join(", ")}.
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🚀 I love turning complex problems into simple, beautiful interfaces.
+          🚀 {portfolio.home_subtitle}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}

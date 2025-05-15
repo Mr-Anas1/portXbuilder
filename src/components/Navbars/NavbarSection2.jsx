@@ -2,17 +2,24 @@
 
 import React, { useState } from "react";
 import { Menu, X, Github, Linkedin } from "lucide-react";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 const NavbarSection2 = ({ theme, handleScrollToSection, isMobileLayout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = ["Home", "About", "Projects", "Contact"];
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading...</p>;
+  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <nav className={`w-full ${theme.bg} ${theme.shadow}`} id="navbar">
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
         {/* Logo */}
-        <div className={`text-xl font-bold ${theme.text}`}>John Wick</div>
+        <div className={`text-xl font-bold ${theme.text}`}>
+          {portfolio.name}
+        </div>
 
         {/* Desktop Nav Links */}
         {!isMobileLayout && (
@@ -80,14 +87,14 @@ const NavbarSection2 = ({ theme, handleScrollToSection, isMobileLayout }) => {
           ))}
           <div className="flex gap-6">
             <a
-              href="https://github.com"
+              href={portfolio.github}
               target="_blank"
               className={`transition ${theme.hoverText}`}
             >
               <Github />
             </a>
             <a
-              href="https://linkedin.com"
+              href={portfolio.linkedin}
               target="_blank"
               className={`transition ${theme.hoverText}`}
             >
