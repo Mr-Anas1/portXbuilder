@@ -1,7 +1,48 @@
 "use client";
 import { ProjectData } from "@/Helpers/ProjectData";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 export default function ProjectSection2({ theme, isMobileLayout }) {
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) return <p>Loading projects...</p>;
+
+  // Normalize fallback project data
+  const formattedProjectData = ProjectData.map((project) => ({
+    project_img: project.image,
+    project_title: project.title,
+    project_description: project.description,
+    project_link: project.link,
+  }));
+
+  // Use DB data if available, else fallback
+  const rawProjects = portfolio?.projects?.length
+    ? portfolio.projects
+    : formattedProjectData;
+
+  // Filter out invalid entries
+  const projectsToRender = rawProjects.filter(
+    (p) => p.project_title && p.project_img
+  );
+
+  if (!projectsToRender || projectsToRender.length === 0) {
+    return (
+      <section
+        className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
+        id="project"
+      >
+        <h2
+          className={`text-4xl md:text-5xl font-bold mb-6 text-center ${theme.accentText}`}
+        >
+          Projects
+        </h2>
+
+        <p className="text-xl md:text-2xl text-gray-500 text-center max-w-xl">
+          Still working on my projects. Stay tuned for some awesome work!
+        </p>
+      </section>
+    );
+  }
   return (
     <section
       className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
@@ -33,10 +74,10 @@ export default function ProjectSection2({ theme, isMobileLayout }) {
             isMobileLayout ? "flex-col items-center gap-8" : "flex-row gap-10"
           }`}
         >
-          {ProjectData.map((project) => (
+          {projectsToRender.map((project, index) => (
             <a
-              key={project.id}
-              href={project.link}
+              key={project.project_title || index}
+              href={project.project_link}
               target="_blank"
               rel="noopener noreferrer"
               className={`rounded-2xl overflow-hidden shadow-md ${
@@ -46,14 +87,14 @@ export default function ProjectSection2({ theme, isMobileLayout }) {
               }`}
             >
               <img
-                src={project.image}
-                alt={project.title}
+                src={project.project_image}
+                alt={project.project_title}
                 className="w-full h-56 object-cover"
               />
               <div className="p-5">
                 <h3 className="text-xl font-semibold">{project.title}</h3>
                 <p className={`text-sm ${theme.text} mt-2`}>
-                  {project.description}
+                  {project.project_description}
                 </p>
               </div>
             </a>

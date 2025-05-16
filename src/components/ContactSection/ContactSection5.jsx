@@ -3,8 +3,13 @@
 import React from "react";
 import { FaClock } from "react-icons/fa";
 import { socialLinks } from "@/Helpers/SocialLinks";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 const ContactSection5 = ({ theme, isMobileLayout }) => {
+  const { portfolio, loading } = usePortfolio();
+  const socialLinks = useSocialLinks();
+
   return (
     <section
       className={`w-full min-h-screen flex flex-col justify-between ${theme.text} ${theme.bg}`}
@@ -29,7 +34,9 @@ const ContactSection5 = ({ theme, isMobileLayout }) => {
           <div
             className={`text-center ${isMobileLayout ? "" : "md:text-left"}`}
           >
-            <p className="text-lg font-semibold">mohamed.anas.l7a@gmail.com</p>
+            <p className="text-lg text-center font-semibold">
+              {portfolio.email}
+            </p>
           </div>
 
           {/* Phone */}
@@ -39,7 +46,7 @@ const ContactSection5 = ({ theme, isMobileLayout }) => {
             <div className="flex justify-center md:justify-center items-center gap-3">
               <FaClock className="text-xl" />
               <div>
-                <p className="font-semibold">+91 98765 43210</p>
+                <p className="font-semibold">{portfolio.phone}</p>
               </div>
             </div>
           </div>

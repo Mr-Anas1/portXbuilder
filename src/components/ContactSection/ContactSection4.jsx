@@ -2,8 +2,13 @@
 
 import React from "react";
 import { socialLinks } from "@/Helpers/SocialLinks";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 const ContactSection4 = ({ theme, isMobileLayout }) => {
+  const { portfolio, loading } = usePortfolio();
+  const socialLinks = useSocialLinks();
+
   return (
     <section
       className={`w-full min-h-screen flex flex-col ${theme.bg} ${theme.text}`}
@@ -29,15 +34,13 @@ const ContactSection4 = ({ theme, isMobileLayout }) => {
           {/* Email */}
           <div>
             <p className="font-semibold text-lg mb-1">Email Address</p>
-            <p className={`${theme.subtext} text-sm`}>
-              mohamed.anas.l7a@gmail.com
-            </p>
+            <p className={`${theme.subtext} text-sm`}>{portfolio.email}</p>
           </div>
 
           {/* Phone */}
           <div>
             <p className="font-semibold text-lg mb-1">Phone Number</p>
-            <p className={`${theme.subtext} text-sm`}>+91 98765 43210</p>
+            <p className={`${theme.subtext} text-sm`}>{portfolio.phone}</p>
           </div>
 
           {/* Social Icons */}

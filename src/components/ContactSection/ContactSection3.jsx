@@ -1,10 +1,14 @@
 "use client";
 import React from "react";
 import { FaEnvelope } from "react-icons/fa6";
-import { socialLinks } from "@/Helpers/SocialLinks";
 import { cloneElement } from "react";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 const ContactSection3 = ({ theme, isMobileLayout }) => {
+  const { portfolio, loading } = usePortfolio();
+  const socialLinks = useSocialLinks();
+
   return (
     <section
       className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen`}
@@ -21,7 +25,7 @@ const ContactSection3 = ({ theme, isMobileLayout }) => {
         className={`flex items-center justify-center border px-4 py-2 rounded-md shadow-sm hover:shadow-md transition text-sm sm:text-base ${theme.subtext}`}
       >
         <FaEnvelope className="mr-2" size={20} />
-        <span>mohamed.anas.l7a@gmail.com</span>
+        <span>{portfolio.email}</span>
       </a>
 
       {/* Social Icons */}

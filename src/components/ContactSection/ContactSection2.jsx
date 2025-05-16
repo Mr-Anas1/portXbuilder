@@ -1,9 +1,12 @@
 "use client";
 import React from "react";
-import { socialLinks } from "@/Helpers/SocialLinks";
 import { cloneElement } from "react";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 const ContactSection2 = ({ theme, isMobileLayout }) => {
+  const { portfolio, loading } = usePortfolio();
+  const socialLinks = useSocialLinks();
   return (
     <section
       className={`${theme.bg} ${theme.text} min-h-screen px-4 flex flex-col justify-center items-center`}
@@ -18,11 +21,7 @@ const ContactSection2 = ({ theme, isMobileLayout }) => {
         </p>
 
         <div
-          className={`grid ${
-            isMobileLayout
-              ? "grid-cols-2 gap-6"
-              : "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-16"
-          } max-w-6xl mx-auto`}
+          className={`flex flex-wrap justify-center items-center gap-6 md:gap-10 lg:gap-16 max-w-6xl mx-auto`}
         >
           {socialLinks.map((item, idx) => (
             <a

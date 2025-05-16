@@ -2,22 +2,26 @@
 
 import React from "react";
 import { FaEnvelope, FaPhone } from "react-icons/fa6";
-import { socialLinks } from "../../Helpers/SocialLinks";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { useSocialLinks } from "@/hooks/useSocialLinks";
 
 const ContactSection1 = ({ theme, isMobileLayout }) => {
+  const { portfolio, loading } = usePortfolio();
+  const socialLinks = useSocialLinks();
+
   const contactItems = [
     {
       icon: <FaPhone className={`text-2xl ${theme.accentText}`} />,
       title: "Give a Call",
-      content: "8939402040",
+      content: portfolio.phone,
       isLink: false,
     },
     {
       icon: <FaEnvelope className={`text-2xl ${theme.accentText}`} />,
       title: "Email",
-      content: "email@example.com",
+      content: portfolio.email,
       isLink: true,
-      href: "mailto:business@jongde.com",
+      href: "portxbuilder@gmail.com",
     },
   ];
 
@@ -38,7 +42,7 @@ const ContactSection1 = ({ theme, isMobileLayout }) => {
       >
         <div className="flex flex-col gap-8">
           {contactItems.map((item, index) => (
-            <div key={index} className="flex items-start gap-4">
+            <div key={index} className="flex items-center gap-4">
               {item.icon}
               <div className="text-left">
                 <p className="font-semibold">{item.title}</p>
@@ -70,9 +74,10 @@ const ContactSection1 = ({ theme, isMobileLayout }) => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={link.label || "Social link"}
+              className={`hover:scale-110 transition-transform ${theme.accentText}`}
             >
               {React.cloneElement(link.icon, {
-                className: `text-2xl ${theme.text} hover:${theme.accentText} transition-all duration-300`,
+                className: `text-2xl ${theme.accentText} transition-all duration-300`,
               })}
             </a>
           ))}
