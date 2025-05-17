@@ -7,13 +7,14 @@ import Projects from "./Projects";
 import Social from "./Social";
 import Review from "./Review";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "../Navbar/Page";
 import { supabase } from "@/lib/supabaseClient";
 import { generateFields } from "@/lib/generateFields";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect } from "react";
+import { removeBackground } from "@imgly/background-removal";
 
 function CreatePortfolio() {
   const { user, loading } = useAuth();
@@ -21,6 +22,8 @@ function CreatePortfolio() {
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasPortfolio, setHasPortfolio] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [creationProgress, setCreationProgress] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -68,7 +71,7 @@ function CreatePortfolio() {
         .from("portfolios")
         .select("id")
         .eq("user_id", user.id)
-        .maybeSingle(); // safer than .single() for optional results
+        .maybeSingle();
 
       if (error) {
         console.error("Error checking portfolio:", error.message);
@@ -76,7 +79,7 @@ function CreatePortfolio() {
       }
 
       if (data) {
-        router.push("/dashboard"); // Redirect if portfolio exists
+        router.push("/dashboard");
       }
     };
 
@@ -125,6 +128,9 @@ function CreatePortfolio() {
     }
 
     try {
+      setIsCreating(true);
+      setCreationProgress("Preparing your portfolio...");
+
       if (
         !formData ||
         !formData.name ||
@@ -136,6 +142,7 @@ function CreatePortfolio() {
         return;
       }
 
+      setCreationProgress("Generating AI content...");
       const aiFields = await generateFields({
         name: formData.name,
         profession: formData.profession,
@@ -150,27 +157,63 @@ function CreatePortfolio() {
 
       let profileImagePath = "";
       if (formData.profileImage) {
-        const file = formData.profileImage;
-        const fileExt = file.name.split(".").pop();
+        setCreationProgress("Processing your profile image...");
+        const fileExt = formData.profileImage.name.split(".").pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
         const filePath = `profile-images/${fileName}`;
+        let processedBlob = null;
 
-        const { error: uploadError } = await supabase.storage
-          .from("profile-images")
-          .upload(filePath, file);
-
-        if (uploadError) {
-          console.error("Error uploading image:", uploadError.message);
-          return;
+        try {
+          processedBlob = await removeBackground(formData.profileImage, {
+            debug: true,
+            device: "cpu",
+            model: "isnet_fp16",
+            output: {
+              format: "image/webp",
+              quality: 0.8,
+              type: "foreground",
+            },
+          });
+        } catch (e) {
+          console.error("Background removal failed:", e);
         }
 
-        const { data: urlData } = supabase.storage
-          .from("profile-images")
-          .getPublicUrl(filePath);
+        try {
+          setCreationProgress("Uploading your profile image...");
+          const uploadBlob = processedBlob || formData.profileImage;
+          const contentType = processedBlob
+            ? "image/webp"
+            : formData.profileImage.type;
 
-        profileImagePath = urlData?.publicUrl || filePath;
+          const { error: uploadError } = await supabase.storage
+            .from("profile-images")
+            .upload(filePath, uploadBlob, {
+              contentType,
+              cacheControl: "3600",
+            });
+
+          if (uploadError) {
+            console.error("Error uploading image:", uploadError.message);
+            return;
+          }
+
+          const { data: urlData } = supabase.storage
+            .from("profile-images")
+            .getPublicUrl(filePath);
+
+          if (!urlData?.publicUrl) {
+            console.error("Failed to get public URL for uploaded image");
+            return;
+          }
+
+          profileImagePath = urlData.publicUrl;
+        } catch (uploadError) {
+          console.error("Error during upload process:", uploadError);
+          return;
+        }
       }
 
+      setCreationProgress("Finalizing your portfolio...");
       const fullData = {
         user_id: user.id,
         name: formData.name,
@@ -211,10 +254,12 @@ function CreatePortfolio() {
         profileImage: profileImagePath,
       }));
 
-      console.log("Portfolio created successfully with AI fields!");
+      setCreationProgress("Redirecting to your dashboard...");
       router.push("/dashboard");
     } catch (err) {
       console.error("Unexpected error:", err.message || err);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -225,6 +270,18 @@ function CreatePortfolio() {
       <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
       <div className="h-screen overflow-x-hidden">
         <Navbar />
+
+        {isCreating && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+            <div className="bg-card p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+              <h2 className="text-xl font-semibold mb-2">
+                Creating Your Portfolio
+              </h2>
+              <p className="text-muted-foreground">{creationProgress}</p>
+            </div>
+          </div>
+        )}
 
         <div className="text-center my-12 min-h-[calc(100vh-86px)] relative w-screen flex flex-col justify-center items-center gap-6 ">
           {PageDisplay()}
@@ -244,7 +301,7 @@ function CreatePortfolio() {
                 variant={"outline"}
                 size="lg"
                 onClick={() => setPage((currentPage) => currentPage - 1)}
-                disabled={page === 0}
+                disabled={page === 0 || isCreating}
               >
                 Back
               </Button>
@@ -253,9 +310,18 @@ function CreatePortfolio() {
                 className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 size="lg"
                 onClick={handleCreatePortfolio}
-                disabled={!proceed || page === FormTitles.length - 1}
+                disabled={
+                  !proceed || page === FormTitles.length - 1 || isCreating
+                }
               >
-                Create Portfolio
+                {isCreating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Portfolio"
+                )}
               </Button>
             </div>
           ) : page === FormTitles.length - 1 ? null : (
@@ -265,7 +331,7 @@ function CreatePortfolio() {
                 variant={"outline"}
                 size="lg"
                 onClick={() => setPage((currentPage) => currentPage - 1)}
-                disabled={page === 0}
+                disabled={page === 0 || isCreating}
               >
                 Back
               </Button>
@@ -274,7 +340,9 @@ function CreatePortfolio() {
                 className="px-6 py-2 rounded-lg bg-gradient-to-r from-primary-600 to-secondary-600 text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 size="lg"
                 onClick={() => setPage((currentPage) => currentPage + 1)}
-                disabled={!proceed || page === FormTitles.length - 1}
+                disabled={
+                  !proceed || page === FormTitles.length - 1 || isCreating
+                }
               >
                 Next
               </Button>

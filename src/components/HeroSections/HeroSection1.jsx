@@ -69,7 +69,7 @@ export default function HeroSection1({
         <div className="relative w-full max-w-[500px] aspect-[5/5.5] mx-auto md:mx-0">
           {/* Background Decoration */}
           <Image
-            src="/images/bg-1.png"
+            src={"/images/bg-1.png"}
             alt="Background Decoration"
             layout="fill"
             className="object-contain z-0 rounded-xl"
@@ -79,7 +79,7 @@ export default function HeroSection1({
           {/* User Image */}
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <Image
-              src="/images/no-bg.png"
+              src={portfolio.profileImage}
               alt="User"
               width={500}
               height={550}

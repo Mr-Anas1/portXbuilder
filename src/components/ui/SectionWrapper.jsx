@@ -15,7 +15,7 @@ const SectionWrapper = ({
     <section
       ref={innerRef}
       id={id}
-      className="relative group border-2 border-transparent hover:border-primary-500 transition-all duration-300"
+      className={`${theme.bg}  relative group border-2 hover:border-primary-500 border-transparent transition-all duration-300`}
     >
       <Component
         theme={theme}
