@@ -7,6 +7,8 @@ import Sidebar from "@/components/common/Sidebar/Page";
 import MobileSidebar from "@/components/common/MobileSidebar/Page";
 import { useAuth } from "@/context/AuthContext";
 import {
+  ChevronDown,
+  ChevronUp,
   Contact,
   Drama,
   FolderKanban,
@@ -51,6 +53,8 @@ const Dashboard = () => {
     footer: footerComponents[0],
   });
   const [isMobileLayout, setIsMobileLayout] = useState(false);
+  const [themeOverlay, setThemeOverlay] = useState(false);
+  const [themeKey, setThemeKey] = useState("default");
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
     { id: "home", label: "Home", icon: Sparkles, isCustom: false },
@@ -114,6 +118,20 @@ const Dashboard = () => {
   //     </div>
   //   );
   // }
+
+  // For Theme change
+
+  const handleThemeButtonClick = () => {
+    setThemeOverlay((prev) => !prev);
+  };
+
+  const handleThemeChange = (key) => {
+    if (previewThemes[key]) {
+      setThemeKey(key);
+    }
+
+    setThemeOverlay(false);
+  };
 
   // For changing into mobile component
 
@@ -198,7 +216,7 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes["default"];
+  const theme = previewThemes[themeKey];
 
   if (hasPortfolio) {
     return (
@@ -238,7 +256,7 @@ const Dashboard = () => {
           <div className="flex-1 mt-16 ">
             <div
               className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
-                isMobileLayout ? "max-w-[430px] mx-auto md:ml-[45%]" : ""
+                isMobileLayout ? " mx-auto md:ml-[45%] md:max-w-[420px]" : ""
               }`}
             >
               {/* Fixed outline container */}
@@ -324,6 +342,58 @@ const Dashboard = () => {
             >
               Change
             </button>
+
+            <div>
+              <button
+                className="px-4 py-2 relative rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105 flex justify-center items-center gap-1"
+                onClick={handleThemeButtonClick}
+              >
+                Theme {themeOverlay ? <ChevronDown /> : <ChevronUp />}
+              </button>
+
+              {themeOverlay ? (
+                <div className="absolute left-1/2 transform -translate-x-1/2 -top-28 md:-top-16 flex items-center gap-2 bg-white px-2 py-2 rounded-lg border border-primary-500 w-[270px] md:w-[520px] flex-wrap md:flex-nowrap justify-center">
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-[#1e1e1e] text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("dark")}
+                  >
+                    Dark
+                  </button>
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-orange-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("sunset")}
+                  >
+                    Sunset
+                  </button>
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-white-500 text-gray-800  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("light")}
+                  >
+                    Light
+                  </button>
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-blue-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("ocean")}
+                  >
+                    Ocean
+                  </button>
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-green-600 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("forest")}
+                  >
+                    Forest
+                  </button>
+                  <button
+                    className="px-4 py-2  rounded-md border border-gray-300 bg-[#00ffff] text-gray-800 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                    onClick={() => handleThemeChange("neon")}
+                  >
+                    Neon
+                  </button>
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
 
             <button
               className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
