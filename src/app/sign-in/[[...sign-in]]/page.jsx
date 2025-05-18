@@ -77,7 +77,7 @@ export default function Page() {
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setGoogleLoading(true);
 
     const { user, session, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -85,7 +85,7 @@ export default function Page() {
 
     if (error) {
       console.error("Google sign-in error:", error.message);
-      setLoading(false);
+      setGoogleLoading(false);
     }
 
     // Wait for session state change
@@ -129,11 +129,18 @@ export default function Page() {
                 <input
                   type="email"
                   id="email"
-                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  className={`border rounded-md px-3 py-2 focus:outline-none focus:ring-2 ${
+                    errors.email
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-300 focus:ring-primary-400"
+                  }`}
                   required
                   value={formData.email}
                   onChange={handleChange}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
 
               <div className="flex flex-col space-y-2 relative">
@@ -143,7 +150,11 @@ export default function Page() {
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
-                  className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                  className={`border rounded-md px-3 py-2 focus:outline-none focus:ring-2 ${
+                    errors.password
+                      ? "border-red-500 focus:ring-red-400"
+                      : "border-gray-300 focus:ring-primary-400"
+                  }`}
                   required
                   value={formData.password}
                   onChange={handleChange}
@@ -154,6 +165,9 @@ export default function Page() {
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password}</p>
+                )}
                 <Link
                   href="/forgot-password"
                   className="text-sm text-primary-600 hover:underline"
@@ -162,6 +176,11 @@ export default function Page() {
                 </Link>
               </div>
 
+              {errors.signIn && (
+                <p className="text-center text-sm text-red-500 mb-2">
+                  {errors.signIn}
+                </p>
+              )}
               <button
                 type="submit"
                 className="w-full bg-primary-500 text-white font-semibold py-2 rounded-md hover:bg-primary-600 transition duration-200"
@@ -178,7 +197,7 @@ export default function Page() {
               onClick={handleGoogleSignIn}
             >
               <img src="/google.svg" alt="Google Logo" className="w-5 h-5" />
-              {loading ? "Signing in..." : "Continue with Google"}
+              {googleLoading ? "Signing in..." : "Continue with Google"}
             </div>
 
             <div className="flex items-center justify-center mt-4">

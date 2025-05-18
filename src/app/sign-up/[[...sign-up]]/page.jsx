@@ -90,7 +90,7 @@ export default function Page() {
       console.log(
         "Signup successful! Please check your email to verify your account before continuing."
       );
-      router.push("/dashboard");
+      router.push("/create");
     } finally {
       setLoading(false);
     }

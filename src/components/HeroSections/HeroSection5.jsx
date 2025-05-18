@@ -25,18 +25,20 @@ export default function HomeSection5({
           isMobileLayout ? "w-full mb-8" : "md:w-1/2 items-start mb-0"
         }`}
       >
-        <img
-          src="/images/no-bg.png"
-          alt="Profile"
-          className="w-12 h-12 rounded-full object-cover"
-        />
-        <h1
-          className={`${
-            isMobileLayout ? "text-3xl" : "text-5xl"
-          } font-semibold leading-snug mt-2`}
-        >
-          Hello! I’m <br /> {portfolio.name}
-        </h1>
+        <div>
+          <img
+            src={portfolio.profileImage}
+            alt="Profile"
+            className="w-12 h-12 rounded-full object-cover"
+          />
+          <h1
+            className={`${
+              isMobileLayout ? "text-3xl" : "text-5xl"
+            } font-semibold leading-snug mt-2`}
+          >
+            Hello! I’m <br /> {portfolio.name}
+          </h1>
+        </div>
       </div>
 
       {/* Right Side: Description + Buttons */}

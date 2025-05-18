@@ -95,21 +95,21 @@ export default function HeroSection1({
                 <span
                   className={`${theme.label1Bg} ${theme.label1Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  Webflow Developer
+                  {portfolio.skills[0]}
                 </span>
               </div>
               <div className="absolute z-20 top-[15%] right-[-10px] hidden sm:block">
                 <span
                   className={`${theme.label2Bg} ${theme.label2Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  UI/UX Designer
+                  {portfolio.skills[1]}
                 </span>
               </div>
               <div className="absolute z-20 bottom-[10%] right-[10%] hidden sm:block">
                 <span
                   className={`${theme.label3Bg} ${theme.label3Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  Product Designer
+                  {portfolio.skills[2]}
                 </span>
               </div>
             </>

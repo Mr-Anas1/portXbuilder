@@ -103,7 +103,7 @@ export default function HeroSection4({
         ></div>
         <div className="relative w-full h-full">
           <Image
-            src="/images/no-bg.png"
+            src={portfolio.profileImage}
             alt="Profile picture"
             width={550}
             height={550}

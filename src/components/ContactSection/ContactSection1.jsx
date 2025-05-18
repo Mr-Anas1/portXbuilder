@@ -4,7 +4,6 @@ import React from "react";
 import { FaEnvelope, FaPhone } from "react-icons/fa6";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
-import { Loader2 } from "lucide-react";
 
 const ContactSection1 = ({ theme, isMobileLayout }) => {
   const { portfolio, loading } = usePortfolio();
@@ -22,23 +21,9 @@ const ContactSection1 = ({ theme, isMobileLayout }) => {
       title: "Email",
       content: portfolio?.email || "Not provided",
       isLink: true,
-      href: `mailto:${portfolio?.email || ""}`,
+      href: "mailto:portXbuilder@gmail.com",
     },
   ];
-
-  if (loading) {
-    return (
-      <section
-        id="contact"
-        className={`${theme.bg} ${theme.text} py-16 px-4 flex flex-col items-center justify-center text-center min-h-screen`}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p>Loading contact information...</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section

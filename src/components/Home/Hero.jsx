@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <section className="flex-1 flex items-center justify-center  px-4 flex-col gap-6 lg:gap-8 border-b border-gray-200">
+    <section className="flex-1 flex items-center justify-center  px-4 flex-col gap-6 lg:gap-8 border-b border-gray-200 min-h-[calc(100vh-4rem)]">
       <h1 className="text-4xl lg:text-7xl font-bold text-center ">
         Build Your{" "}
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-secondary-500">

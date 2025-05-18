@@ -148,7 +148,7 @@ export default function HeroSection3({
             />
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <Image
-                src="/images/no-bg.png"
+                src={portfolio.profileImage}
                 alt="User"
                 width={280}
                 height={308}
