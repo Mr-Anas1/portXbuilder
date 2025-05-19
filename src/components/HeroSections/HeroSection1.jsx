@@ -39,14 +39,14 @@ export default function HeroSection1({
               isMobile ? "text-2xl" : "text-4xl md:text-5xl"
             } font-bold leading-tight ${theme.text}`}
           >
-            {portfolio.home_title}
+            {portfolio?.home_title || ""}
           </h1>
           <p
             className={`mt-4 ${isMobile ? "text-base" : "text-lg"} ${
               theme.subtext
             }`}
           >
-            {portfolio.home_subtitle}
+            {portfolio?.home_subtitle || ""}
           </p>
           <div
             className={`mt-6 flex items-center ${
@@ -69,24 +69,21 @@ export default function HeroSection1({
         <div className="relative w-full max-w-[500px] aspect-[5/5.5] mx-auto md:mx-0">
           {/* Background Decoration */}
           <Image
-            src={"/images/bg-1.png"}
+            src="/images/bg-1.png"
             alt="Background Decoration"
-            layout="fill"
+            fill
             className="object-contain z-0 rounded-xl"
             priority
           />
 
           {/* User Image */}
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <Image
-              src={portfolio.profileImage}
-              alt="User"
-              width={500}
-              height={550}
-              className="rounded-xl object-contain"
-              priority
-            />
-          </div>
+          <Image
+            src={portfolio?.profileImage || ""}
+            alt="User"
+            fill
+            className="object-contain z-10 rounded-xl"
+            priority
+          />
 
           {/* Floating Labels */}
           {!isMobile && (
@@ -95,21 +92,21 @@ export default function HeroSection1({
                 <span
                   className={`${theme.label1Bg} ${theme.label1Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio.skills[0]}
+                  {portfolio?.skills[0] || ""}
                 </span>
               </div>
               <div className="absolute z-20 top-[15%] right-[-10px] hidden sm:block">
                 <span
                   className={`${theme.label2Bg} ${theme.label2Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio.skills[1]}
+                  {portfolio?.skills[1] || ""}
                 </span>
               </div>
               <div className="absolute z-20 bottom-[10%] right-[10%] hidden sm:block">
                 <span
                   className={`${theme.label3Bg} ${theme.label3Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio.skills[2]}
+                  {portfolio?.skills[2] || ""}
                 </span>
               </div>
             </>

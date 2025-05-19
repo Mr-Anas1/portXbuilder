@@ -23,10 +23,10 @@ const AboutUsSection1 = ({ theme, isMobileLayout }) => {
         } text-white`}
       >
         <p className="text-sm uppercase font-medium mb-2">
-          Hello, I'm {portfolio.name}!
+          Hello, I'm {portfolio?.name || ""}!
         </p>
         <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
-          {portfolio.bio}
+          {portfolio?.bio || ""}
         </h1>
       </div>
 
@@ -39,7 +39,9 @@ const AboutUsSection1 = ({ theme, isMobileLayout }) => {
         <h2 className={`text-2xl font-semibold mb-4 ${theme.accentText || ""}`}>
           What I Do
         </h2>
-        <p className="text-base leading-relaxed mb-4">{portfolio.about_me}</p>
+        <p className="text-base leading-relaxed mb-4">
+          {portfolio?.about_me || ""}
+        </p>
       </div>
     </section>
   );

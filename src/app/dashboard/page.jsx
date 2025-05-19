@@ -28,6 +28,8 @@ import { aboutComponents } from "@/components/AboutSection/index";
 import previewThemes from "@/components/ui/previewThemes";
 import SectionWrapper from "@/components/ui/SectionWrapper";
 import { usePortfolioRedirect } from "@/context/usePortfolioRedirect";
+import { usePortfolio } from "@/context/PortfolioContext";
+import PortfolioEditor from "@/components/PortfolioEditor/PortfolioEditor";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -55,6 +57,8 @@ const Dashboard = () => {
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [themeOverlay, setThemeOverlay] = useState(false);
   const [themeKey, setThemeKey] = useState("default");
+  const [editingSection, setEditingSection] = useState(null);
+
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
     { id: "home", label: "Home", icon: Sparkles, isCustom: false },
@@ -68,6 +72,8 @@ const Dashboard = () => {
       isCustom: false,
     },
   ]);
+
+  const { portfolio, refetchPortfolio } = usePortfolio();
 
   usePortfolioRedirect();
 
@@ -218,9 +224,36 @@ const Dashboard = () => {
 
   const theme = previewThemes[themeKey];
 
+  const handleSave = async (section, updatedData) => {
+    const { id } = portfolio;
+
+    const { error } = await supabase
+      .from("portfolios")
+      .update(updatedData)
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating:", error);
+      return;
+    }
+
+    await refetchPortfolio();
+
+    setEditingSection(null);
+  };
+
   if (hasPortfolio) {
     return (
       <section className="relative min-h-screen flex flex-col bg-background">
+        {editingSection && (
+          <PortfolioEditor
+            section={editingSection}
+            data={portfolio}
+            onClose={() => setEditingSection(null)}
+            onSave={handleSave}
+            style={{ "z-index": "999" }}
+          />
+        )}
         <Navbar isDashboard={true} />
         <div className="flex">
           <Sidebar
@@ -271,6 +304,7 @@ const Dashboard = () => {
                   componentList={navbarComponents}
                   isMobileLayout={isMobileLayout}
                   setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
 
                 <SectionWrapper
@@ -282,6 +316,8 @@ const Dashboard = () => {
                   changeFunction={changeSingleComponent}
                   componentList={heroComponents}
                   isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
 
                 <SectionWrapper
@@ -293,6 +329,7 @@ const Dashboard = () => {
                   componentList={aboutComponents}
                   isMobileLayout={isMobileLayout}
                   setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
 
                 <SectionWrapper
@@ -303,6 +340,8 @@ const Dashboard = () => {
                   changeFunction={changeSingleComponent}
                   componentList={projectsComponents}
                   isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
 
                 <SectionWrapper
@@ -313,6 +352,8 @@ const Dashboard = () => {
                   changeFunction={changeSingleComponent}
                   componentList={contactComponents}
                   isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
 
                 <SectionWrapper
@@ -323,6 +364,8 @@ const Dashboard = () => {
                   changeFunction={changeSingleComponent}
                   componentList={footerComponents}
                   isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
                 />
               </div>
             </div>

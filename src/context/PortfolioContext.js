@@ -11,36 +11,38 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      console.log("Fetching portfolio for user ID:", user.id);
-
-      const { data, error } = await supabase
-        .from("portfolios")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching portfolio:", error.message);
-      }
-
-      console.log("Portfolio data:", data);
-
-      setPortfolio(data);
+  const fetchPortfolio = async () => {
+    if (!user) {
       setLoading(false);
-    };
+      return;
+    }
 
+    console.log("Fetching portfolio for user ID:", user.id);
+
+    const { data, error } = await supabase
+      .from("portfolios")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error fetching portfolio:", error.message);
+    }
+
+    console.log("Portfolio data:", data);
+
+    setPortfolio(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
     fetchPortfolio();
   }, [user]);
 
   return (
-    <PortfolioContext.Provider value={{ portfolio, loading }}>
+    <PortfolioContext.Provider
+      value={{ portfolio, loading, refetchPortfolio: fetchPortfolio }}
+    >
       {children}
     </PortfolioContext.Provider>
   );

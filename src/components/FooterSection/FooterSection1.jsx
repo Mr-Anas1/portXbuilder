@@ -8,7 +8,8 @@ const Footer = ({ theme }) => {
       className={`w-full py-4 text-center text-sm ${theme.subtext} ${theme.bg}`}
       id="footer"
     >
-      © {new Date().getFullYear()} {portfolio.name} – All rights reserved.
+      © {new Date().getFullYear()} {portfolio?.name || ""} – All rights
+      reserved.
     </footer>
   );
 };
