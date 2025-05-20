@@ -15,8 +15,8 @@ const Projects = ({ formData, setFormData }) => {
       projects: [
         ...prevFormData.projects,
         {
-          title: "",
-          description: "",
+          project_title: "",
+          project_description: "",
           project_link: "",
           project_img: "",
         },
@@ -34,7 +34,7 @@ const Projects = ({ formData, setFormData }) => {
     }));
   };
   return (
-    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg flex flex-col justify-center items-center">
+    <section className="w-full max-w-[90%] md:max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg flex flex-col justify-center items-center">
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
         Projects
       </h2>

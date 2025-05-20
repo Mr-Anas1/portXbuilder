@@ -87,8 +87,8 @@ export default function ProjectSection2({ theme, isMobileLayout }) {
               }`}
             >
               <img
-                src={project.project_image}
-                alt={project.project_title}
+                src={project.project_img.data}
+                alt={project.project_img.name}
                 className="w-full h-56 object-cover"
               />
               <div className="p-5">

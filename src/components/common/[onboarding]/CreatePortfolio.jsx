@@ -40,9 +40,13 @@ function CreatePortfolio() {
         project_title: "",
         project_description: "",
         project_link: "",
-        project_img: "",
+        project_img: {
+          name: "",
+          data: "",
+        },
       },
     ],
+
     github: "",
     linkedin: "",
     x: "",
@@ -116,6 +120,10 @@ function CreatePortfolio() {
         return <Review />;
     }
   };
+
+  {
+    console.log(formData);
+  }
 
   const handleCreatePortfolio = async () => {
     const {
