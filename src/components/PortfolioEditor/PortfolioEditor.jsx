@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { removeBackground } from "@imgly/background-removal";
 import { Loader2 } from "lucide-react";
+import Projects from "../common/[onboarding]/Projects";
 
 const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   const [formState, setFormState] = useState({});
@@ -13,9 +14,27 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
-    setFormState(data);
+    // Initialize projects array if it doesn't exist
+    if (
+      section === "projects" &&
+      (!data.projects || !Array.isArray(data.projects))
+    ) {
+      setFormState({
+        ...data,
+        projects: [
+          {
+            project_title: "",
+            project_description: "",
+            project_link: "",
+            project_img: "",
+          },
+        ],
+      });
+    } else {
+      setFormState(data);
+    }
     setFieldErrors({});
-  }, [data]);
+  }, [data, section]);
 
   const handleChange = async (e) => {
     const { name, value, files } = e.target;
@@ -217,6 +236,14 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
               </label>
             </div>
           </>
+        )}
+
+        {section === "projects" && (
+          <div className="w-full max-h-[80vh] overflow-y-auto">
+            <div className="bg-white/80 rounded-xl p-6 shadow-lg">
+              <Projects formData={formState} setFormData={setFormState} />
+            </div>
+          </div>
         )}
 
         {section === "about" && (
