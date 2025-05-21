@@ -78,7 +78,11 @@ export default function HeroSection1({
 
           {/* User Image */}
           <Image
-            src={portfolio?.profileImage || ""}
+            src={
+              portfolio?.profileImage?.includes("supabase.co")
+                ? portfolio.profileImage
+                : "/default-avatar.png"
+            }
             alt="User"
             fill
             className="object-contain z-10 rounded-xl"
