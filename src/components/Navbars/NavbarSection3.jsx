@@ -16,7 +16,6 @@ const NavbarSection3 = ({
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
 
   return (
     <nav

@@ -11,7 +11,6 @@ export default function HomeSection5({
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       ref={sectionRef}
@@ -29,7 +28,7 @@ export default function HomeSection5({
       >
         <div>
           <img
-            src={portfolio.profileImage}
+            src={portfolio?.profileImage || "/default-avatar.png"}
             alt="Profile"
             className="w-12 h-12 rounded-full object-cover"
           />
@@ -38,7 +37,7 @@ export default function HomeSection5({
               isMobileLayout ? "text-3xl" : "text-5xl"
             } font-semibold leading-snug mt-2`}
           >
-            Hello! I’m <br /> {portfolio.name}
+            Hello! I'm <br /> {portfolio?.name}
           </h1>
         </div>
       </div>
@@ -50,10 +49,10 @@ export default function HomeSection5({
         }`}
       >
         <p className="text-xl font-medium">
-          A {portfolio.profession} based in <br /> {portfolio.location}.
+          A {portfolio?.profession} based in <br /> {portfolio?.location}.
         </p>
         <p className={`text-sm mt-2 ${theme.subtext}`}>
-          {portfolio.home_subtitle}
+          {portfolio?.home_subtitle}
         </p>
 
         <div

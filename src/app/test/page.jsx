@@ -8,6 +8,8 @@ import AboutSection3 from "@/components/AboutSection/AboutSection3";
 import ProjectSection3 from "@/components/Projects/ProjectSection3";
 import ContactSection3 from "@/components/ContactSection/ContactSection3";
 import Footer from "@/components/FooterSection/FooterSection1";
+import { usePortfolio } from "@/context/PortfolioContext";
+import { Loader2 } from "lucide-react";
 
 const Page = () => {
   const navbarRef = useRef(null);
@@ -16,6 +18,7 @@ const Page = () => {
   const projectsRef = useRef(null);
   const contactRef = useRef(null);
   const footerRef = useRef(null);
+  const { loading } = usePortfolio();
 
   const handleScrollToSection = (sectionId) => {
     const sectionMap = {
@@ -32,6 +35,16 @@ const Page = () => {
       section.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary-500" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

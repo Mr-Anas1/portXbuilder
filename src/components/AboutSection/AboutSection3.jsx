@@ -17,27 +17,26 @@ export default function AboutSection3({
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   const aboutData = [
     {
       icon: <FontAwesomeIcon icon={faUser} size="lg" />,
       label: "Name",
-      value: portfolio.name,
+      value: portfolio?.name,
     },
     {
       icon: <FontAwesomeIcon icon={faCode} size="lg" />,
       label: "Role",
-      value: portfolio.profession,
+      value: portfolio?.profession,
     },
     {
       icon: <FontAwesomeIcon icon={faMapMarkerAlt} size="lg" />,
       label: "Location",
-      value: portfolio.location,
+      value: portfolio?.location,
     },
     {
       icon: <FontAwesomeIcon icon={faEnvelope} size="lg" />,
       label: "Email",
-      value: portfolio.email,
+      value: portfolio?.email,
     },
   ];
   return (
@@ -116,7 +115,7 @@ export default function AboutSection3({
               isMobileLayout ? "text-center" : ""
             }`}
           >
-            {portfolio.about_me}
+            {portfolio?.about_me}
           </p>
         </div>
       </div>

@@ -9,10 +9,8 @@ export default function HeroSection3({
   isMobileLayout,
   sectionRef,
 }) {
-  const { portfolio, loading } = usePortfolio();
+  const { portfolio } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <>
       <style jsx>{`
@@ -81,7 +79,7 @@ export default function HeroSection3({
             >
               Hello, I'm{" "}
               <span className={`font-bold ${theme.accentText}`}>
-                {portfolio.name}
+                {portfolio?.name}
               </span>
             </h1>
 
@@ -90,7 +88,7 @@ export default function HeroSection3({
                 isMobileLayout ? "text-lg" : "text-xl sm:text-2xl md:text-3xl"
               }`}
             >
-              A Passionate {portfolio.profession}
+              A Passionate {portfolio?.profession}
             </h2>
 
             <p
@@ -140,7 +138,7 @@ export default function HeroSection3({
             />
             <div className="absolute inset-0 flex items-center justify-center z-10">
               <Image
-                src={portfolio.profileImage}
+                src={portfolio?.profileImage || "/default-avatar.png"}
                 alt="User"
                 width={280}
                 height={308}

@@ -88,9 +88,9 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
               }`}
             >
               <img
-                src={project.project_img.data}
-                alt={project.project_img.name}
-                className="w-full h-56 object-cover"
+                src={project.project_img?.data || "/default-project.png"}
+                alt={project.project_img?.name || "Project image"}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="p-5">
                 <h3 className="text-xl font-semibold">{project.title}</h3>

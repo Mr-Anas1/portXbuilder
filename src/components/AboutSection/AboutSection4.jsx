@@ -6,7 +6,6 @@ export default function AboutSection3({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       ref={sectionRef}
@@ -39,7 +38,7 @@ export default function AboutSection3({ theme, isMobileLayout, sectionRef }) {
           } space-y-6 ${theme.text}`}
         >
           <h3 className="text-3xl md:text-4xl font-semibold">About me</h3>
-          <p className="text-lg leading-relaxed">{portfolio.about_me}</p>
+          <p className="text-lg leading-relaxed">{portfolio?.about_me}</p>
 
           {/* Skills Tags */}
           <div
@@ -47,7 +46,7 @@ export default function AboutSection3({ theme, isMobileLayout, sectionRef }) {
               isMobileLayout ? "justify-center  text-center" : " text-start"
             }`}
           >
-            {portfolio.skills?.map((skill, index) => (
+            {portfolio?.skills?.map((skill, index) => (
               <span
                 key={index}
                 className={`px-4 py-2 rounded-full ${theme.card1Bg} text-sm font-medium ${theme.card1Text} shadow-sm hover:shadow-md transition`}

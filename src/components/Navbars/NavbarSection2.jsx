@@ -17,7 +17,6 @@ const NavbarSection2 = ({
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <nav
       ref={sectionRef}
@@ -27,7 +26,7 @@ const NavbarSection2 = ({
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
         {/* Logo */}
         <div className={`text-xl font-bold ${theme.text}`}>
-          {portfolio.name}
+          {portfolio?.name}
         </div>
 
         {/* Desktop Nav Links */}
@@ -96,14 +95,14 @@ const NavbarSection2 = ({
           ))}
           <div className="flex gap-6">
             <a
-              href={portfolio.github}
+              href={portfolio?.github}
               target="_blank"
               className={`transition ${theme.hoverText}`}
             >
               <Github />
             </a>
             <a
-              href={portfolio.linkedin}
+              href={portfolio?.linkedin}
               target="_blank"
               className={`transition ${theme.hoverText}`}
             >

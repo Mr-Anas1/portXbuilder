@@ -36,7 +36,7 @@ const ContactSection5 = ({ theme, isMobileLayout, sectionRef }) => {
             className={`text-center ${isMobileLayout ? "" : "md:text-left"}`}
           >
             <p className="text-lg text-center font-semibold">
-              {portfolio.email}
+              {portfolio?.email}
             </p>
           </div>
 
@@ -47,7 +47,7 @@ const ContactSection5 = ({ theme, isMobileLayout, sectionRef }) => {
             <div className="flex justify-center md:justify-center items-center gap-3">
               <FaClock className="text-xl" />
               <div>
-                <p className="font-semibold">{portfolio.phone}</p>
+                <p className="font-semibold">{portfolio?.phone}</p>
               </div>
             </div>
           </div>

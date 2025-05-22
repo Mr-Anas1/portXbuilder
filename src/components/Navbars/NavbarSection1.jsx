@@ -15,7 +15,6 @@ const NavbarSection1 = ({
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)");
 

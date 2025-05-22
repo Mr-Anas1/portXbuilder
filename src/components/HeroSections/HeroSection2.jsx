@@ -21,11 +21,8 @@ export default function HeroSection2({
   }, []);
 
   const isMobile = isMobileLayout;
-  const { portfolio, loading } = usePortfolio();
-
-  if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
-  const fullText = portfolio.name;
+  const { portfolio } = usePortfolio();
+  const fullText = portfolio?.name;
   const [displayedText, setDisplayedText] = useState("");
 
   return (
@@ -46,7 +43,7 @@ export default function HeroSection2({
               : "text-4xl md:text-6xl lg:text-8xl text-center md:text-left"
           } font-bold leading-tight ${theme.text}`}
         >
-          Hi, I’m{" "}
+          Hi, I'm{" "}
           <span
             className={`border-r-2 animate-pulse ${theme.accentText} border-current`}
           >
@@ -66,7 +63,7 @@ export default function HeroSection2({
                 : "text-lg md:text-xl text-left"
             } max-w-2xl ${theme.subtext}`}
           >
-            {portfolio.bio}
+            {portfolio?.bio}
           </p>
 
           <a
@@ -77,7 +74,7 @@ export default function HeroSection2({
               handleScrollToSection("contact");
             }}
           >
-            Let’s Collaborate
+            Let's Collaborate
             <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
               →
             </span>

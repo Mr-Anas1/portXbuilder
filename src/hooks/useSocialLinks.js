@@ -13,27 +13,27 @@ export const useSocialLinks = () => {
 
   return [
     portfolio?.linkedin && {
-      href: portfolio.linkedin,
+      href: portfolio?.linkedin,
       icon: <FaLinkedin />,
       label: "LinkedIn",
     },
     portfolio?.github && {
-      href: portfolio.github,
+      href: portfolio?.github,
       icon: <FaGithub />,
       label: "GitHub",
     },
     portfolio?.x && {
-      href: portfolio.x,
+      href: portfolio?.x,
       icon: <FaTwitter />,
       label: "X",
     },
     portfolio?.instagram && {
-      href: portfolio.instagram,
+      href: portfolio?.instagram,
       icon: <FaInstagram />,
       label: "Instagram",
     },
     portfolio?.facebook && {
-      href: portfolio.facebook,
+      href: portfolio?.facebook,
       icon: <FaFacebook />,
       label: "Facebook",
     },

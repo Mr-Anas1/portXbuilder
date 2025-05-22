@@ -64,8 +64,8 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
           }`}
         >
           <img
-            src={project.project_img.data}
-            alt={project.project_img.name}
+            src={project.project_img?.data || "/default-project.png"}
+            alt={project.project_img?.name || "Project image"}
             className={`w-full md:w-1/2 rounded-xl shadow-md ${
               isMobileLayout ? "md:w-full" : ""
             }`}

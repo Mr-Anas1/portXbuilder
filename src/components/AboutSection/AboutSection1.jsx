@@ -6,7 +6,6 @@ const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       ref={sectionRef}

@@ -10,12 +10,9 @@ export default function HeroSection4({
   isMobileLayout,
   sectionRef,
 }) {
-  const { portfolio, loading } = usePortfolio();
-
-  if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
+  const { portfolio } = usePortfolio();
   const [text, setText] = useState("");
-  const name = portfolio.name;
+  const name = portfolio?.name;
   const [isTyping, setIsTyping] = useState(true);
 
   useEffect(() => {
@@ -72,7 +69,7 @@ export default function HeroSection4({
               ></span>
             </span>{" "}
             <br />
-            {portfolio.profession}
+            {portfolio?.profession}
           </h1>
 
           <a
@@ -105,7 +102,7 @@ export default function HeroSection4({
         ></div>
         <div className="relative w-full h-full">
           <Image
-            src={portfolio.profileImage}
+            src={portfolio?.profileImage || "/default-avatar.png"}
             alt="Profile picture"
             width={550}
             height={550}

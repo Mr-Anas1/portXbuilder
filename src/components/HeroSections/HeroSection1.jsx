@@ -10,10 +10,7 @@ export default function HeroSection1({
   sectionRef,
 }) {
   const isMobile = isMobileLayout;
-  const { portfolio, loading } = usePortfolio();
-
-  if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
+  const { portfolio } = usePortfolio();
 
   return (
     <section
@@ -98,21 +95,21 @@ export default function HeroSection1({
                 <span
                   className={`${theme.label1Bg} ${theme.label1Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio?.skills[0] || ""}
+                  {portfolio?.skills?.[0] || ""}
                 </span>
               </div>
               <div className="absolute z-20 top-[15%] right-[-10px] hidden sm:block">
                 <span
                   className={`${theme.label2Bg} ${theme.label2Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio?.skills[1] || ""}
+                  {portfolio?.skills?.[1] || ""}
                 </span>
               </div>
               <div className="absolute z-20 bottom-[10%] right-[10%] hidden sm:block">
                 <span
                   className={`${theme.label3Bg} ${theme.label3Text} px-4 py-2 rounded-full shadow-md text-sm`}
                 >
-                  {portfolio?.skills[2] || ""}
+                  {portfolio?.skills?.[2] || ""}
                 </span>
               </div>
             </>

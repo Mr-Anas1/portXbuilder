@@ -7,7 +7,6 @@ export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
-  if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
       ref={sectionRef}
@@ -40,27 +39,27 @@ export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          👋 Hi! I'm {portfolio.name}
+          �� Hi! I'm {portfolio?.name}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🎨 {portfolio.bio}
+          🎨 {portfolio?.bio}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🧠 I specialize in {portfolio.skills.join(", ")}.
+          🧠 I specialize in {portfolio?.skills?.join(", ")}.
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          🚀 {portfolio.home_subtitle}
+          🚀 {portfolio?.home_subtitle}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          💬 Let’s work together to bring your ideas to life!
+          💬 Let's work together to bring your ideas to life!
         </p>
       </div>
     </section>
