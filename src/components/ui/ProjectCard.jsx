@@ -21,6 +21,16 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
       return;
     }
 
+    if (field === "project_link") {
+      if (
+        value &&
+        !value.startsWith("http://") &&
+        !value.startsWith("https://")
+      ) {
+        value = `https://${value}`;
+      }
+    }
+
     const updatedProjects = [...(formData.projects || [])];
     if (!updatedProjects[id]) {
       updatedProjects[id] = {
@@ -36,7 +46,7 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    const index = id; // Use correct index logic if needed
+    const index = id;
 
     if (file) {
       const reader = new FileReader();

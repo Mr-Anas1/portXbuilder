@@ -33,7 +33,7 @@ const BasicInfo = ({
 
     const validationRules = {
       name: /^[a-zA-Z\s]*$/,
-      profession: /^[a-zA-Z\s]*$/,
+      profession: /^[a-zA-Z0-9\s\-\/()&]{2,50}$/,
       bio: /^[a-zA-Z0-9\s.,'"\-!?()]{0,160}$/,
       picture: /^.*$/,
       age: /^(?:1[01][0-9]|120|[1-9]?[0-9])$/,

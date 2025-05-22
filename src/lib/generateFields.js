@@ -4,7 +4,7 @@ export async function generateFields({ name, age, experience, profession }) {
   }
 
   const prompt = `
-You're creating personal portfolio content for a frontend developer. All content should sound human, modern, and confident — written like it's from the user, not about them.
+You're creating personal portfolio content for a ${profession}. All content should sound human, modern, and confident — written like it's from the user, not about them.
 
 Use the following info:
 - Name: ${name}
@@ -14,10 +14,10 @@ Use the following info:
 
 Generate a JSON object with:
 {
-  "home_title": "A short, catchy tagline about what the user does (max 6 words). No names or job titles. Think personal brand or vibe, e.g., 'Designing for Amazing People' or 'Crafting Clean Interfaces'.",
-  "home_subtitle": "A confident one-liner where the user introduces themselves casually. E.g., 'I'm a passionate frontend developer building clean web experiences.'",
+  "home_title": "A short, catchy tagline about what the user does (max 6 words). No names or job titles. Think personal brand or vibe, e.g., 'Designing for Amazing People' or 'Solving Problems with Precision'.",
+  "home_subtitle": "A confident one-liner where the user introduces themselves casually. E.g., 'I'm a passionate ${profession} building clean web experiences.'",
   "about_me": "A short paragraph in first person (3-4 lines) where the user shares who they are, their experience, and what excites them about their profession. Keep it friendly and natural.",
-  "skills": ["List of 4-6 top skills in tech/tools"]
+  "skills": ["List of 4-6 top skills relevant to the profession"]
 }
 
 Only return valid JSON. Do not include markdown or extra explanation.

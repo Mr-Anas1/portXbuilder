@@ -37,8 +37,9 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   }, [data, section]);
 
   const handleChange = async (e) => {
-    const { name, value, files } = e.target;
+    const { name, value: rawValue, files } = e.target;
 
+    let value = rawValue; // <-- Now it's reassignable
     const maxLength = 240;
     let isValidInput = true;
 
@@ -50,7 +51,23 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       setSelectedFile(file);
       return;
     } else {
-      isValidInput = /^[a-zA-Z0-9/@. ]*$/.test(value);
+      isValidInput = /^[a-zA-Z0-9/@.:]*$/.test(value);
+    }
+
+    if (
+      name === "github" ||
+      name === "linkedin" ||
+      name === "x" ||
+      name === "instagram" ||
+      name === "facebook"
+    ) {
+      if (
+        value &&
+        !value.startsWith("http://") &&
+        !value.startsWith("https://")
+      ) {
+        value = `https://${value}`;
+      }
     }
 
     const isTooLong = value.length > maxLength;
