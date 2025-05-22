@@ -1,10 +1,11 @@
 import { usePortfolio } from "@/context/PortfolioContext";
 
-const Footer = ({ theme }) => {
+const Footer = ({ theme, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
 
   return (
     <footer
+      ref={sectionRef}
       className={`w-full py-4 text-center text-sm ${theme.subtext} ${theme.bg}`}
       id="footer"
     >

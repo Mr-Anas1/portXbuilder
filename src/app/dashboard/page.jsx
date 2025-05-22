@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   LayoutPanelTopIcon,
   Pen,
+  Rocket,
   Smartphone,
   Sparkles,
 } from "lucide-react";
@@ -289,7 +290,9 @@ const Dashboard = () => {
           <div className="flex-1 mt-16 ">
             <div
               className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
-                isMobileLayout ? " mx-auto md:ml-[45%] md:max-w-[420px]" : ""
+                isMobileLayout
+                  ? " mx-auto md:ml-[45%] md:max-w-[420px] mb-16"
+                  : ""
               }`}
             >
               {/* Fixed outline container */}
@@ -373,14 +376,14 @@ const Dashboard = () => {
 
           <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
             <button
-              className="md:hidden px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+              className="md:hidden px-2 py-1 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
               onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
             >
               Edit
             </button>
 
             <button
-              className="px-4 py-2 rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105"
+              className="px-2 py-1 md:px-4 md:py-2 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
               onClick={handleComponentChange}
             >
               Change
@@ -388,7 +391,7 @@ const Dashboard = () => {
 
             <div>
               <button
-                className="px-4 py-2 relative rounded-md text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 hover:shadow-lg hover:scale-105 flex justify-center items-center gap-1"
+                className="px-2 py-1 md:px-4 md:py-2 relative rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg  hover:scale-105 flex justify-center items-center gap-1"
                 onClick={handleThemeButtonClick}
               >
                 Theme {themeOverlay ? <ChevronDown /> : <ChevronUp />}
@@ -410,7 +413,7 @@ const Dashboard = () => {
                   </button>
                   <button
                     className="px-4 py-2  rounded-md border border-gray-300 bg-white-500 text-gray-800  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("light")}
+                    onClick={() => handleThemeChange("default")}
                   >
                     Light
                   </button>
@@ -443,6 +446,10 @@ const Dashboard = () => {
               onClick={handleMobileLayoutClick}
             >
               <Smartphone />
+            </button>
+
+            <button className="px-2 py-1 md:px-4 md:py-2 rounded-md text-white  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500 flex justify-center items-center ">
+              Launch <Rocket className="ml-2" size={16} />
             </button>
           </div>
         </div>

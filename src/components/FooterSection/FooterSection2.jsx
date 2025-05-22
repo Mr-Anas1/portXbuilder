@@ -1,9 +1,10 @@
 import { usePortfolio } from "@/context/PortfolioContext";
 
-const FooterSection2 = ({ theme }) => {
+const FooterSection2 = ({ theme, sectionRef }) => {
   const { portfolio } = usePortfolio();
   return (
     <footer
+      ref={sectionRef}
       className={`w-full py-6 px-4 text-center ${theme.bg} ${theme.text} `}
       id="footer"
     >

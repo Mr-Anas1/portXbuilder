@@ -7,6 +7,7 @@ export default function HeroSection3({
   theme,
   handleScrollToSection,
   isMobileLayout,
+  sectionRef,
 }) {
   const { portfolio, loading } = usePortfolio();
 
@@ -48,6 +49,7 @@ export default function HeroSection3({
       `}</style>
 
       <section
+        ref={sectionRef}
         className={`w-full ${
           isMobileLayout
             ? "py-12 px-6"
@@ -95,11 +97,6 @@ export default function HeroSection3({
               className={`${theme.subtext} max-w-md ${
                 isMobileLayout ? "text-sm text-center" : "text-base text-left"
               }`}
-              style={{
-                animation: isMobileLayout ? "none" : "fadeInUp 1s ease-out",
-                animationDelay: "0.3s",
-                animationFillMode: "both",
-              }}
             >
               With a love for building visually engaging and responsive
               websites, I blend creativity with code to bring designs to life.
@@ -108,11 +105,6 @@ export default function HeroSection3({
             <a
               href="#projects"
               className={`mt-4 ${theme.buttonBg} ${theme.buttonHover} ${theme.buttonText} font-medium px-4 sm:px-6 py-2 sm:py-3 rounded-md shadow-lg transition text-sm sm:text-base`}
-              style={{
-                animation: isMobileLayout ? "none" : "fadeInUp 1s ease-out",
-                animationDelay: "0.5s",
-                animationFillMode: "both",
-              }}
               onClick={(e) => {
                 e.preventDefault();
                 handleScrollToSection("projects");

@@ -12,6 +12,7 @@ export default function AboutSection3({
   theme,
   isMobileLayout,
   setIsMobileLayout,
+  sectionRef,
 }) {
   const { portfolio, loading } = usePortfolio();
 
@@ -41,6 +42,7 @@ export default function AboutSection3({
   ];
   return (
     <section
+      ref={sectionRef}
       className={`min-h-screen mx-auto px-6 py-16 md:px-20 flex flex-col ${
         isMobileLayout ? "md:px-4" : "lg:flex-row"
       } gap-10 items-center ${theme.bg}`}

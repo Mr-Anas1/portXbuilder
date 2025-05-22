@@ -6,6 +6,7 @@ export default function HomeSection5({
   theme,
   handleScrollToSection,
   isMobileLayout,
+  sectionRef,
 }) {
   const { portfolio, loading } = usePortfolio();
 
@@ -13,6 +14,7 @@ export default function HomeSection5({
   if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
+      ref={sectionRef}
       className={`min-h-screen flex flex-col ${
         isMobileLayout
           ? "gap-8 items-center justify-center text-center px-6 py-10"

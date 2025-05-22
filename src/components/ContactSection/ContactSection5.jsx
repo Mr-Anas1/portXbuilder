@@ -6,12 +6,13 @@ import { socialLinks } from "@/Helpers/SocialLinks";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
 
-const ContactSection5 = ({ theme, isMobileLayout }) => {
+const ContactSection5 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
   const socialLinks = useSocialLinks();
 
   return (
     <section
+      ref={sectionRef}
       className={`w-full min-h-screen flex flex-col justify-between ${theme.text} ${theme.bg}`}
       id="contact"
     >

@@ -2,13 +2,14 @@
 import React from "react";
 import { usePortfolio } from "@/context/PortfolioContext";
 
-const AboutUsSection1 = ({ theme, isMobileLayout }) => {
+const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
   if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
+      ref={sectionRef}
       className={`min-h-screen flex flex-col ${
         isMobileLayout ? "" : "md:flex-row"
       } ${theme.bg} ${theme.text}`}

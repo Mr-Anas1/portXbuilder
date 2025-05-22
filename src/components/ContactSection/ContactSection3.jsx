@@ -5,12 +5,13 @@ import { cloneElement } from "react";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
 
-const ContactSection3 = ({ theme, isMobileLayout }) => {
+const ContactSection3 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
   const socialLinks = useSocialLinks();
 
   return (
     <section
+      ref={sectionRef}
       className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen`}
       id="contact"
     >
@@ -25,7 +26,7 @@ const ContactSection3 = ({ theme, isMobileLayout }) => {
         className={`flex items-center justify-center border px-4 py-2 rounded-md shadow-sm hover:shadow-md transition text-sm sm:text-base ${theme.subtext}`}
       >
         <FaEnvelope className="mr-2" size={20} />
-        <span>{portfolio.email}</span>
+        <span>{portfolio?.email || "email"}</span>
       </a>
 
       {/* Social Icons */}

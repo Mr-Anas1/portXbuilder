@@ -3,13 +3,14 @@
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useEffect, useState } from "react";
 
-export default function AboutSection1({ theme, isMobileLayout }) {
+export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
   if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
+      ref={sectionRef}
       id="about"
       className={`flex flex-col ${
         isMobileLayout ? "md:px-4" : "md:flex-row"

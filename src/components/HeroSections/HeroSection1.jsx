@@ -7,6 +7,7 @@ export default function HeroSection1({
   theme,
   handleScrollToSection,
   isMobileLayout,
+  sectionRef,
 }) {
   const isMobile = isMobileLayout;
   const { portfolio, loading } = usePortfolio();
@@ -16,6 +17,7 @@ export default function HeroSection1({
 
   return (
     <section
+      ref={sectionRef}
       className={`w-full px-6 ${isMobile ? "py-12" : "py-16 md:py-24"} ${
         theme.bg
       }`}

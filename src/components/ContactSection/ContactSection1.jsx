@@ -5,7 +5,7 @@ import { FaEnvelope, FaPhone } from "react-icons/fa6";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
 
-const ContactSection1 = ({ theme, isMobileLayout }) => {
+const ContactSection1 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
   const socialLinks = useSocialLinks();
 
@@ -27,6 +27,7 @@ const ContactSection1 = ({ theme, isMobileLayout }) => {
 
   return (
     <section
+      ref={sectionRef}
       id="contact"
       className={`${theme.bg} ${theme.text} py-16 px-4 flex flex-col items-center justify-center text-center min-h-screen`}
     >

@@ -3,7 +3,7 @@ import React from "react";
 import { ProjectData } from "@/Helpers/ProjectData";
 import { usePortfolio } from "@/context/PortfolioContext";
 
-const ProjectSection3 = ({ theme, isMobileLayout }) => {
+const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading projects...</p>;
@@ -45,7 +45,10 @@ const ProjectSection3 = ({ theme, isMobileLayout }) => {
     );
   }
   return (
-    <section className={`px-4 py-12 ${theme.bg} ${theme.text} min-h-screen`}>
+    <section
+      className={`px-4 py-12 ${theme.bg} ${theme.text} min-h-screen`}
+      ref={sectionRef}
+    >
       <h1
         className={`text-4xl md:text-5xl font-bold text-center mb-12 ${theme.accentText}`}
       >

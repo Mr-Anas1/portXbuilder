@@ -4,7 +4,12 @@ import React, { useState } from "react";
 import { Menu, X, Github, Linkedin } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
 
-const NavbarSection2 = ({ theme, handleScrollToSection, isMobileLayout }) => {
+const NavbarSection2 = ({
+  theme,
+  handleScrollToSection,
+  isMobileLayout,
+  sectionRef,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const navLinks = ["Home", "About", "Projects", "Contact"];
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -14,7 +19,11 @@ const NavbarSection2 = ({ theme, handleScrollToSection, isMobileLayout }) => {
   if (loading) return <p>Loading...</p>;
   if (!portfolio) return <p>No portfolio data found.</p>;
   return (
-    <nav className={`w-full ${theme.bg} ${theme.shadow}`} id="navbar">
+    <nav
+      ref={sectionRef}
+      className={` w-full ${theme.bg} ${theme.shadow}`}
+      id="navbar"
+    >
       <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
         {/* Logo */}
         <div className={`text-xl font-bold ${theme.text}`}>

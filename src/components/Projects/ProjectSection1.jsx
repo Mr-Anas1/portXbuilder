@@ -2,7 +2,7 @@
 import { usePortfolio } from "@/context/PortfolioContext";
 import { ProjectData } from "../../Helpers/ProjectData";
 
-export default function ProjectSection1({ theme, isMobileLayout }) {
+export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading projects...</p>;
@@ -46,6 +46,7 @@ export default function ProjectSection1({ theme, isMobileLayout }) {
 
   return (
     <section
+      ref={sectionRef}
       className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
         theme.text
       } min-h-screen ${isMobileLayout ? "md:px-2" : ""}`}

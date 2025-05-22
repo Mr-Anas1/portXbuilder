@@ -43,9 +43,17 @@ const SectionWrapper = ({
       {/* Mobile: always show small icon */}
       <button
         onClick={() => changeFunction(id, componentList)}
-        className="md:hidden absolute top-0 left-1 z-10 px-1 py-1 rounded-md text-white text-sm cursor-pointer font-base transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500"
+        className="md:hidden absolute top-1 left-1 z-10 px-1 py-1 rounded-md text-white text-sm cursor-pointer font-base transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500"
       >
-        <Pen size={16} />
+        {/* <Pen size={16} /> */}
+        Change
+      </button>
+
+      <button
+        onClick={() => setEditingSection(id)}
+        className="md:hidden absolute top-1 left-16 z-10 px-2 py-1 rounded-md text-white text-sm cursor-pointer font-base transition-all duration-200 ease-in bg-gradient-to-r from-primary-500 to-secondary-500 "
+      >
+        Edit
       </button>
     </section>
   );

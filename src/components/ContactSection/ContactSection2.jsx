@@ -4,11 +4,12 @@ import { cloneElement } from "react";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { useSocialLinks } from "@/hooks/useSocialLinks";
 
-const ContactSection2 = ({ theme, isMobileLayout }) => {
+const ContactSection2 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
   const socialLinks = useSocialLinks();
   return (
     <section
+      ref={sectionRef}
       className={`${theme.bg} ${theme.text} min-h-screen px-4 flex flex-col justify-center items-center`}
       id="contact"
     >

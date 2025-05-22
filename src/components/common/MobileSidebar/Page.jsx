@@ -54,7 +54,7 @@ const MobileSidebar = ({
     };
   }, []);
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999]">
       <div className="w-[50%] bg-background h-full shadow-lg p-4 relative">
         <div className="flex flex-col mx-2 h-full mt-10">
           <ul className="mt-4 space-y-2">

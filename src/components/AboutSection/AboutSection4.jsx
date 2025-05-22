@@ -2,13 +2,14 @@
 
 import { usePortfolio } from "@/context/PortfolioContext";
 
-export default function AboutSection3({ theme, isMobileLayout }) {
+export default function AboutSection3({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
   if (loading) return <p>Loading...</p>;
   if (!portfolio) return <p>No portfolio data found.</p>;
   return (
     <section
+      ref={sectionRef}
       className={`w-full min-h-screen flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
     >
       <div

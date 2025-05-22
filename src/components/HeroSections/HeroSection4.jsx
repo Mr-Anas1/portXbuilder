@@ -8,6 +8,7 @@ export default function HeroSection4({
   theme,
   handleScrollToSection,
   isMobileLayout,
+  sectionRef,
 }) {
   const { portfolio, loading } = usePortfolio();
 
@@ -34,6 +35,7 @@ export default function HeroSection4({
 
   return (
     <section
+      ref={sectionRef}
       className={`w-full h-[calc(100vh-64px)] ${
         theme.bg
       } flex flex-col-reverse ${
