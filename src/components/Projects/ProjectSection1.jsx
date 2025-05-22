@@ -28,7 +28,7 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
   if (!projectsToRender || projectsToRender.length === 0) {
     return (
       <section
-        className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
+        className={`py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
         id="project"
       >
         <h2
@@ -47,12 +47,10 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
   return (
     <section
       ref={sectionRef}
-      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
-        theme.text
-      } min-h-screen ${isMobileLayout ? "md:px-2" : ""}`}
+      className={`py-20 ${theme.bg} ${theme.text} min-h-screen`}
       id="project"
     >
-      <div className="max-w-7xl mx-auto text-center">
+      <div className="text-center">
         <h2
           className={`text-4xl md:text-5xl font-bold mb-12 ${theme.accentText}`}
         >
@@ -75,11 +73,11 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
                 isMobileLayout ? "max-w-[90%]" : "max-w-sm"
               }`}
             >
-              <div className="relative overflow-hidden h-56">
+              <div className="relative overflow-hidden w-full h-[300px]">
                 <img
                   src={project.project_img?.data || "/default-project.png"}
                   alt={project.project_img?.name || "Project image"}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 

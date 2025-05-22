@@ -49,9 +49,7 @@ export default function HeroSection3({
       <section
         ref={sectionRef}
         className={`w-full ${
-          isMobileLayout
-            ? "py-12 px-6"
-            : "h-[calc(100vh-64px)] py-8 px-4 sm:px-6 md:px-12 lg:px-24"
+          isMobileLayout ? "py-12" : "h-[calc(100vh-64px)] py-8"
         } flex flex-col-reverse ${
           isMobileLayout ? "" : "md:flex-row"
         } items-center justify-between gap-6 sm:gap-10 ${theme.bg}`}

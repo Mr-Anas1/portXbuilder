@@ -47,44 +47,46 @@ const Page = () => {
   }
 
   return (
-    <>
+    <div className={previewThemes.default.bg}>
       <NavbarSection2
         id="navbar"
         theme={previewThemes.default}
         handleScrollToSection={handleScrollToSection}
         sectionRef={navbarRef}
       />
-      <HeroSection3
-        id="home"
-        theme={previewThemes.default}
-        handleScrollToSection={handleScrollToSection}
-        sectionRef={homeRef}
-      />
-      <AboutSection3
-        id="about"
-        theme={previewThemes.default}
-        handleScrollToSection={handleScrollToSection}
-        sectionRef={aboutRef}
-      />
-      <ProjectSection3
-        id="projects"
-        theme={previewThemes.default}
-        handleScrollToSection={handleScrollToSection}
-        sectionRef={projectsRef}
-      />
-      <ContactSection3
-        id="contact"
-        theme={previewThemes.default}
-        handleScrollToSection={handleScrollToSection}
-        sectionRef={contactRef}
-      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <HeroSection3
+          id="home"
+          theme={previewThemes.default}
+          handleScrollToSection={handleScrollToSection}
+          sectionRef={homeRef}
+        />
+        <AboutSection3
+          id="about"
+          theme={previewThemes.default}
+          handleScrollToSection={handleScrollToSection}
+          sectionRef={aboutRef}
+        />
+        <ProjectSection3
+          id="projects"
+          theme={previewThemes.default}
+          handleScrollToSection={handleScrollToSection}
+          sectionRef={projectsRef}
+        />
+        <ContactSection3
+          id="contact"
+          theme={previewThemes.default}
+          handleScrollToSection={handleScrollToSection}
+          sectionRef={contactRef}
+        />
+      </div>
       <Footer
         id="footer"
         theme={previewThemes.default}
         handleScrollToSection={handleScrollToSection}
         sectionRef={footerRef}
       />
-    </>
+    </div>
   );
 };
 

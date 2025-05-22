@@ -16,8 +16,8 @@ export default function HomeSection5({
       ref={sectionRef}
       className={`min-h-screen flex flex-col ${
         isMobileLayout
-          ? "gap-8 items-center justify-center text-center px-6 py-10"
-          : "md:flex-row items-center justify-between gap-4 px-6 md:px-16 py-12 text-left"
+          ? "gap-8 items-center justify-center text-center py-10"
+          : "md:flex-row items-center justify-between gap-4 py-12 text-left"
       } ${theme.bg} ${theme.text}`}
     >
       {/* Left Side: Image + Heading */}

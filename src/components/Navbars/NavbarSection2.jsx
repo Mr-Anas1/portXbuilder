@@ -14,62 +14,63 @@ const NavbarSection2 = ({
   const navLinks = ["Home", "About", "Projects", "Contact"];
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const { portfolio, loading } = usePortfolio();
+  const { portfolio } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   return (
     <nav
       ref={sectionRef}
-      className={` w-full ${theme.bg} ${theme.shadow}`}
+      className={`w-full ${theme.bg} ${theme.shadow}`}
       id="navbar"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
-        {/* Logo */}
-        <div className={`text-xl font-bold ${theme.text}`}>
-          {portfolio?.name}
-        </div>
-
-        {/* Desktop Nav Links */}
-        {!isMobileLayout && (
-          <ul className={`flex gap-8 font-medium text-sm ${theme.text}`}>
-            {navLinks.map((link, i) => (
-              <li
-                key={i}
-                className={`cursor-pointer transition duration-300 ${theme.hoverText} hover:scale-105`}
-                onClick={() => handleScrollToSection(link.toLowerCase())}
-              >
-                {link}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {/* Desktop Socials */}
-        {!isMobileLayout && (
-          <div className={`flex gap-4 ${theme.text}`}>
-            <a
-              href="https://github.com"
-              target="_blank"
-              className={`transition ${theme.hoverText}`}
-            >
-              <Github />
-            </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              className={`transition ${theme.hoverText}`}
-            >
-              <Linkedin />
-            </a>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className={`text-xl font-bold ${theme.text}`}>
+            {portfolio?.name}
           </div>
-        )}
 
-        {/* Mobile Toggle Button */}
-        {isMobileLayout && (
-          <button onClick={toggleMenu} className={`${theme.text}`}>
-            {isOpen ? <X size={26} /> : <Menu size={26} />}
-          </button>
-        )}
+          {/* Desktop Nav Links */}
+          {!isMobileLayout && (
+            <ul className={`flex gap-8 font-medium text-sm ${theme.text}`}>
+              {navLinks.map((link, i) => (
+                <li
+                  key={i}
+                  className={`cursor-pointer transition duration-300 ${theme.hoverText} hover:scale-105`}
+                  onClick={() => handleScrollToSection(link.toLowerCase())}
+                >
+                  {link}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Desktop Socials */}
+          {!isMobileLayout && (
+            <div className={`flex gap-4 ${theme.text}`}>
+              <a
+                href={portfolio?.github}
+                target="_blank"
+                className={`transition ${theme.hoverText}`}
+              >
+                <Github />
+              </a>
+              <a
+                href={portfolio?.linkedin}
+                target="_blank"
+                className={`transition ${theme.hoverText}`}
+              >
+                <Linkedin />
+              </a>
+            </div>
+          )}
+
+          {/* Mobile Toggle Button */}
+          {isMobileLayout && (
+            <button onClick={toggleMenu} className={`${theme.text}`}>
+              {isOpen ? <X size={26} /> : <Menu size={26} />}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Mobile Dropdown */}

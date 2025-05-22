@@ -46,7 +46,7 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
   }
   return (
     <section
-      className={`px-4 py-12 ${theme.bg} ${theme.text} min-h-screen`}
+      className={`py-12 ${theme.bg} ${theme.text} min-h-screen`}
       ref={sectionRef}
     >
       <h1
@@ -57,21 +57,21 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
       {projectsToRender.map((project, index) => (
         <div
           key={project.project_title || index}
-          className={`flex ${
+          className={`flex px-8 ${
             isMobileLayout ? "flex-col" : "flex-col md:flex-row"
           } items-center gap-10 mb-16 ${
             !isMobileLayout && index % 2 !== 0 ? "md:flex-row-reverse" : ""
           }`}
         >
-          <img
-            src={project.project_img?.data || "/default-project.png"}
-            alt={project.project_img?.name || "Project image"}
-            className={`w-full md:w-1/2 rounded-xl shadow-md ${
-              isMobileLayout ? "md:w-full" : ""
-            }`}
-          />
+          <div className="relative flex-1 rounded-xl overflow-hidden w-full h-[400px]">
+            <img
+              src={project.project_img?.data || "/default-project.png"}
+              alt={project.project_img?.name || "Project image"}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          </div>
           <div
-            className={`w-full md:w-1/2 text-center md:text-left ${
+            className={`w-full flex-1 md:w-1/2 text-center md:text-left ${
               isMobileLayout ? "md:w-full" : ""
             }`}
           >

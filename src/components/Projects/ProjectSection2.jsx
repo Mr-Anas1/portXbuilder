@@ -46,14 +46,10 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
   return (
     <section
       ref={sectionRef}
-      className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${
-        theme.text
-      } min-h-screen flex justify-center items-center  ${
-        isMobileLayout ? "md:px-2" : ""
-      }`}
+      className={`py-20 ${theme.bg} ${theme.text} min-h-screen flex justify-center items-center`}
       id="project"
     >
-      <div className="max-w-7xl mx-auto w-full">
+      <div className="w-full">
         {/* Header */}
         <div
           className={`flex justify-center md:justify-start items-center mb-12 ${
@@ -87,11 +83,13 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
                 isMobileLayout ? "max-w-[90%]" : "max-w-xl"
               }`}
             >
-              <img
-                src={project.project_img?.data || "/default-project.png"}
-                alt={project.project_img?.name || "Project image"}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+              <div className="relative overflow-hidden w-full h-[400px]">
+                <img
+                  src={project.project_img?.data || "/default-project.png"}
+                  alt={project.project_img?.name || "Project image"}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
               <div className="p-5">
                 <h3 className="text-xl font-semibold">{project.title}</h3>
                 <p className={`text-sm ${theme.text} mt-2`}>

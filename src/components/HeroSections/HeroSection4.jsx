@@ -37,8 +37,8 @@ export default function HeroSection4({
         theme.bg
       } flex flex-col-reverse ${
         isMobileLayout
-          ? "items-center flex-col-reverse text-center justify-center px-6 py-12 gap-8 h-[calc(100vh-64px)]"
-          : "md:flex-row items-center justify-center px-6 md:px-24 py-16 gap-8 h-[calc(100vh-64px)]"
+          ? "items-center flex-col-reverse text-center justify-center py-12 gap-8 h-[calc(100vh-64px)]"
+          : "md:flex-row items-center justify-center py-16 gap-8 h-[calc(100vh-64px)]"
       }`}
     >
       {/* Left Text Section */}
