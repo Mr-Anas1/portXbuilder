@@ -146,6 +146,27 @@ const Dashboard = () => {
     setIsMobileLayout((prev) => !prev);
   };
 
+  // For checking if the user has selected a pro component
+
+  const handlePublishClick = () => {
+    alert("Portfolio published.");
+  };
+
+  // Check for pro component selected
+
+  const isUsingProComponent = Object.values(selectedComponent).some(
+    (comp) => comp.type === "pro"
+  );
+
+  // For pro users allowing to launch
+  const { userData } = useAuth();
+
+  const userPlan = userData?.plan || "free";
+
+  const isProUser = userPlan === "pro";
+
+  const disableLaunchButton = isUsingProComponent && !isProUser;
+
   // For randomly change component
 
   const getRandomComponent = (components) => {
@@ -226,21 +247,55 @@ const Dashboard = () => {
   const theme = previewThemes[themeKey];
 
   const handleSave = async (section, updatedData) => {
-    const { id } = portfolio;
+    try {
+      // First check if user is trying to use pro components
+      const sections = [
+        "navbar",
+        "hero",
+        "about",
+        "projects",
+        "contact",
+        "footer",
+      ];
+      const hasProComponents = sections.some((section) => {
+        const component = selectedComponent[section];
+        return component?.type === "pro";
+      });
 
-    const { error } = await supabase
-      .from("portfolios")
-      .update(updatedData)
-      .eq("id", id);
+      if (hasProComponents && !isProUser) {
+        alert("You need to upgrade to Pro to use these components.");
+        return;
+      }
 
-    if (error) {
-      console.error("Error updating:", error);
-      return;
+      // If validation passes, proceed with the API call
+      const response = await fetch("/api/portfolio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...updatedData,
+          components: selectedComponent, // Include the selected components in the update
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          alert("You need to upgrade to Pro to use these components.");
+        } else {
+          alert("Error saving changes. Please try again.");
+        }
+        return;
+      }
+
+      await refetchPortfolio();
+      setEditingSection(null);
+    } catch (error) {
+      console.error("Error saving portfolio:", error);
+      alert("Error saving changes. Please try again.");
     }
-
-    await refetchPortfolio();
-
-    setEditingSection(null);
   };
 
   if (hasPortfolio) {
@@ -300,7 +355,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="navbar"
                   innerRef={navbarRef}
-                  Component={selectedComponent.navbar}
+                  Component={selectedComponent.navbar.component}
+                  componentMeta={selectedComponent.navbar}
                   theme={theme}
                   handleScrollToSection={handleScrollToSection}
                   changeFunction={changeSingleComponent}
@@ -313,7 +369,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="home"
                   innerRef={homeRef}
-                  Component={selectedComponent.home}
+                  Component={selectedComponent.home.component}
+                  componentMeta={selectedComponent.home}
                   theme={theme}
                   handleScrollToSection={handleScrollToSection}
                   changeFunction={changeSingleComponent}
@@ -326,7 +383,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="about"
                   innerRef={aboutRef}
-                  Component={selectedComponent.about}
+                  Component={selectedComponent.about.component}
+                  componentMeta={selectedComponent.about}
                   theme={theme}
                   changeFunction={changeSingleComponent}
                   componentList={aboutComponents}
@@ -338,7 +396,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="projects"
                   innerRef={projectsRef}
-                  Component={selectedComponent.projects}
+                  Component={selectedComponent.projects.component}
+                  componentMeta={selectedComponent.projects}
                   theme={theme}
                   changeFunction={changeSingleComponent}
                   componentList={projectsComponents}
@@ -350,7 +409,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="contact"
                   innerRef={contactRef}
-                  Component={selectedComponent.contact}
+                  Component={selectedComponent.contact.component}
+                  componentMeta={selectedComponent.contact}
                   theme={theme}
                   changeFunction={changeSingleComponent}
                   componentList={contactComponents}
@@ -362,7 +422,8 @@ const Dashboard = () => {
                 <SectionWrapper
                   id="footer"
                   innerRef={footerRef}
-                  Component={selectedComponent.footer}
+                  Component={selectedComponent.footer.component}
+                  componentMeta={selectedComponent.footer}
                   theme={theme}
                   changeFunction={changeSingleComponent}
                   componentList={footerComponents}
@@ -448,7 +509,16 @@ const Dashboard = () => {
               <Smartphone />
             </button>
 
-            <button className="px-2 py-1 md:px-4 md:py-2 rounded-md text-white  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500 flex justify-center items-center ">
+            <button
+              className={`px-2 py-1 md:px-4 md:py-2 rounded-md text-md font-semibold transition-all duration-200 ease-in flex justify-center items-center 
+              ${
+                disableLaunchButton
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "text-white cursor-pointer hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500"
+              }`}
+              onClick={handlePublishClick}
+              disabled={disableLaunchButton}
+            >
               Launch <Rocket className="ml-2" size={16} />
             </button>
           </div>

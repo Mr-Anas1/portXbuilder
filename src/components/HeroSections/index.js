@@ -5,9 +5,9 @@ import HeroSection4 from "./HeroSection4";
 import HeroSection5 from "./HeroSection5";
 
 export const heroComponents = [
-  HeroSection1,
-  HeroSection2,
-  HeroSection3,
-  HeroSection4,
-  HeroSection5,
+  { id: 1, name: "Hero 1", component: HeroSection1, type: "free" },
+  { id: 2, name: "Hero 2", component: HeroSection2, type: "pro" },
+  { id: 3, name: "Hero 3", component: HeroSection3, type: "pro" },
+  { id: 4, name: "Hero 4", component: HeroSection4, type: "pro" },
+  { id: 5, name: "Hero 5", component: HeroSection5, type: "pro" },
 ];

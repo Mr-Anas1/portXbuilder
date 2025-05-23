@@ -28,7 +28,7 @@ export default function HeroSection2({
   return (
     <section
       ref={sectionRef}
-      className={`w-full ${
+      className={`w-full px-6 ${
         isMobile
           ? "h-[calc(100vh-64px)] py-16 px-6"
           : "h-[calc(100vh-64px)] px-6 md:px-28"

@@ -75,7 +75,9 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
               isMobileLayout ? "md:w-full" : ""
             }`}
           >
-            <h2 className="text-3xl font-semibold mb-4">{project.title}</h2>
+            <h2 className="text-3xl font-semibold mb-4">
+              {project.project_title}
+            </h2>
             <p className={`text-lg mb-4 ${theme.subtext}`}>
               {project.project_description}
             </p>
