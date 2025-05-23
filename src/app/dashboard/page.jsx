@@ -59,6 +59,11 @@ const Dashboard = () => {
   const [themeOverlay, setThemeOverlay] = useState(false);
   const [themeKey, setThemeKey] = useState("default");
   const [editingSection, setEditingSection] = useState(null);
+  const [showUrlModal, setShowUrlModal] = useState(false);
+  const [enteredName, setEnteredName] = useState("");
+  const [isValid, setIsValid] = useState(true);
+  const [isNameTaken, setIsNameTaken] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
@@ -75,6 +80,7 @@ const Dashboard = () => {
   ]);
 
   const { portfolio, refetchPortfolio } = usePortfolio();
+  const { userData } = useAuth();
 
   usePortfolioRedirect();
 
@@ -146,10 +152,97 @@ const Dashboard = () => {
     setIsMobileLayout((prev) => !prev);
   };
 
-  // For checking if the user has selected a pro component
+  // For handle launch button
 
   const handlePublishClick = () => {
-    alert("Portfolio published.");
+    console.log("Launch button clicked");
+    if (!userData?.url_name) {
+      setShowUrlModal(true);
+      console.log(showUrlModal);
+    } else {
+      console.log("User already has a URL name:", userData.url_name);
+    }
+  };
+
+  const checkNameAvailability = async (name) => {
+    if (!name || !isValid) return false;
+
+    setIsChecking(true);
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("url_name")
+        .eq("url_name", name)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking name:", error);
+        return false;
+      }
+
+      const isTaken = !!data;
+      setIsNameTaken(isTaken);
+      return !isTaken;
+    } catch (error) {
+      console.error("Error checking name:", error);
+      return false;
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleUrlNameChange = async (e) => {
+    const value = e.target.value.toLowerCase();
+    setEnteredName(value);
+
+    // Check format validity
+    const validFormat = /^[a-z0-9-]+$/.test(value);
+    setIsValid(validFormat);
+
+    // Reset taken status when user types
+    if (isNameTaken) setIsNameTaken(false);
+
+    // Only check availability if format is valid and not empty
+    if (validFormat && value.trim()) {
+      await checkNameAvailability(value);
+    }
+  };
+
+  const handleUrlNameSubmit = async () => {
+    if (!isValid || isNameTaken || isChecking) {
+      return;
+    }
+
+    // Check availability one final time before saving
+    const isAvailable = await checkNameAvailability(enteredName);
+    if (!isAvailable) {
+      setIsNameTaken(true);
+      return;
+    }
+
+    try {
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ url_name: enteredName })
+        .eq("id", userData.id)
+        .select();
+
+      if (updateError) {
+        if (updateError.code === "23505") {
+          // Unique violation error code
+          setIsNameTaken(true);
+          return;
+        }
+        console.error("Error updating URL name:", updateError);
+        alert("Something went wrong while saving your URL name.");
+      } else {
+        alert("Success! Your portfolio URL is: localhost/" + enteredName);
+        setShowUrlModal(false);
+      }
+    } catch (error) {
+      console.error("Error saving URL name:", error);
+      alert("Something went wrong while saving your URL name.");
+    }
   };
 
   // Check for pro component selected
@@ -159,7 +252,6 @@ const Dashboard = () => {
   );
 
   // For pro users allowing to launch
-  const { userData } = useAuth();
 
   const userPlan = userData?.plan || "free";
 
@@ -298,6 +390,8 @@ const Dashboard = () => {
     }
   };
 
+  // For URL name submission
+
   if (hasPortfolio) {
     return (
       <section className="relative min-h-screen flex flex-col bg-background">
@@ -310,6 +404,58 @@ const Dashboard = () => {
             style={{ "z-index": "99" }}
           />
         )}
+
+        {showUrlModal && (
+          <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
+              <div className="relative">
+                <input
+                  className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 ${
+                    !isValid || isNameTaken
+                      ? "border-red-500 focus:ring-2 focus:ring-red-400"
+                      : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  }`}
+                  placeholder="e.g. john"
+                  value={enteredName}
+                  onChange={handleUrlNameChange}
+                />
+                {isChecking && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-2 space-y-2">
+                {!isValid && (
+                  <p className="text-red-500 text-sm">
+                    Only lowercase letters, numbers, and hyphens (-) are
+                    allowed.
+                  </p>
+                )}
+                {isNameTaken && (
+                  <p className="text-red-500 text-sm">
+                    This name is already taken. Please choose a different one.
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={handleUrlNameSubmit}
+                disabled={!isValid || isNameTaken || isChecking}
+                className={`mt-4 w-full px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
+                  !isValid || isNameTaken || isChecking
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-primary-500 hover:bg-primary-600"
+                }`}
+              >
+                Save & Continue
+              </button>
+            </div>
+          </div>
+        )}
+
         <Navbar isDashboard={true} />
         <div className="flex">
           <Sidebar
