@@ -271,7 +271,26 @@ const Dashboard = () => {
         console.error("Error updating URL name:", updateError);
         alert("Something went wrong while saving your URL name.");
       } else {
-        alert("Success! Your portfolio URL is: localhost/" + enteredName);
+        const componentsToSave = {
+          navbar: selectedComponent.navbar.name,
+          home: selectedComponent.home.name,
+          about: selectedComponent.about.name,
+          projects: selectedComponent.projects.name,
+          contact: selectedComponent.contact.name,
+          footer: selectedComponent.footer.name,
+        };
+
+        const { error } = await supabase
+          .from("users")
+          .update({ components: componentsToSave })
+          .eq("id", userData.id);
+
+        if (error) {
+          console.error("Failed to save components:", error.message);
+          alert("Error publishing portfolio.");
+        } else {
+          alert("Portfolio published successfully!");
+        }
         setShowUrlModal(false);
       }
     } catch (error) {
@@ -446,7 +465,7 @@ const Dashboard = () => {
               <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
               <div className="relative">
                 <input
-                  className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 ${
+                  className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 outline-none ${
                     !isValid || isNameTaken
                       ? "border-red-500 focus:ring-2 focus:ring-red-400"
                       : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"

@@ -119,7 +119,6 @@ const Page = () => {
 
     // Add common props for all components
     const commonProps = {
-      key: sectionId,
       id: sectionId,
       theme: currentTheme,
       handleScrollToSection: handleScrollToSection,
@@ -128,7 +127,7 @@ const Page = () => {
       setIsMobileLayout: setIsMobileLayout,
     };
 
-    return <Component {...commonProps} />;
+    return <Component {...commonProps} key={sectionId} />;
   };
 
   // Get the current theme object
