@@ -138,9 +138,25 @@ const Dashboard = () => {
     setThemeOverlay((prev) => !prev);
   };
 
-  const handleThemeChange = (key) => {
+  const handleThemeChange = async (key) => {
     if (previewThemes[key]) {
       setThemeKey(key);
+
+      // Update in Supabase
+      try {
+        const { error } = await supabase
+          .from("users")
+          .update({ theme: key })
+          .eq("id", userData.id);
+
+        if (error) {
+          console.error("Failed to update theme:", error.message);
+        } else {
+          console.log("Theme updated successfully");
+        }
+      } catch (err) {
+        console.error("Error updating theme:", err);
+      }
     }
 
     setThemeOverlay(false);
@@ -154,13 +170,32 @@ const Dashboard = () => {
 
   // For handle launch button
 
-  const handlePublishClick = () => {
-    console.log("Launch button clicked");
+  const handlePublishClick = async () => {
     if (!userData?.url_name) {
       setShowUrlModal(true);
-      console.log(showUrlModal);
+      return;
+    }
+
+    // Extract only the component names
+    const componentsToSave = {
+      navbar: selectedComponent.navbar.name,
+      home: selectedComponent.home.name,
+      about: selectedComponent.about.name,
+      projects: selectedComponent.projects.name,
+      contact: selectedComponent.contact.name,
+      footer: selectedComponent.footer.name,
+    };
+
+    const { error } = await supabase
+      .from("users")
+      .update({ components: componentsToSave })
+      .eq("id", userData.id);
+
+    if (error) {
+      console.error("Failed to save components:", error.message);
+      alert("Error publishing portfolio.");
     } else {
-      console.log("User already has a URL name:", userData.url_name);
+      alert("Portfolio published successfully!");
     }
   };
 
