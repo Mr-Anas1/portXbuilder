@@ -127,7 +127,7 @@ const Page = () => {
       setIsMobileLayout: setIsMobileLayout,
     };
 
-    return <Component {...commonProps} key={sectionId} />;
+    return <Component key={sectionId} {...commonProps} />;
   };
 
   // Get the current theme object
