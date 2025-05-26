@@ -9,7 +9,7 @@ const FooterSection2 = ({ theme, sectionRef }) => {
       id="footer"
     >
       <p className={`text-sm ${theme.subtext}`}>
-        © {new Date().getFullYear()} {portfolio.name} – All rights reserved.
+        © {new Date().getFullYear()} {portfolio?.name} – All rights reserved.
       </p>
       <p className={`text-xs mt-1 ${theme.subtext}`}>
         Striving for excellence in everything I do.

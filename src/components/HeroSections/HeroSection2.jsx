@@ -9,7 +9,14 @@ export default function HeroSection2({
   isMobileLayout,
   sectionRef,
 }) {
+  const isMobile = isMobileLayout;
+  const { portfolio } = usePortfolio();
+  const fullText = portfolio?.name || "";
+  const [displayedText, setDisplayedText] = useState("");
+
   useEffect(() => {
+    if (!fullText) return; // Don't start animation if no text
+
     let index = 0;
     const interval = setInterval(() => {
       setDisplayedText(fullText.slice(0, index + 1));
@@ -18,12 +25,7 @@ export default function HeroSection2({
     }, 150);
 
     return () => clearInterval(interval);
-  }, []);
-
-  const isMobile = isMobileLayout;
-  const { portfolio } = usePortfolio();
-  const fullText = portfolio?.name;
-  const [displayedText, setDisplayedText] = useState("");
+  }, [fullText]); // Add fullText as dependency
 
   return (
     <section

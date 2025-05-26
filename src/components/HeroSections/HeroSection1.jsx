@@ -71,6 +71,7 @@ export default function HeroSection1({
             src="/images/bg-1.png"
             alt="Background Decoration"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-contain z-0 rounded-xl"
             priority
           />
@@ -84,6 +85,7 @@ export default function HeroSection1({
             }
             alt="User"
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-contain z-10 rounded-xl"
             priority
           />

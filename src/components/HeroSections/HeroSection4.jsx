@@ -12,7 +12,7 @@ export default function HeroSection4({
 }) {
   const { portfolio } = usePortfolio();
   const [text, setText] = useState("");
-  const name = portfolio?.name;
+  const name = portfolio?.name || "";
   const [isTyping, setIsTyping] = useState(true);
 
   useEffect(() => {

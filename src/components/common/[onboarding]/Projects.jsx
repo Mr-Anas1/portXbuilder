@@ -55,7 +55,7 @@ const Projects = ({ formData, setFormData }) => {
     }));
   };
   return (
-    <section className="w-full">
+    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg">
       <h2 className="text-lg font-semibold mb-4">Projects</h2>
       <div className="space-y-4">
         {cards.map((id) => (

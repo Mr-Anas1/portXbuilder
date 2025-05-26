@@ -28,17 +28,38 @@ export const PortfolioProvider = ({ children }) => {
     });
 
     try {
-      // First, let's check if the portfolio exists
-      const { data: portfolio, error: portfolioError } = await supabase
-        .from("portfolios")
-        .select("*")
-        .eq("url_name", url_name)
-        .maybeSingle();
+      // First, try to find portfolio by user_id if available
+      let portfolio = null;
+      let portfolioError = null;
+
+      if (user?.id) {
+        const { data, error } = await supabase
+          .from("portfolios")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        portfolio = data;
+        portfolioError = error;
+      }
+
+      // If no portfolio found by user_id and url_name is available, try searching by url_name
+      if (!portfolio && url_name) {
+        const { data, error } = await supabase
+          .from("portfolios")
+          .select("*")
+          .eq("url_name", url_name)
+          .maybeSingle();
+
+        portfolio = data;
+        portfolioError = error;
+      }
 
       console.log("Portfolio query result:", {
         data: portfolio,
         error: portfolioError,
         url_name,
+        userId: user?.id,
       });
 
       if (portfolioError) {
@@ -49,7 +70,7 @@ export const PortfolioProvider = ({ children }) => {
       }
 
       if (!portfolio) {
-        console.log("No portfolio found with url_name:", url_name);
+        console.log("No portfolio found with user_id or url_name");
         setPortfolio(null);
         setLoading(false);
         return;
