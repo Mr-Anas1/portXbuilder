@@ -3,28 +3,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import {
-  AlignJustify,
-  BriefcaseBusiness,
-  LogOut,
-  Settings,
-  X,
-} from "lucide-react";
+import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { useClerk, UserButton } from "@clerk/nextjs";
 
 const Navbar = ({ isDashboard }) => {
-  const { user, userData } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuthContext();
+  const { signOut } = useClerk();
   const router = useRouter();
-  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
-
-  const handleAccountMenuClick = () => {
-    setAccountMenuOpen(!accountMenuOpen);
-    console.log(accountMenuOpen);
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -39,8 +29,12 @@ const Navbar = ({ isDashboard }) => {
   }, [isOpen]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
+    try {
+      await signOut();
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (
@@ -97,42 +91,14 @@ const Navbar = ({ isDashboard }) => {
                 >
                   Dashboard
                 </Link>
-
-                <div
-                  className="relative cursor-pointer hover:shadow-lg transition-all duration-300 transform  rounded-full"
-                  onClick={handleAccountMenuClick}
-                >
-                  <img
-                    src={userData?.image_url || "/default-avatar.png"}
-                    alt={userData?.name || "User"}
-                    className="w-10 h-10 rounded-full"
-                  />
-
-                  {accountMenuOpen && (
-                    <div className="absolute flex flex-col gap-2 top-14 right-0 bg-background shadow-lg rounded-lg p-4 z-50 min-w-[150px]">
-                      <Link
-                        href="/settings"
-                        className="flex border-b group border-gray-300 pb-4 items-center gap-2 text-sm hover:text-primary-600 transition"
-                      >
-                        <Settings
-                          size={18}
-                          className="text-gray-500 group-hover:text-primary-600 transition"
-                        />
-                        <span>Settings</span>
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center group gap-2 mt-3 text-sm hover:text-red-500 transition"
-                      >
-                        <LogOut
-                          size={18}
-                          className="text-gray-500 group-hover:text-red-500 transition"
-                        />
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                    },
+                  }}
+                />
               </div>
             ) : (
               <Button variant="outline" asChild>
@@ -206,14 +172,13 @@ const Navbar = ({ isDashboard }) => {
                   {" "}
                   Dashboard
                 </Link>
-                <Link
-                  href="/dashboard"
-                  className="cursor-pointer text-red-500"
+                <button
                   onClick={handleLogout}
+                  className="cursor-pointer text-red-500"
                 >
                   {" "}
                   Logout
-                </Link>
+                </button>
               </div>
             ) : (
               <Button variant="outline" asChild>

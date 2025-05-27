@@ -1,216 +1,49 @@
 "use client";
-
 import Navbar from "@/components/common/Navbar/Page";
-import { useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { SignIn } from "@clerk/nextjs";
+import { useAuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { useEffect } from "react";
 
-export default function Page() {
+export default function SignInPage() {
+  const { user, loading } = useAuthContext();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
-
-  const handleSignInClick = async (e) => {
-    e.preventDefault();
-
-    const { email, password } = formData;
-
-    const newErrors = {};
-
-    if (!email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Email is invalid";
-    }
-
-    if (!password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long";
-    } else if (password.length > 20) {
-      newErrors.password = "Password must be less than 20 characters long";
-    }
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      console.log("Sign In successful", formData);
-    }
-
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        console.error("Error signing in:", error.message);
-        setErrors({ signIn: "Invalid email or password" });
-        return;
-      }
-      console.log("Login successful!", data);
+  useEffect(() => {
+    if (!loading && user) {
       router.push("/dashboard");
-    } catch (error) {
-      console.error("Error signing in:", error.message);
-      setErrors({ signIn: "An error occurred during sign in" });
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user, loading, router]);
 
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-
-    const { user, session, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-
-    if (error) {
-      console.error("Google sign-in error:", error.message);
-      setGoogleLoading(false);
-    }
-
-    // Wait for session state change
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === "SIGNED_IN") {
-          console.log("User signed in:", session.user);
-          // Redirect to /dashboard after successful login
-          router.push("/dashboard");
-        }
-      }
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
     );
+  }
 
-    // Clean up listener
-    return () => {
-      authListener?.unsubscribe();
-    };
-  };
+  if (user) {
+    return null;
+  }
 
   return (
-    <section className="flex flex-col min-h-screen bg-background">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
-      <div className="absolute top-1/4 right-[10px] w-32 h-32 bg-secondary-400/20 rounded-full blur-2xl" />
-      <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
-      <div className="flex flex-col min-h-screen bg-background">
-        <Navbar />
-        <div className="mt-12 mb-12 mx-auto border border-gray-300 px-6 py-4 rounded-lg shadow-lg bg-white w-[80%] sm:w-full max-w-md">
-          <div className="my-8">
-            <h1 className="text-center text-lg md:text-xl font-bold text text-gray-800">
-              Sign In to your account
-            </h1>
-            <p className="text-center text-sm text-gray-600 my-1 ">
-              Sign in to get started with our service.
-            </p>
-
-            <form className="space-y-4 my-6">
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="email" className="text-sm text-gray-600">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className={`border rounded-md px-3 py-2 focus:outline-none focus:ring-2 ${
-                    errors.email
-                      ? "border-red-500 focus:ring-red-400"
-                      : "border-gray-300 focus:ring-primary-400"
-                  }`}
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-500">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="flex flex-col space-y-2 relative">
-                <label htmlFor="password" className="text-sm text-gray-600">
-                  Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  className={`border rounded-md px-3 py-2 focus:outline-none focus:ring-2 ${
-                    errors.password
-                      ? "border-red-500 focus:ring-red-400"
-                      : "border-gray-300 focus:ring-primary-400"
-                  }`}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                <div
-                  className="absolute right-3 top-7 cursor-pointer"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </div>
-                {errors.password && (
-                  <p className="text-sm text-red-500">{errors.password}</p>
-                )}
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-primary-600 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              {errors.signIn && (
-                <p className="text-center text-sm text-red-500 mb-2">
-                  {errors.signIn}
-                </p>
-              )}
-              <button
-                type="submit"
-                className="w-full bg-primary-500 text-white font-semibold py-2 rounded-md hover:bg-primary-600 transition duration-200"
-                onClick={handleSignInClick}
-              >
-                Sign In
-              </button>
-            </form>
-
-            <div className="w-full h-[1px] bg-gray-300"></div>
-
-            <div
-              className="flex justify-center gap-2 items-center border my-6 border-gray-300 rounded-md px-3 py-2 cursor-pointer hover:bg-gray-100 transition duration-200"
-              onClick={handleGoogleSignIn}
-            >
-              <img src="/google.svg" alt="Google Logo" className="w-5 h-5" />
-              {googleLoading ? "Signing in..." : "Continue with Google"}
-            </div>
-
-            <div className="flex items-center justify-center mt-4">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <a href="/sign-up" className="text-primary-500 font-semibold">
-                  Sign Up
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center p-4">
+        <SignIn
+          appearance={{
+            elements: {
+              formButtonPrimary:
+                "bg-primary-500 hover:bg-primary-600 text-sm normal-case",
+              card: "shadow-xl",
+              footerActionLink: "text-primary-500 hover:text-primary-600",
+            },
+          }}
+          afterSignInUrl="/dashboard"
+          signUpUrl="/sign-up"
+        />
       </div>
-    </section>
+    </div>
   );
 }

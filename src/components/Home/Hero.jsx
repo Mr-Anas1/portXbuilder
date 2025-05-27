@@ -1,8 +1,10 @@
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { Button } from "../ui/button";
 import Link from "next/link";
 
 const Hero = () => {
+  const { user } = useAuthContext();
+
   return (
     <section className="flex-1 flex items-center justify-center  px-4 flex-col gap-6 lg:gap-8 border-b border-gray-200 min-h-[calc(100vh-4rem)]">
       <h1 className="text-4xl lg:text-7xl font-bold text-center ">

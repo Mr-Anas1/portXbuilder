@@ -14,7 +14,23 @@ const NavbarSection2 = ({
   const navLinks = ["Home", "About", "Projects", "Contact"];
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const { portfolio } = usePortfolio();
+  const { portfolio, loading } = usePortfolio();
+
+  if (loading) {
+    return (
+      <nav
+        className={`w-full ${theme.bg} ${theme.shadow}`}
+        id="navbar"
+        ref={sectionRef}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <div className={`text-xl font-bold ${theme.text}`}>Loading...</div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav
@@ -26,7 +42,7 @@ const NavbarSection2 = ({
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className={`text-xl font-bold ${theme.text}`}>
-            {portfolio?.name}
+            {portfolio?.name || "Portfolio"}
           </div>
 
           {/* Desktop Nav Links */}
@@ -47,20 +63,26 @@ const NavbarSection2 = ({
           {/* Desktop Socials */}
           {!isMobileLayout && (
             <div className={`flex gap-4 ${theme.text}`}>
-              <a
-                href={portfolio?.github}
-                target="_blank"
-                className={`transition ${theme.hoverText}`}
-              >
-                <Github />
-              </a>
-              <a
-                href={portfolio?.linkedin}
-                target="_blank"
-                className={`transition ${theme.hoverText}`}
-              >
-                <Linkedin />
-              </a>
+              {portfolio?.github && (
+                <a
+                  href={portfolio.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`transition ${theme.hoverText}`}
+                >
+                  <Github />
+                </a>
+              )}
+              {portfolio?.linkedin && (
+                <a
+                  href={portfolio.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`transition ${theme.hoverText}`}
+                >
+                  <Linkedin />
+                </a>
+              )}
             </div>
           )}
 
@@ -95,20 +117,26 @@ const NavbarSection2 = ({
             </span>
           ))}
           <div className="flex gap-6">
-            <a
-              href={portfolio?.github}
-              target="_blank"
-              className={`transition ${theme.hoverText}`}
-            >
-              <Github />
-            </a>
-            <a
-              href={portfolio?.linkedin}
-              target="_blank"
-              className={`transition ${theme.hoverText}`}
-            >
-              <Linkedin />
-            </a>
+            {portfolio?.github && (
+              <a
+                href={portfolio.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`transition ${theme.hoverText}`}
+              >
+                <Github />
+              </a>
+            )}
+            {portfolio?.linkedin && (
+              <a
+                href={portfolio.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`transition ${theme.hoverText}`}
+              >
+                <Linkedin />
+              </a>
+            )}
           </div>
         </div>
       )}

@@ -8,7 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CheckIcon, MinusIcon, X } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 const planFeatures = [
   {
@@ -92,6 +94,44 @@ const planFeatures = [
 ];
 
 export default function PricingSectionCards() {
+  const { user } = useUser();
+  const router = useRouter();
+  const [isUpgrading, setIsUpgrading] = useState(false);
+
+  const handleUpgrade = async (plan) => {
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    setIsUpgrading(true);
+    try {
+      const response = await fetch("/api/update-plan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          plan,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to upgrade plan");
+      }
+
+      // Force a page reload to update the user's plan status
+      window.location.reload();
+    } catch (error) {
+      console.error("Error upgrading plan:", error);
+      alert("Failed to upgrade plan. Please try again.");
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
   return (
     <section id="pricing">
       {/* Pricing */}
@@ -104,7 +144,7 @@ export default function PricingSectionCards() {
         </div>
         {/* End Title */}
         {/* Grid */}
-        <div className=" flex flex-col w-full md:flex-row justify-center items-center gap-6 lg:items-center mb-16">
+        <div className="flex flex-col w-full md:flex-row justify-center items-center gap-6 lg:items-center mb-16">
           {/* Card */}
           <Card className="flex flex-col w-full transition duration-300 hover:scale-105">
             <CardHeader className="text-center pb-2">
@@ -124,16 +164,14 @@ export default function PricingSectionCards() {
                     Basic Templates
                   </span>
                 </li>
-                <li className="flex items-center space-x-2 ">
+                <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Ads + Watermark
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     15 Credits
                   </span>
@@ -164,7 +202,7 @@ export default function PricingSectionCards() {
           </Card>
           {/* End Card */}
           {/* Card */}
-          <Card className="border-primary-500 border-2 flex flex-col  w-full transition duration-300 hover:scale-105">
+          <Card className="border-primary-500 border-2 flex flex-col w-full transition duration-300 hover:scale-105">
             <CardHeader className="text-center pb-2">
               <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
                 Pro
@@ -178,35 +216,30 @@ export default function PricingSectionCards() {
               <ul className="mt-7 space-y-2.5 text-sm">
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Premium Templates
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     No Ads + Watermark
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Specific Subdomain
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Unlimited Credits
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <X className="flex-shrink-0 mt-0.5 h-6 w-6 text-red-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Download Source Code
                   </span>
@@ -218,14 +251,16 @@ export default function PricingSectionCards() {
                 className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
                 size="lg"
                 variant={"outline"}
+                onClick={() => handleUpgrade("pro")}
+                disabled={isUpgrading}
               >
-                Go Pro
+                {isUpgrading ? "Upgrading..." : "Go Pro"}
               </Button>
             </CardFooter>
           </Card>
           {/* End Card */}
           {/* Card */}
-          <Card className="flex flex-col  w-full transition duration-300 hover:scale-105">
+          <Card className="flex flex-col w-full transition duration-300 hover:scale-105">
             <CardHeader className="text-center pb-2">
               <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
                 Ultimate
@@ -241,35 +276,30 @@ export default function PricingSectionCards() {
               <ul className="mt-7 space-y-2.5 text-sm">
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Premium Templates
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     No Ads + Watermark
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
-                    15 Credits
+                    Specific Subdomain
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Unlimited Credits
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-
                   <span className="text-muted-foreground text-lg">
                     Download Source Code
                   </span>
@@ -281,8 +311,10 @@ export default function PricingSectionCards() {
                 className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
                 size="lg"
                 variant={"outline"}
+                onClick={() => handleUpgrade("ultimate")}
+                disabled={isUpgrading}
               >
-                Go Ultimate
+                {isUpgrading ? "Upgrading..." : "Go Ultimate"}
               </Button>
             </CardFooter>
           </Card>

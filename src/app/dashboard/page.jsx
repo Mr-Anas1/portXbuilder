@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Sidebar from "@/components/common/Sidebar/Page";
 import MobileSidebar from "@/components/common/MobileSidebar/Page";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import {
   ChevronDown,
   ChevronUp,
@@ -34,7 +34,7 @@ import PortfolioEditor from "@/components/PortfolioEditor/PortfolioEditor";
 import LaunchSuccessModal from "@/components/ui/LaunchSuccessModal";
 
 const Dashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isOffline, retrySync } = useAuthContext();
   const navbarRef = useRef(null);
   const homeRef = useRef(null);
   const aboutRef = useRef(null);
@@ -82,7 +82,6 @@ const Dashboard = () => {
   ]);
 
   const { portfolio, refetchPortfolio } = usePortfolio();
-  const { userData } = useAuth();
 
   usePortfolioRedirect();
 
@@ -100,19 +99,46 @@ const Dashboard = () => {
 
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("portfolios")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
+      try {
+        // First get the user's Supabase ID from the users table using the API route
+        const response = await fetch("/api/sync-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        });
 
-      if (error) {
-        console.error(error.message);
-      } else {
-        setHasPortfolio(!!data);
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("Error syncing user:", error);
+          return;
+        }
+
+        const userData = await response.json();
+
+        if (!userData) {
+          console.error("No user data found");
+          return;
+        }
+
+        // Then check for portfolio using the Supabase user ID
+        const { data, error } = await supabase
+          .from("portfolios")
+          .select("id")
+          .eq("user_id", userData.id)
+          .single();
+
+        if (error) {
+          console.error("Error checking portfolio:", error);
+        } else {
+          setHasPortfolio(!!data);
+        }
+      } catch (error) {
+        console.error("Error in checkPortfolio:", error);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
 
     checkPortfolio();
@@ -149,7 +175,7 @@ const Dashboard = () => {
         const { error } = await supabase
           .from("users")
           .update({ theme: key })
-          .eq("id", userData.id);
+          .eq("id", user.id);
 
         if (error) {
           console.error("Failed to update theme:", error.message);
@@ -173,7 +199,7 @@ const Dashboard = () => {
   // For handle launch button
 
   const handlePublishClick = async () => {
-    if (!userData?.url_name) {
+    if (!user?.username) {
       setShowUrlModal(true);
       return;
     }
@@ -188,16 +214,50 @@ const Dashboard = () => {
       footer: selectedComponent.footer.name,
     };
 
-    const { error } = await supabase
-      .from("users")
-      .update({ components: componentsToSave })
-      .eq("id", userData.id);
+    try {
+      // First get the user's Supabase ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("clerk_id", user.id)
+        .single();
 
-    if (error) {
-      console.error("Failed to save components:", error.message);
-      alert("Error publishing portfolio.");
-    } else {
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        throw new Error("Failed to fetch user data");
+      }
+
+      if (!userData) {
+        console.error("No user data found");
+        throw new Error("User data not found");
+      }
+
+      // Update portfolio data in Supabase
+      const { error: portfolioError } = await supabase
+        .from("portfolios")
+        .update({
+          components: componentsToSave,
+          theme: themeKey,
+        })
+        .eq("user_id", userData.id);
+
+      if (portfolioError) {
+        console.error("Error updating portfolio:", portfolioError);
+        throw new Error("Failed to update portfolio");
+      }
+
+      // Update user metadata in Clerk
+      await user.update({
+        publicMetadata: {
+          components: componentsToSave,
+          theme: themeKey,
+        },
+      });
+
       setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Failed to save components:", error);
+      alert("Error publishing portfolio. Please try again.");
     }
   };
 
@@ -247,56 +307,44 @@ const Dashboard = () => {
 
   const handleUrlNameSubmit = async () => {
     if (!isValid || isNameTaken || isChecking) {
-      return;
-    }
-
-    // Check availability one final time before saving
-    const isAvailable = await checkNameAvailability(enteredName);
-    if (!isAvailable) {
-      setIsNameTaken(true);
+      console.log("Validation failed:", { isValid, isNameTaken, isChecking });
       return;
     }
 
     try {
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ url_name: enteredName })
-        .eq("id", userData.id)
-        .select();
+      console.log("Starting URL name update process");
+      console.log("User data:", {
+        id: user.id,
+        email: user.emailAddresses[0]?.emailAddress,
+        name: user.fullName,
+      });
+      console.log("URL name to set:", enteredName);
 
-      if (updateError) {
-        if (updateError.code === "23505") {
-          // Unique violation error code
-          setIsNameTaken(true);
-          return;
-        }
-        console.error("Error updating URL name:", updateError);
-        alert("Something went wrong while saving your URL name.");
-      } else {
-        const componentsToSave = {
-          navbar: selectedComponent.navbar.name,
-          home: selectedComponent.home.name,
-          about: selectedComponent.about.name,
-          projects: selectedComponent.projects.name,
-          contact: selectedComponent.contact.name,
-          footer: selectedComponent.footer.name,
-        };
+      // Use the API route to handle user creation/update
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...user,
+          url_name: enteredName,
+        }),
+      });
 
-        const { error } = await supabase
-          .from("users")
-          .update({ components: componentsToSave })
-          .eq("id", userData.id);
-
-        if (error) {
-          console.error("Failed to save components:", error.message);
-          alert("Error publishing portfolio.");
-        } else {
-          alert("Portfolio published successfully!");
-        }
-        setShowUrlModal(false);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        alert("Error saving URL name. Please try again.");
+        return;
       }
+
+      const userData = await response.json();
+      console.log("User sync response:", userData);
+
+      setShowUrlModal(false);
     } catch (error) {
-      console.error("Error saving URL name:", error);
+      console.error("Unexpected error in handleUrlNameSubmit:", error);
       alert("Something went wrong while saving your URL name.");
     }
   };
@@ -309,8 +357,7 @@ const Dashboard = () => {
 
   // For pro users allowing to launch
 
-  const userPlan = userData?.plan || "free";
-
+  const userPlan = user?.publicMetadata?.plan || "free";
   const isProUser = userPlan === "pro";
 
   const disableLaunchButton = isUsingProComponent && !isProUser;
@@ -354,6 +401,25 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (isOffline) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center p-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold mb-4">You're Offline</h2>
+          <p className="text-gray-600 mb-6">
+            Please check your internet connection and try again.
+          </p>
+          <button
+            onClick={retrySync}
+            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors"
+          >
+            Retry Connection
+          </button>
+        </div>
       </div>
     );
   }
@@ -436,7 +502,24 @@ const Dashboard = () => {
         [fieldName]: updatedData[fieldName],
       };
 
-      // Update the portfolio data in Supabase
+      // First get the user's Supabase ID from the users table
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("clerk_id", user.id)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        return;
+      }
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Update the portfolio data in Supabase using the Supabase user ID
       const { error } = await supabase
         .from("portfolios")
         .update(updateData)
@@ -526,7 +609,7 @@ const Dashboard = () => {
         <LaunchSuccessModal
           isOpen={showSuccessModal}
           onClose={() => setShowSuccessModal(false)}
-          portfolioUrl={`${window.location.origin}/${userData?.url_name}`}
+          portfolioUrl={`${window.location.origin}/${user.username}`}
         />
 
         <Navbar isDashboard={true} />

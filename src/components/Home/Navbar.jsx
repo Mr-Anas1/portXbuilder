@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { useClerk } from "@clerk/nextjs";
-import CustomUserSettings from "../ui/CustomUserSettings";
+// import CustomUserSettings from "../ui/CustomUserSettings";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -129,7 +129,7 @@ const Navbar = () => {
                   {" "}
                   Dashboard
                 </Link>
-                <CustomUserSettings />
+                {/* <CustomUserSettings /> */}
               </div>
             </SignedIn>
           </div>

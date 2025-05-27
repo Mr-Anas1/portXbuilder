@@ -2,13 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useAuthContext } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 
 const PortfolioContext = createContext();
 
 export const PortfolioProvider = ({ children }) => {
-  const user = useUser();
+  const { user } = useAuthContext();
   const params = useParams();
   const url_name = params?.url_name;
   const [portfolio, setPortfolio] = useState(null);
@@ -28,15 +28,40 @@ export const PortfolioProvider = ({ children }) => {
     });
 
     try {
-      // First, try to find portfolio by user_id if available
       let portfolio = null;
       let portfolioError = null;
 
+      // If we have a user ID, try to get their portfolio
       if (user?.id) {
+        // First get the user's Supabase ID from the users table
+        const response = await fetch("/api/sync-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("Error syncing user:", error);
+          setLoading(false);
+          return;
+        }
+
+        const userData = await response.json();
+
+        if (!userData) {
+          console.error("No user data found");
+          setLoading(false);
+          return;
+        }
+
+        // Then get the portfolio using the Supabase user ID
         const { data, error } = await supabase
           .from("portfolios")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userData.id)
           .maybeSingle();
 
         portfolio = data;
@@ -81,7 +106,7 @@ export const PortfolioProvider = ({ children }) => {
         .from("users")
         .select("components, theme")
         .eq("id", portfolio.user_id)
-        .single();
+        .maybeSingle();
 
       console.log("User data query result:", {
         data: userData,
@@ -96,9 +121,11 @@ export const PortfolioProvider = ({ children }) => {
         return;
       }
 
+      // Merge portfolio data with user data, using default values if user data is not found
       setPortfolio({
         ...portfolio,
-        ...userData,
+        components: userData?.components || {},
+        theme: userData?.theme || "default",
       });
     } catch (error) {
       console.error("Unexpected error in fetchPortfolio:", error);
@@ -111,7 +138,7 @@ export const PortfolioProvider = ({ children }) => {
   useEffect(() => {
     if (!url_name && !user) return; // wait until one is available
 
-    // optionally add a tiny timeout (debounce-style) to wait for Supabase to initialize on client
+    // Add a small delay to ensure Supabase is initialized
     const timeout = setTimeout(() => {
       console.log("PortfolioContext useEffect triggered with:", {
         user: user?.id,
@@ -119,7 +146,7 @@ export const PortfolioProvider = ({ children }) => {
         loading,
       });
       fetchPortfolio();
-    }, 100); // adjust if needed
+    }, 100);
 
     return () => clearTimeout(timeout);
   }, [user, url_name]);

@@ -6,8 +6,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { PortfolioProvider } from "@/context/PortfolioContext";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { supabase } from "@/lib/supabaseClient";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +29,11 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionContextProvider supabaseClient={supabase}>
+        <ClerkProvider>
           <AuthProvider>
             <PortfolioProvider>{children}</PortfolioProvider>
           </AuthProvider>
-        </SessionContextProvider>
+        </ClerkProvider>
       </body>
     </html>
   );

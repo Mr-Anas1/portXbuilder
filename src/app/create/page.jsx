@@ -1,11 +1,11 @@
 "use client";
 import CreatePortfolio from "@/components/common/[onboarding]/CreatePortfolio";
 import React, { useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 const Page = () => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthContext();
   const router = useRouter();
 
   useEffect(() => {

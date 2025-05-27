@@ -5,8 +5,10 @@ import { supabase } from "@/lib/supabaseClient";
 import { removeBackground } from "@imgly/background-removal";
 import { Loader2 } from "lucide-react";
 import Projects from "../common/[onboarding]/Projects";
+import { useAuthContext } from "@/context/AuthContext";
 
 const PortfolioEditor = ({ section, data, onClose, onSave }) => {
+  const { user } = useAuthContext();
   const [formState, setFormState] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
   const [creationProgress, setCreationProgress] = useState("");
@@ -119,17 +121,30 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
         setIsCreating(true);
         setCreationProgress("Processing your profile image...");
 
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
         if (!user) {
           console.error("User not logged in");
           return;
         }
 
+        // First get the user's Supabase ID from the users table
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("clerk_id", user.id)
+          .single();
+
+        if (userError) {
+          console.error("Error fetching user data:", userError);
+          return;
+        }
+
+        if (!userData) {
+          console.error("No user data found");
+          return;
+        }
+
         const fileExt = selectedFile.name.split(".").pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${userData.id}-${Date.now()}.${fileExt}`;
         const filePath = `profile-images/${fileName}`;
         let processedBlob = null;
 

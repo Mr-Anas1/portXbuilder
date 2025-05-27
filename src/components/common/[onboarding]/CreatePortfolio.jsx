@@ -12,12 +12,12 @@ import Navbar from "../Navbar/Page";
 import { supabase } from "@/lib/supabaseClient";
 import { generateFields } from "@/lib/generateFields";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { removeBackground } from "@imgly/background-removal";
 
 function CreatePortfolio() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthContext();
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,26 +69,51 @@ function CreatePortfolio() {
 
   useEffect(() => {
     const checkPortfolio = async () => {
-      if (loading || !user) return;
-
-      const { data, error } = await supabase
-        .from("portfolios")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error checking portfolio:", error.message);
+      if (loading || !user) {
         return;
       }
 
-      if (data) {
-        router.push("/dashboard");
+      setIsLoading(true);
+
+      try {
+        // First get the user's Supabase ID from the users table
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("clerk_id", user.id)
+          .single();
+
+        if (userError) {
+          console.error("Error fetching user data:", userError);
+          return;
+        }
+
+        if (!userData) {
+          console.error("No user data found");
+          return;
+        }
+
+        // Then check for portfolio using the Supabase user ID
+        const { data, error } = await supabase
+          .from("portfolios")
+          .select("id")
+          .eq("user_id", userData.id)
+          .single();
+
+        if (error) {
+          console.error("Error checking portfolio:", error);
+        } else {
+          setHasPortfolio(!!data);
+        }
+      } catch (error) {
+        console.error("Error in checkPortfolio:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkPortfolio();
-  }, [user, loading, router, supabase]);
+  }, [user, loading, supabase]);
 
   const FormTitles = [
     "Welcome",
@@ -126,10 +151,6 @@ function CreatePortfolio() {
   }
 
   const handleCreatePortfolio = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     if (!user) {
       console.error("No user logged in");
       return;
@@ -222,8 +243,33 @@ function CreatePortfolio() {
       }
 
       setCreationProgress("Finalizing your portfolio...");
+
+      // First get the user's Supabase ID from the users table using the API route
+      console.log("Fetching user data for Clerk ID:", user.id);
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        return;
+      }
+
+      const userData = await response.json();
+      console.log("Found user data:", userData);
+
+      if (!userData) {
+        console.error("No user data found for Clerk ID:", user.id);
+        return;
+      }
+
       const fullData = {
-        user_id: user.id,
+        user_id: userData.id, // Use the Supabase user ID from the API response
         name: formData.name,
         age: formData.age,
         profession: formData.profession,
@@ -242,17 +288,18 @@ function CreatePortfolio() {
         ...aiFields,
       };
 
-      const { error: insertError } = await supabase
-        .from("portfolios")
-        .upsert(fullData, {
-          onConflict: "user_id",
-        });
+      // Create portfolio using the API route
+      const portfolioResponse = await fetch("/api/portfolio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fullData),
+      });
 
-      if (insertError) {
-        console.error(
-          "Error inserting/updating portfolio:",
-          insertError.message
-        );
+      if (!portfolioResponse.ok) {
+        const error = await portfolioResponse.json();
+        console.error("Error creating portfolio:", error);
         return;
       }
 
