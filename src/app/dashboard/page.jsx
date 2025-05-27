@@ -31,6 +31,7 @@ import SectionWrapper from "@/components/ui/SectionWrapper";
 import { usePortfolioRedirect } from "@/context/usePortfolioRedirect";
 import { usePortfolio } from "@/context/PortfolioContext";
 import PortfolioEditor from "@/components/PortfolioEditor/PortfolioEditor";
+import LaunchSuccessModal from "@/components/ui/LaunchSuccessModal";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -64,6 +65,7 @@ const Dashboard = () => {
   const [isValid, setIsValid] = useState(true);
   const [isNameTaken, setIsNameTaken] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
@@ -195,7 +197,7 @@ const Dashboard = () => {
       console.error("Failed to save components:", error.message);
       alert("Error publishing portfolio.");
     } else {
-      alert("Portfolio published successfully!");
+      setShowSuccessModal(true);
     }
   };
 
@@ -413,29 +415,40 @@ const Dashboard = () => {
         return;
       }
 
-      // If validation passes, proceed with the API call
-      const response = await fetch("/api/portfolio", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...updatedData,
-          components: selectedComponent, // Include the selected components in the update
-        }),
-      });
+      // Map section to the actual field name in the database
+      const sectionToField = {
+        navbar: "name",
+        home: "home_title",
+        about: "about_me",
+        projects: "projects",
+        contact: "contact",
+        footer: "name",
+      };
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          alert("You need to upgrade to Pro to use these components.");
-        } else {
-          alert("Error saving changes. Please try again.");
-        }
+      const fieldName = sectionToField[section];
+      if (!fieldName) {
+        console.error("Invalid section name:", section);
         return;
       }
 
+      // Create update object with only the field that was edited
+      const updateData = {
+        [fieldName]: updatedData[fieldName],
+      };
+
+      // Update the portfolio data in Supabase
+      const { error } = await supabase
+        .from("portfolios")
+        .update(updateData)
+        .eq("user_id", userData.id);
+
+      if (error) {
+        console.error("Error saving portfolio:", error);
+        alert("Error saving changes. Please try again.");
+        return;
+      }
+
+      // Refresh the portfolio data
       await refetchPortfolio();
       setEditingSection(null);
     } catch (error) {
@@ -509,6 +522,12 @@ const Dashboard = () => {
             </div>
           </div>
         )}
+
+        <LaunchSuccessModal
+          isOpen={showSuccessModal}
+          onClose={() => setShowSuccessModal(false)}
+          portfolioUrl={`${window.location.origin}/${userData?.url_name}`}
+        />
 
         <Navbar isDashboard={true} />
         <div className="flex">

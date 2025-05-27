@@ -38,29 +38,47 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
 
   const handleChange = async (e) => {
     const { name, value: rawValue, files } = e.target;
+    let value = rawValue;
 
-    let value = rawValue; // <-- Now it's reassignable
-    const maxLength = 240;
+    // Max length per field
+    const maxLengths = {
+      about_me: 1000,
+      phone: 15,
+      email: 254,
+      name: 60,
+      home_title: 100,
+      home_subtitle: 150,
+      default: 240,
+    };
+    const fieldMaxLength = maxLengths[name] || maxLengths.default;
     let isValidInput = true;
 
-    if (name === "phone") {
-      isValidInput = /^[0-9]*$/.test(value);
-    } else if (name === "profileImage") {
+    // Patterns to validate input
+    const validationPatterns = {
+      phone: /^[0-9+\s-]*$/, // Digits, spaces, +, and dashes
+      email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Valid email
+      about_me: /^(?!.*<[^>]*>)[a-zA-Z0-9\s.,'()!?\-]*$/, // No HTML, allow basic punctuation
+      name: /^[a-zA-Z\s]*$/, // Letters and spaces
+      home_title: /^[a-zA-Z0-9\s.,!?-]*$/, // Basic sentence format
+      home_subtitle: /^[a-zA-Z0-9\s.,!?-]*$/,
+      github: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9-_/]+$/, // GitHub profile URLs
+      linkedin: /^https?:\/\/(www\.)?linkedin\.com\/.*$/, // LinkedIn URLs
+      x: /^https?:\/\/(www\.)?(x|twitter)\.com\/.*$/, // Twitter/X URLs
+      instagram: /^https?:\/\/(www\.)?instagram\.com\/.*$/, // Instagram URLs
+      facebook: /^https?:\/\/(www\.)?facebook\.com\/.*$/, // Facebook URLs
+    };
+
+    // Handle image file
+    if (name === "profileImage") {
       const file = files?.[0];
       if (!file) return;
       setSelectedFile(file);
       return;
-    } else {
-      isValidInput = /^[a-zA-Z0-9/@.:]*$/.test(value);
     }
 
-    if (
-      name === "github" ||
-      name === "linkedin" ||
-      name === "x" ||
-      name === "instagram" ||
-      name === "facebook"
-    ) {
+    // Auto-prepend https:// for social links if missing
+    const socialFields = ["github", "linkedin", "x", "instagram", "facebook"];
+    if (socialFields.includes(name)) {
       if (
         value &&
         !value.startsWith("http://") &&
@@ -70,19 +88,27 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       }
     }
 
-    const isTooLong = value.length > maxLength;
+    // Apply validation pattern if it exists
+    if (validationPatterns[name]) {
+      isValidInput = value === "" || validationPatterns[name].test(value);
+    } else {
+      // Default fallback pattern
+      isValidInput = /^[a-zA-Z0-9\s.,!?'"()-]*$/.test(value);
+    }
 
+    const isTooLong = value.length > fieldMaxLength;
+
+    // Update form state always
+    setFormState((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Update field error
     setFieldErrors((prev) => ({
       ...prev,
       [name]: !isValidInput || isTooLong,
     }));
-
-    if (isValidInput && !isTooLong) {
-      setFormState((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
   };
 
   const handleSave = async () => {
@@ -148,22 +174,10 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
           return;
         }
 
-        setFormState((prev) => ({
-          ...prev,
-          profileImage: urlData.publicUrl,
-        }));
-
         updatedFormState = {
           ...updatedFormState,
           profileImage: urlData.publicUrl,
         };
-
-        setFieldErrors((prev) => ({
-          ...prev,
-          profileImage: false,
-        }));
-
-        setCreationProgress("Image uploaded successfully!");
       } catch (error) {
         console.error("Error processing profile image:", error);
       } finally {
@@ -171,10 +185,30 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       }
     }
 
+    // Call onSave with the updated form state
     onSave(section, updatedFormState);
   };
 
-  const isFormValid = Object.values(fieldErrors).every((v) => v === false);
+  const isFormValid = () => {
+    // Check if any field has an error
+    const hasErrors = Object.values(fieldErrors).some(
+      (error) => error === true
+    );
+
+    // Check if any required fields are empty
+    const requiredFields = {
+      about_me: "About Me",
+      name: "Name",
+      home_title: "Home Title",
+      home_subtitle: "Home Subtitle",
+    };
+
+    const emptyRequiredFields = Object.entries(requiredFields).some(
+      ([field, _]) => !formState[field] || formState[field].trim() === ""
+    );
+
+    return !hasErrors && !emptyRequiredFields;
+  };
 
   const inputClass = (fieldName) =>
     `rounded-lg px-4 py-2 w-full outline-none border transition-all duration-300 mb-4 ${
@@ -360,8 +394,12 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
-            disabled={!isFormValid}
+            className={`px-4 py-2 rounded ${
+              isFormValid()
+                ? "bg-primary-500 text-white hover:bg-primary-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            disabled={!isFormValid()}
           >
             Save
           </button>

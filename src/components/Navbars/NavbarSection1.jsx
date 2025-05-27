@@ -14,7 +14,6 @@ const NavbarSection1 = ({
 }) => {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 767px)");
 
@@ -34,6 +33,8 @@ const NavbarSection1 = ({
   const { bg, shadow, text } = theme;
 
   const toggleMenu = () => setIsOpen(!isOpen);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <nav className={`w-full ${bg} ${shadow}`} id="navbar" ref={sectionRef}>
