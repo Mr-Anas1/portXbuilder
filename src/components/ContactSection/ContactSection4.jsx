@@ -35,13 +35,13 @@ const ContactSection4 = ({ theme, isMobileLayout, sectionRef }) => {
           {/* Email */}
           <div>
             <p className="font-semibold text-lg mb-1">Email Address</p>
-            <p className={`${theme.subtext} text-sm`}>{portfolio.email}</p>
+            <p className={`${theme.subtext} text-sm`}>{portfolio?.email}</p>
           </div>
 
           {/* Phone */}
           <div>
             <p className="font-semibold text-lg mb-1">Phone Number</p>
-            <p className={`${theme.subtext} text-sm`}>{portfolio.phone}</p>
+            <p className={`${theme.subtext} text-sm`}>{portfolio?.phone}</p>
           </div>
 
           {/* Social Icons */}

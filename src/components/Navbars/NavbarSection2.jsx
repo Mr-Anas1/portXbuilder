@@ -62,7 +62,7 @@ const NavbarSection2 = ({
 
           {/* Desktop Socials */}
           {!isMobileLayout && (
-            <div className={`flex gap-4 ${theme.text}`}>
+            <div className={`flex gap-4 ${theme.text} hidden`}>
               {portfolio?.github && (
                 <a
                   href={portfolio.github}

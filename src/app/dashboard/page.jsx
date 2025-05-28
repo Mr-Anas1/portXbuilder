@@ -170,17 +170,71 @@ const Dashboard = () => {
     if (previewThemes[key]) {
       setThemeKey(key);
 
-      // Update in Supabase
       try {
-        const { error } = await supabase
+        // First get the user's Supabase ID from the API route
+        const response = await fetch("/api/sync-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("Error syncing user:", error);
+          return;
+        }
+
+        const userData = await response.json();
+
+        if (!userData) {
+          console.error("No user data found");
+          return;
+        }
+
+        // Create components object
+        const components = {
+          home: selectedComponent.home.name,
+          about: selectedComponent.about.name,
+          footer: selectedComponent.footer.name,
+          navbar: selectedComponent.navbar.name,
+          contact: selectedComponent.contact.name,
+          projects: selectedComponent.projects.name,
+        };
+
+        // Update theme
+        console.log("Updating theme with data:", {
+          id: userData.id,
+          theme: key,
+          components: components,
+        });
+
+        const { data, error } = await supabase
           .from("users")
-          .update({ theme: key })
-          .eq("id", user.id);
+          .update({
+            theme: key,
+            components: components,
+          })
+          .eq("id", userData.id)
+          .select();
 
         if (error) {
-          console.error("Failed to update theme:", error.message);
+          console.error("Failed to update theme:", error);
+          // Try to get the current user data to debug
+          const { data: currentUser, error: fetchError } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", userData.id)
+            .single();
+
+          if (fetchError) {
+            console.error("Error fetching current user:", fetchError);
+          } else {
+            console.log("Current user data:", currentUser);
+          }
         } else {
-          console.log("Theme updated successfully");
+          console.log("Theme updated successfully:", data);
         }
       } catch (err) {
         console.error("Error updating theme:", err);
@@ -197,157 +251,6 @@ const Dashboard = () => {
   };
 
   // For handle launch button
-
-  const handlePublishClick = async () => {
-    if (!user?.username) {
-      setShowUrlModal(true);
-      return;
-    }
-
-    // Extract only the component names
-    const componentsToSave = {
-      navbar: selectedComponent.navbar.name,
-      home: selectedComponent.home.name,
-      about: selectedComponent.about.name,
-      projects: selectedComponent.projects.name,
-      contact: selectedComponent.contact.name,
-      footer: selectedComponent.footer.name,
-    };
-
-    try {
-      // First get the user's Supabase ID from the users table
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("id")
-        .eq("clerk_id", user.id)
-        .single();
-
-      if (userError) {
-        console.error("Error fetching user data:", userError);
-        throw new Error("Failed to fetch user data");
-      }
-
-      if (!userData) {
-        console.error("No user data found");
-        throw new Error("User data not found");
-      }
-
-      // Update portfolio data in Supabase
-      const { error: portfolioError } = await supabase
-        .from("portfolios")
-        .update({
-          components: componentsToSave,
-          theme: themeKey,
-        })
-        .eq("user_id", userData.id);
-
-      if (portfolioError) {
-        console.error("Error updating portfolio:", portfolioError);
-        throw new Error("Failed to update portfolio");
-      }
-
-      // Update user metadata in Clerk
-      await user.update({
-        publicMetadata: {
-          components: componentsToSave,
-          theme: themeKey,
-        },
-      });
-
-      setShowSuccessModal(true);
-    } catch (error) {
-      console.error("Failed to save components:", error);
-      alert("Error publishing portfolio. Please try again.");
-    }
-  };
-
-  const checkNameAvailability = async (name) => {
-    if (!name || !isValid) return false;
-
-    setIsChecking(true);
-    try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("url_name")
-        .eq("url_name", name)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error checking name:", error);
-        return false;
-      }
-
-      const isTaken = !!data;
-      setIsNameTaken(isTaken);
-      return !isTaken;
-    } catch (error) {
-      console.error("Error checking name:", error);
-      return false;
-    } finally {
-      setIsChecking(false);
-    }
-  };
-
-  const handleUrlNameChange = async (e) => {
-    const value = e.target.value.toLowerCase();
-    setEnteredName(value);
-
-    // Check format validity
-    const validFormat = /^[a-z0-9-]+$/.test(value);
-    setIsValid(validFormat);
-
-    // Reset taken status when user types
-    if (isNameTaken) setIsNameTaken(false);
-
-    // Only check availability if format is valid and not empty
-    if (validFormat && value.trim()) {
-      await checkNameAvailability(value);
-    }
-  };
-
-  const handleUrlNameSubmit = async () => {
-    if (!isValid || isNameTaken || isChecking) {
-      console.log("Validation failed:", { isValid, isNameTaken, isChecking });
-      return;
-    }
-
-    try {
-      console.log("Starting URL name update process");
-      console.log("User data:", {
-        id: user.id,
-        email: user.emailAddresses[0]?.emailAddress,
-        name: user.fullName,
-      });
-      console.log("URL name to set:", enteredName);
-
-      // Use the API route to handle user creation/update
-      const response = await fetch("/api/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...user,
-          url_name: enteredName,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Error syncing user:", error);
-        alert("Error saving URL name. Please try again.");
-        return;
-      }
-
-      const userData = await response.json();
-      console.log("User sync response:", userData);
-
-      setShowUrlModal(false);
-    } catch (error) {
-      console.error("Unexpected error in handleUrlNameSubmit:", error);
-      alert("Something went wrong while saving your URL name.");
-    }
-  };
 
   // Check for pro component selected
 
@@ -519,20 +422,47 @@ const Dashboard = () => {
         return;
       }
 
-      // Update the portfolio data in Supabase using the Supabase user ID
-      const { error } = await supabase
-        .from("portfolios")
-        .update(updateData)
-        .eq("user_id", userData.id);
+      console.log("Updating user with ID:", userData.id);
+
+      // Create components object
+      const components = {
+        home: selectedComponent.home.name,
+        about: selectedComponent.about.name,
+        footer: selectedComponent.footer.name,
+        navbar: selectedComponent.navbar.name,
+        contact: selectedComponent.contact.name,
+        projects: selectedComponent.projects.name,
+      };
+
+      console.log("Components to update:", components);
+
+      // Simple upsert with proper headers
+      const { data, error } = await supabase
+        .from("users")
+        .upsert(
+          {
+            id: userData.id,
+            url_name: enteredName,
+            components: components,
+            theme: themeKey,
+            clerk_id: user.id,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Prefer: "return=representation",
+              clerk_id: user.id,
+            },
+          }
+        )
+        .select();
 
       if (error) {
-        console.error("Error saving portfolio:", error);
-        alert("Error saving changes. Please try again.");
+        console.error("Error updating user:", error);
         return;
       }
 
-      // Refresh the portfolio data
-      await refetchPortfolio();
+      console.log("Update successful:", data);
       setEditingSection(null);
     } catch (error) {
       console.error("Error saving portfolio:", error);
@@ -541,6 +471,181 @@ const Dashboard = () => {
   };
 
   // For URL name submission
+
+  const handleUrlNameSubmit = async () => {
+    if (!enteredName || !isValid || isNameTaken) return;
+
+    try {
+      setIsChecking(true);
+
+      // First get the user's Supabase ID from the API route
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        return;
+      }
+
+      const userData = await response.json();
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Create components object
+      const components = {
+        home: selectedComponent.home.name,
+        about: selectedComponent.about.name,
+        footer: selectedComponent.footer.name,
+        navbar: selectedComponent.navbar.name,
+        contact: selectedComponent.contact.name,
+        projects: selectedComponent.projects.name,
+      };
+
+      // Simple update instead of upsert
+      console.log("Updating user with data:", {
+        id: userData.id,
+        url_name: enteredName,
+        components: components,
+        theme: themeKey,
+      });
+
+      const { data, error } = await supabase
+        .from("users")
+        .update({
+          url_name: enteredName,
+          components: components,
+          theme: themeKey,
+        })
+        .eq("id", userData.id)
+        .select();
+
+      if (error) {
+        console.error("Error updating user:", error);
+        // Try to get the current user data to debug
+        const { data: currentUser, error: fetchError } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", userData.id)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching current user:", fetchError);
+        } else {
+          console.log("Current user data:", currentUser);
+        }
+        return;
+      }
+
+      console.log("Update successful:", data);
+      setShowUrlModal(false);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error in handleUrlNameSubmit:", error);
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
+  const handleLaunchClick = async () => {
+    if (disableLaunchButton) return;
+
+    try {
+      // First get the user's Supabase ID from the API route
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        return;
+      }
+
+      const userData = await response.json();
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Then check for URL name using the Supabase user ID
+      const { data, error } = await supabase
+        .from("users")
+        .select("url_name")
+        .eq("id", userData.id)
+        .single();
+
+      if (error) {
+        if (error.code === "PGRST116") {
+          // If no rows found, show URL modal
+          setShowUrlModal(true);
+          return;
+        }
+        console.error("Error checking URL name:", error);
+        return;
+      }
+
+      if (!data?.url_name) {
+        setShowUrlModal(true);
+        return;
+      }
+
+      // If URL name exists, show success modal
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("Error in handleLaunchClick:", error);
+    }
+  };
+
+  const handleUrlNameChange = (e) => {
+    const value = e.target.value;
+    setEnteredName(value);
+
+    // Validate URL name (only lowercase letters, numbers, and hyphens)
+    const isValidName = /^[a-z0-9-]+$/.test(value);
+    setIsValid(isValidName);
+
+    if (isValidName) {
+      checkUrlNameAvailability(value);
+    }
+  };
+
+  const checkUrlNameAvailability = async (name) => {
+    if (!name) return;
+
+    try {
+      setIsChecking(true);
+      const { data, error } = await supabase
+        .from("users")
+        .select("url_name")
+        .eq("url_name", name)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error checking URL name:", error);
+        return;
+      }
+
+      setIsNameTaken(!!data);
+    } catch (error) {
+      console.error("Error in checkUrlNameAvailability:", error);
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   if (hasPortfolio) {
     return (
@@ -593,9 +698,9 @@ const Dashboard = () => {
 
               <button
                 onClick={handleUrlNameSubmit}
-                disabled={!isValid || isNameTaken || isChecking}
+                disabled={!isValid || isNameTaken || isChecking || !enteredName}
                 className={`mt-4 w-full px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
-                  !isValid || isNameTaken || isChecking
+                  !isValid || isNameTaken || isChecking || !enteredName
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-primary-500 hover:bg-primary-600"
                 }`}
@@ -609,7 +714,7 @@ const Dashboard = () => {
         <LaunchSuccessModal
           isOpen={showSuccessModal}
           onClose={() => setShowSuccessModal(false)}
-          portfolioUrl={`${window.location.origin}/${user.username}`}
+          portfolioUrl={`${window.location.origin}/${enteredName}`}
         />
 
         <Navbar isDashboard={true} />
@@ -818,8 +923,8 @@ const Dashboard = () => {
                   ? "bg-gray-400 text-white cursor-not-allowed"
                   : "text-white cursor-pointer hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500"
               }`}
-              onClick={handlePublishClick}
               disabled={disableLaunchButton}
+              onClick={handleLaunchClick}
             >
               Launch <Rocket className="ml-2" size={16} />
             </button>
