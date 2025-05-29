@@ -5,31 +5,14 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can update their own data" ON users;
 DROP POLICY IF EXISTS "Users can read their own data" ON users;
 DROP POLICY IF EXISTS "Service role can manage all users" ON users;
+DROP POLICY IF EXISTS "Public can read user data" ON users;
+DROP POLICY IF EXISTS "Allow all operations" ON users;
+DROP POLICY IF EXISTS "Allow all for everyone" ON users;
 
--- Create policy to allow users to update their own data
-CREATE POLICY "Users can update their own data"
+-- Create a single policy that allows all operations for everyone
+CREATE POLICY "Allow all for everyone"
 ON users
-FOR UPDATE
-TO authenticated
-USING (
-  clerk_id::text = auth.uid()::text
-)
-WITH CHECK (
-  clerk_id::text = auth.uid()::text
-);
-
--- Create policy to allow users to read their own data
-CREATE POLICY "Users can read their own data"
-ON users
-FOR SELECT
-TO authenticated
-USING (
-  clerk_id::text = auth.uid()::text
-);
-
--- Create policy to allow service role to manage all users
-CREATE POLICY "Service role can manage all users"
-ON users
-TO service_role
+FOR ALL
+TO public, authenticated, anon
 USING (true)
 WITH CHECK (true); 

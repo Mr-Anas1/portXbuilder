@@ -66,6 +66,7 @@ const Dashboard = () => {
   const [isNameTaken, setIsNameTaken] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [portfolioUrl, setPortfolioUrl] = useState("");
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
@@ -603,6 +604,8 @@ const Dashboard = () => {
         return;
       }
 
+      // Set the portfolio URL using the existing url_name
+      setPortfolioUrl(`${window.location.origin}/${data.url_name}`);
       // If URL name exists, show success modal
       setShowSuccessModal(true);
     } catch (error) {
@@ -714,7 +717,7 @@ const Dashboard = () => {
         <LaunchSuccessModal
           isOpen={showSuccessModal}
           onClose={() => setShowSuccessModal(false)}
-          portfolioUrl={`${window.location.origin}/${enteredName}`}
+          portfolioUrl={portfolioUrl}
         />
 
         <Navbar isDashboard={true} />

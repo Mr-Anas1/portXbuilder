@@ -26,7 +26,7 @@ const NavbarSection3 = ({
       <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
         {/* Logo */}
         <div className={`text-xl font-bold font-serif italic ${theme.text}`}>
-          {portfolio.name}
+          {portfolio?.name}
         </div>
 
         {/* Desktop Navigation */}
