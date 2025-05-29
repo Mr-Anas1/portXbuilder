@@ -153,6 +153,77 @@ const Dashboard = () => {
     }
   }, [isLoading, hasPortfolio, router]);
 
+  useEffect(() => {
+    const loadUserComponents = async () => {
+      if (loading || !user) return;
+
+      try {
+        // Get user's Supabase ID
+        const response = await fetch("/api/sync-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        });
+
+        if (!response.ok) {
+          console.error("Error syncing user:", await response.json());
+          return;
+        }
+
+        const userData = await response.json();
+
+        // Get user's saved components
+        const { data, error } = await supabase
+          .from("users")
+          .select("components, theme")
+          .eq("id", userData.id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching user components:", error);
+          return;
+        }
+
+        if (data?.components) {
+          // Map the saved component names to actual components
+          const newSelectedComponents = {
+            navbar:
+              navbarComponents.find((c) => c.name === data.components.navbar) ||
+              navbarComponents[0],
+            home:
+              heroComponents.find((c) => c.name === data.components.home) ||
+              heroComponents[0],
+            about:
+              aboutComponents.find((c) => c.name === data.components.about) ||
+              aboutComponents[0],
+            projects:
+              projectsComponents.find(
+                (c) => c.name === data.components.projects
+              ) || projectsComponents[0],
+            contact:
+              contactComponents.find(
+                (c) => c.name === data.components.contact
+              ) || contactComponents[0],
+            footer:
+              footerComponents.find((c) => c.name === data.components.footer) ||
+              footerComponents[0],
+          };
+          setSelectedComponent(newSelectedComponents);
+        }
+
+        if (data?.theme) {
+          setThemeKey(data.theme);
+        }
+      } catch (error) {
+        console.error("Error loading user components:", error);
+      }
+    };
+
+    loadUserComponents();
+  }, [user, loading]);
+
   // if (isLoading) {
   //   return (
   //     <div className="min-h-screen flex justify-center items-center">
