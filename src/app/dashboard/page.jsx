@@ -548,6 +548,7 @@ const Dashboard = () => {
 
       console.log("Update successful:", data);
       setShowUrlModal(false);
+      setPortfolioUrl(`${window.location.origin}/${enteredName}`);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error in handleUrlNameSubmit:", error);

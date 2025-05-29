@@ -30,7 +30,7 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
     return (
       <section
         className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
-        id="project"
+        id="projects"
       >
         <h2
           className={`text-4xl md:text-5xl font-bold mb-6 text-center ${theme.accentText}`}
@@ -48,6 +48,7 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
     <section
       className={`py-12 ${theme.bg} ${theme.text} min-h-screen`}
       ref={sectionRef}
+      id="projects"
     >
       <h1
         className={`text-4xl md:text-5xl font-bold text-center mb-12 ${theme.accentText}`}

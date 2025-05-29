@@ -62,7 +62,15 @@ const Page = () => {
   };
 
   const handleScrollToSection = (sectionId) => {
-    sectionRefs[sectionId]?.current?.scrollIntoView({ behavior: "smooth" });
+    const section = sectionRefs[sectionId]?.current;
+    if (section) {
+      const navbarHeight = sectionRefs.navbar?.current?.offsetHeight || 0;
+      const sectionTop = section.offsetTop - navbarHeight;
+      window.scrollTo({
+        top: sectionTop,
+        behavior: "smooth",
+      });
+    }
   };
 
   // Validate if theme exists in previewThemes
@@ -136,17 +144,25 @@ const Page = () => {
   const currentTheme = previewThemes[userTheme] || previewThemes.default;
 
   return (
-    <div className={`fixed inset-0 ${currentTheme.bg}`}>
-      <div className="h-full overflow-y-auto">
-        {renderComponent(portfolio.components?.navbar, "navbar")}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={`min-h-screen ${currentTheme.bg}`}>
+      {renderComponent(portfolio.components?.navbar, "navbar")}
+      <main className="relative">
+        <section ref={sectionRefs.home}>
           {renderComponent(portfolio.components?.home, "home")}
+        </section>
+        <section ref={sectionRefs.about}>
           {renderComponent(portfolio.components?.about, "about")}
+        </section>
+        <section ref={sectionRefs.projects}>
           {renderComponent(portfolio.components?.projects, "projects")}
+        </section>
+        <section ref={sectionRefs.contact}>
           {renderComponent(portfolio.components?.contact, "contact")}
-        </div>
+        </section>
+      </main>
+      <section ref={sectionRefs.footer}>
         {renderComponent(portfolio.components?.footer, "footer")}
-      </div>
+      </section>
     </div>
   );
 };

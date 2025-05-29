@@ -48,6 +48,10 @@ const NavbarSection3 = ({
             ))}
             <li>
               <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleScrollToSection("contact");
+                }}
                 className={`px-5 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105 ${theme.buttonHover}`}
               >
                 Contact <ArrowRight size={16} />
@@ -91,7 +95,11 @@ const NavbarSection3 = ({
             </div>
           ))}
           <button
-            onClick={toggleMenu}
+            onClick={(e) => {
+              e.preventDefault();
+              handleScrollToSection("contact");
+              toggleMenu();
+            }}
             className={`px-6 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105 ${theme.buttonHover}`}
           >
             Contact <ArrowRight size={16} />

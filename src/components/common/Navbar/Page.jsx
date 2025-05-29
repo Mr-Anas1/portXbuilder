@@ -95,7 +95,7 @@ const Navbar = ({ isDashboard }) => {
                   afterSignOutUrl="/"
                   appearance={{
                     elements: {
-                      avatarBox: "w-8 h-8",
+                      avatarBox: "w-10 h-10",
                     },
                   }}
                 />
@@ -112,29 +112,40 @@ const Navbar = ({ isDashboard }) => {
             )}
           </div>
 
-          <div className="md:hidden">
-            <button className="cursor-pointer">
-              {isOpen ? (
-                <X
-                  size={28}
-                  onClick={handleMenuClick}
-                  className="text-red-500"
-                />
-              ) : (
-                <AlignJustify
-                  size={28}
-                  onClick={handleMenuClick}
-                  className="text-primary-500"
-                />
-              )}
-            </button>
+          <div className="md:hidden flex justify-center items-center">
+            {!user ? (
+              <button className="cursor-pointer">
+                {isOpen ? (
+                  <X
+                    size={28}
+                    onClick={handleMenuClick}
+                    className="text-red-500"
+                  />
+                ) : (
+                  <AlignJustify
+                    size={28}
+                    onClick={handleMenuClick}
+                    className="text-primary-500"
+                  />
+                )}
+              </button>
+            ) : (
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8",
+                  },
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
       {isOpen && (
-        <div className="md:hidden fixed inset-0 z-[999] h-full  overflow-hidden  bg-background w-full text-black  pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
+        <div className="md:hidden  fixed inset-0 z-[999] h-full  overflow-hidden  bg-background w-full text-black  pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
           {!user ? (
-            <div>
+            <div className="flex flex-col gap-8 justify-center items-center">
               <Link
                 href={"#features"}
                 className="cursor-pointer "

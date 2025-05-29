@@ -29,7 +29,8 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
     return (
       <section
         className={`py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
-        id="project"
+        id="projects"
+        ref={sectionRef}
       >
         <h2
           className={`text-4xl md:text-5xl font-bold mb-6 text-center ${theme.accentText}`}
@@ -48,7 +49,7 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
     <section
       ref={sectionRef}
       className={`py-20 ${theme.bg} ${theme.text} min-h-screen`}
-      id="project"
+      id="projects"
     >
       <div className="text-center">
         <h2

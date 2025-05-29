@@ -15,8 +15,6 @@ const NavbarSection4 = ({
 
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <nav
       className={`w-full ${theme.bg} ${theme.shadow}`}
@@ -48,6 +46,10 @@ const NavbarSection4 = ({
             ))}
             <li>
               <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleScrollToSection("contact");
+                }}
                 className={`px-5 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105`}
               >
                 Contact <ArrowRight size={16} />
@@ -91,7 +93,11 @@ const NavbarSection4 = ({
             </div>
           ))}
           <button
-            onClick={toggleMenu}
+            onClick={(e) => {
+              e.preventDefault();
+              handleScrollToSection("contact");
+              toggleMenu();
+            }}
             className={`px-6 py-2 rounded-full flex items-center gap-2 ${theme.buttonBg} ${theme.buttonText} transition duration-200 hover:scale-105`}
           >
             Contact <ArrowRight size={16} />
