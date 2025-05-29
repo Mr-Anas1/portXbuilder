@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import previewThemes from "@/components/ui/previewThemes";
 import { Loader2 } from "lucide-react";
+import { usePortfolio } from "@/context/PortfolioContext";
 
 import { navbarComponents } from "@/components/Navbars/index";
 import { heroComponents } from "@/components/HeroSections/index";
@@ -47,9 +48,7 @@ const componentMap = createComponentMap(
 
 const Page = () => {
   const { url_name } = useParams();
-  const [userComponents, setUserComponents] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { portfolio, loading } = usePortfolio();
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [userTheme, setUserTheme] = useState("default");
 
@@ -76,71 +75,11 @@ const Page = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        console.log("Fetching portfolio for URL name:", url_name);
-
-        const response = await fetch(`/api/portfolio/${url_name}`);
-        const data = await response.json();
-
-        console.log("Portfolio API response:", data);
-
-        if (!response.ok) {
-          const errorMessage = data.error || "Failed to fetch portfolio data";
-          console.error("Error fetching portfolio:", errorMessage);
-          setError(errorMessage);
-          setUserComponents(null);
-          return;
-        }
-
-        if (!data.components) {
-          const errorMessage = "No components found in response";
-          console.error(errorMessage);
-          setError(errorMessage);
-          setUserComponents(null);
-          return;
-        }
-
-        // Validate components
-        const validComponents = {
-          navbar: data.components.navbar || "Navbar 1",
-          home: data.components.home || "Hero 1",
-          about: data.components.about || "About 1",
-          projects: data.components.projects || "Project 1",
-          contact: data.components.contact || "Contact 1",
-          footer: data.components.footer || "Footer 1",
-        };
-
-        // Log the component mapping for debugging
-        console.log("Component mapping:", {
-          received: data.components,
-          mapped: validComponents,
-          available: Object.keys(componentMap),
-        });
-
-        setUserComponents(validComponents);
-
-        // Validate theme before setting
-        const validTheme = getValidTheme(data.theme);
-        console.log("Theme validation:", {
-          received: data.theme,
-          valid: validTheme,
-          available: Object.keys(previewThemes),
-        });
-        setUserTheme(validTheme);
-      } catch (error) {
-        console.error("Unexpected error in fetchData:", error);
-        setError("An unexpected error occurred");
-        setUserComponents(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [url_name]);
+    if (portfolio?.theme) {
+      const validTheme = getValidTheme(portfolio.theme);
+      setUserTheme(validTheme);
+    }
+  }, [portfolio?.theme]);
 
   if (loading) {
     return (
@@ -153,23 +92,7 @@ const Page = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Error Loading Portfolio
-          </h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <p className="text-sm text-gray-500">
-            Please try again later or contact support if the issue persists.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!userComponents) {
+  if (!portfolio) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center p-8">
@@ -215,14 +138,14 @@ const Page = () => {
   return (
     <div className={`fixed inset-0 ${currentTheme.bg}`}>
       <div className="h-full overflow-y-auto">
-        {renderComponent(userComponents.navbar, "navbar")}
+        {renderComponent(portfolio.components?.navbar, "navbar")}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {renderComponent(userComponents.home, "home")}
-          {renderComponent(userComponents.about, "about")}
-          {renderComponent(userComponents.projects, "projects")}
-          {renderComponent(userComponents.contact, "contact")}
+          {renderComponent(portfolio.components?.home, "home")}
+          {renderComponent(portfolio.components?.about, "about")}
+          {renderComponent(portfolio.components?.projects, "projects")}
+          {renderComponent(portfolio.components?.contact, "contact")}
         </div>
-        {renderComponent(userComponents.footer, "footer")}
+        {renderComponent(portfolio.components?.footer, "footer")}
       </div>
     </div>
   );

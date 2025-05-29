@@ -39,7 +39,7 @@ export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}
         >
-          �� Hi! I'm {portfolio?.name}
+          👋 Hi! I'm {portfolio?.name}
         </p>
         <p
           className={`text-lg ${theme.subtext} hover:translate-x-2 transition duration-300`}

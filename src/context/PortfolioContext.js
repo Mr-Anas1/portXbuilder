@@ -30,6 +30,7 @@ export const PortfolioProvider = ({ children }) => {
     try {
       let portfolio = null;
       let portfolioError = null;
+      let userData = null;
 
       // If we have a user ID, try to get their portfolio
       if (user?.id) {
@@ -49,7 +50,7 @@ export const PortfolioProvider = ({ children }) => {
           return;
         }
 
-        const userData = await response.json();
+        userData = await response.json();
 
         if (!userData) {
           console.error("No user data found");
@@ -70,14 +71,37 @@ export const PortfolioProvider = ({ children }) => {
 
       // If no portfolio found by user_id and url_name is available, try searching by url_name
       if (!portfolio && url_name) {
+        // First get the user by url_name
+        const { data: userByUrl, error: userError } = await supabase
+          .from("users")
+          .select("id, components, theme")
+          .eq("url_name", url_name)
+          .maybeSingle();
+
+        if (userError) {
+          console.error("Error fetching user by url_name:", userError);
+          setPortfolio(null);
+          setLoading(false);
+          return;
+        }
+
+        if (!userByUrl) {
+          console.log("No user found with url_name:", url_name);
+          setPortfolio(null);
+          setLoading(false);
+          return;
+        }
+
+        // Then get the portfolio using the user's ID
         const { data, error } = await supabase
           .from("portfolios")
           .select("*")
-          .eq("url_name", url_name)
+          .eq("user_id", userByUrl.id)
           .maybeSingle();
 
         portfolio = data;
         portfolioError = error;
+        userData = userByUrl;
       }
 
       console.log("Portfolio query result:", {
@@ -96,26 +120,6 @@ export const PortfolioProvider = ({ children }) => {
 
       if (!portfolio) {
         console.log("No portfolio found with user_id or url_name");
-        setPortfolio(null);
-        setLoading(false);
-        return;
-      }
-
-      // If we found a portfolio, get the user data
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("components, theme")
-        .eq("id", portfolio.user_id)
-        .maybeSingle();
-
-      console.log("User data query result:", {
-        data: userData,
-        error: userError,
-        userId: portfolio.user_id,
-      });
-
-      if (userError) {
-        console.error("Error fetching user data:", userError);
         setPortfolio(null);
         setLoading(false);
         return;

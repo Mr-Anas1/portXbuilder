@@ -136,6 +136,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({
       components: userComponents.components,
       theme: theme,
+      portfolio: portfolioData,
     });
   } catch (error) {
     console.error("Unexpected error in portfolio API:", error);
