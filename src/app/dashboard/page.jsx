@@ -18,6 +18,7 @@ import {
   Rocket,
   Smartphone,
   Sparkles,
+  X,
 } from "lucide-react";
 import { useRef } from "react";
 import { navbarComponents } from "@/components/Navbars/index";
@@ -32,6 +33,7 @@ import { usePortfolioRedirect } from "@/context/usePortfolioRedirect";
 import { usePortfolio } from "@/context/PortfolioContext";
 import PortfolioEditor from "@/components/PortfolioEditor/PortfolioEditor";
 import LaunchSuccessModal from "@/components/ui/LaunchSuccessModal";
+import { toast } from "react-hot-toast";
 
 const Dashboard = () => {
   const { user, loading, isOffline, retrySync } = useAuthContext();
@@ -67,6 +69,19 @@ const Dashboard = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [portfolioData, setPortfolioData] = useState({});
+  const [formData, setFormData] = useState({});
+  const [isLaunching, setIsLaunching] = useState(false);
+
+  // Add section to field mapping
+  const sectionToField = {
+    navbar: "name",
+    home: ["home_title", "home_subtitle", "profileImage"],
+    about: "about_me",
+    projects: "projects",
+    contact: ["email", "phone"],
+    footer: "name",
+  };
 
   const [sections, setSections] = useState([
     { id: "navbar", label: "Navbar", icon: LayoutGrid, isCustom: false },
@@ -433,51 +448,25 @@ const Dashboard = () => {
     }
   };
 
-  const theme = previewThemes[themeKey];
+  // Get the current theme object
+  const theme = previewThemes[themeKey] || previewThemes.default;
 
-  const handleSave = async (section, updatedData) => {
+  const handleSave = async (section, formData) => {
     try {
-      // First check if user is trying to use pro components
-      const sections = [
-        "navbar",
-        "hero",
-        "about",
-        "projects",
-        "contact",
-        "footer",
-      ];
-      const hasProComponents = sections.some((section) => {
-        const component = selectedComponent[section];
-        return component?.type === "pro";
-      });
+      console.log("Saving section:", section);
+      console.log("Form data:", formData);
 
-      if (hasProComponents && !isProUser) {
-        alert("You need to upgrade to Pro to use these components.");
+      // Get the field names for this section
+      const fieldNames = Array.isArray(sectionToField[section])
+        ? sectionToField[section]
+        : [sectionToField[section]];
+
+      if (!fieldNames || fieldNames.length === 0) {
+        console.error("No field mapping found for section:", section);
         return;
       }
 
-      // Map section to the actual field name in the database
-      const sectionToField = {
-        navbar: "name",
-        home: "home_title",
-        about: "about_me",
-        projects: "projects",
-        contact: "contact",
-        footer: "name",
-      };
-
-      const fieldName = sectionToField[section];
-      if (!fieldName) {
-        console.error("Invalid section name:", section);
-        return;
-      }
-
-      // Create update object with only the field that was edited
-      const updateData = {
-        [fieldName]: updatedData[fieldName],
-      };
-
-      // First get the user's Supabase ID from the users table
+      // Get the user's Supabase ID
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("id")
@@ -494,51 +483,74 @@ const Dashboard = () => {
         return;
       }
 
-      console.log("Updating user with ID:", userData.id);
-
-      // Create components object
-      const components = {
-        home: selectedComponent.home.name,
-        about: selectedComponent.about.name,
-        footer: selectedComponent.footer.name,
-        navbar: selectedComponent.navbar.name,
-        contact: selectedComponent.contact.name,
-        projects: selectedComponent.projects.name,
-      };
-
-      console.log("Components to update:", components);
-
-      // Simple upsert with proper headers
-      const { data, error } = await supabase
+      // Update user components and theme
+      const { error: userUpdateError } = await supabase
         .from("users")
-        .upsert(
-          {
-            id: userData.id,
-            url_name: enteredName,
-            components: components,
-            theme: themeKey,
-            clerk_id: user.id,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Prefer: "return=representation",
-              clerk_id: user.id,
-            },
-          }
-        )
-        .select();
+        .update({
+          components: formData.components || [],
+          theme: formData.theme || "default",
+        })
+        .eq("clerk_id", user.id);
 
-      if (error) {
-        console.error("Error updating user:", error);
+      if (userUpdateError) {
+        console.error("Error updating user:", userUpdateError);
         return;
       }
 
-      console.log("Update successful:", data);
+      // Prepare portfolio data with all fields for the section
+      const portfolioData = {
+        user_id: userData.id,
+      };
+
+      // Add all fields for this section to the portfolio data
+      fieldNames.forEach((fieldName) => {
+        if (formData[fieldName] !== undefined) {
+          portfolioData[fieldName] = formData[fieldName];
+        }
+      });
+
+      console.log("Sending portfolio data:", portfolioData);
+
+      // Update portfolio using API route
+      const response = await fetch("/api/portfolio", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(portfolioData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Portfolio update failed:", errorData);
+        throw new Error(errorData.error || "Failed to update portfolio");
+      }
+
+      const result = await response.json();
+      console.log("Portfolio update response:", result);
+
+      // Update local state with all fields
+      setPortfolioData((prev) => ({
+        ...prev,
+        ...fieldNames.reduce(
+          (acc, fieldName) => ({
+            ...acc,
+            [fieldName]: formData[fieldName],
+          }),
+          {}
+        ),
+      }));
+
+      // Close the editor
       setEditingSection(null);
+
+      // Refresh portfolio data
+      await refetchPortfolio();
+
+      toast.success("Portfolio updated successfully!");
     } catch (error) {
       console.error("Error saving portfolio:", error);
-      alert("Error saving changes. Please try again.");
+      toast.error(error.message || "Failed to update portfolio");
     }
   };
 
@@ -632,6 +644,7 @@ const Dashboard = () => {
     if (disableLaunchButton) return;
 
     try {
+      setIsLaunching(true);
       // First get the user's Supabase ID from the API route
       const response = await fetch("/api/sync-user", {
         method: "POST",
@@ -682,6 +695,8 @@ const Dashboard = () => {
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error in handleLaunchClick:", error);
+    } finally {
+      setIsLaunching(false);
     }
   };
 
@@ -737,7 +752,14 @@ const Dashboard = () => {
 
         {showUrlModal && (
           <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
+              <button
+                onClick={() => setShowUrlModal(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                <X size={20} />
+              </button>
+
               <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
               <div className="relative">
                 <input
@@ -771,17 +793,27 @@ const Dashboard = () => {
                 )}
               </div>
 
-              <button
-                onClick={handleUrlNameSubmit}
-                disabled={!isValid || isNameTaken || isChecking || !enteredName}
-                className={`mt-4 w-full px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
-                  !isValid || isNameTaken || isChecking || !enteredName
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-primary-500 hover:bg-primary-600"
-                }`}
-              >
-                Save & Continue
-              </button>
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => setShowUrlModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUrlNameSubmit}
+                  disabled={
+                    !isValid || isNameTaken || isChecking || !enteredName
+                  }
+                  className={`px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
+                    !isValid || isNameTaken || isChecking || !enteredName
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-primary-500 hover:bg-primary-600"
+                  }`}
+                >
+                  Save & Continue
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -998,10 +1030,19 @@ const Dashboard = () => {
                   ? "bg-gray-400 text-white cursor-not-allowed"
                   : "text-white cursor-pointer hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500"
               }`}
-              disabled={disableLaunchButton}
+              disabled={disableLaunchButton || isLaunching}
               onClick={handleLaunchClick}
             >
-              Launch <Rocket className="ml-2" size={16} />
+              {isLaunching ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Launching...
+                </>
+              ) : (
+                <>
+                  Launch <Rocket className="ml-2" size={16} />
+                </>
+              )}
             </button>
           </div>
         </div>

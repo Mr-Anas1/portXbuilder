@@ -7,6 +7,8 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { PortfolioProvider } from "@/context/PortfolioContext";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "react-hot-toast";
+import { To } from "react-flags-select";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +33,10 @@ export default function RootLayout({ children }) {
       >
         <ClerkProvider>
           <AuthProvider>
-            <PortfolioProvider>{children}</PortfolioProvider>
+            <PortfolioProvider>
+              <Toaster position="top-right" />
+              {children}
+            </PortfolioProvider>
           </AuthProvider>
         </ClerkProvider>
       </body>

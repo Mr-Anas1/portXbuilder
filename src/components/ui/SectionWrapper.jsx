@@ -17,7 +17,7 @@ const SectionWrapper = ({
     <section
       ref={innerRef}
       id={id}
-      className={`${theme.bg}  relative group border-2 hover:border-primary-500 border-transparent transition-all duration-300`}
+      className={`${theme?.bg}  relative group border-2 hover:border-primary-500 border-transparent transition-all duration-300`}
     >
       {componentMeta?.type === "pro" && (
         <span className="absolute top-2 right-2 md:right-auto md:left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">

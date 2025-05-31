@@ -61,8 +61,8 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Valid email
       about_me: /^(?!.*<[^>]*>)[a-zA-Z0-9\s.,'()!?\-]*$/, // No HTML, allow basic punctuation
       name: /^[a-zA-Z\s]*$/, // Letters and spaces
-      home_title: /^[a-zA-Z0-9\s.,!?-]*$/, // Basic sentence format
-      home_subtitle: /^[a-zA-Z0-9\s.,!?-]*$/,
+      home_title: /^[a-zA-Z0-9\s.',!?-]*$/, // Basic sentence format
+      home_subtitle: /^[a-zA-Z0-9\s.',!?-]*$/,
       github: /^https?:\/\/(www\.)?github\.com\/[a-zA-Z0-9-_/]+$/, // GitHub profile URLs
       linkedin: /^https?:\/\/(www\.)?linkedin\.com\/.*$/, // LinkedIn URLs
       x: /^https?:\/\/(www\.)?(x|twitter)\.com\/.*$/, // Twitter/X URLs
@@ -200,7 +200,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       }
     }
 
-    // Call onSave with the updated form state
+    // Call onSave with the section and the updated form state
     onSave(section, updatedFormState);
   };
 
@@ -306,7 +306,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
 
         {section === "projects" && (
           <div className="w-full max-h-[80vh] overflow-y-auto">
-            <div className="bg-white/80 rounded-xl p-6 shadow-lg">
+            <div className="bg-white/80 rounded-xl  shadow-lg">
               <Projects formData={formState} setFormData={setFormState} />
             </div>
           </div>
