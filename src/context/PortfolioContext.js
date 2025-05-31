@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthContext } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const PortfolioContext = createContext();
 
@@ -13,24 +14,39 @@ export const PortfolioProvider = ({ children }) => {
   const url_name = params?.url_name;
   const [portfolio, setPortfolio] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isPro, setIsPro] = useState(false);
+  const supabase = createClientComponentClient();
 
   const fetchPortfolio = async () => {
-    if (!user && !url_name) {
-      console.log("No user or url_name available, skipping fetch");
-      setLoading(false);
-      return;
-    }
-
-    console.log("Fetch parameters:", {
-      url_name,
-      userId: user?.id,
-      isUsingUrlName: !!url_name,
-    });
-
     try {
-      let portfolio = null;
+      setLoading(true);
+      setError(null);
+
+      if (!user) {
+        setPortfolio(null);
+        setIsPro(false);
+        return;
+      }
+
+      // Get user data from Supabase
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("clerk_id", user.id)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user:", userError);
+        setError("Failed to fetch user data");
+        return;
+      }
+
+      // Set pro status
+      setIsPro(userData?.plan === "pro");
+
+      let portfolioData = null;
       let portfolioError = null;
-      let userData = null;
 
       // If we have a user ID, try to get their portfolio
       if (user?.id) {
@@ -50,9 +66,9 @@ export const PortfolioProvider = ({ children }) => {
           return;
         }
 
-        userData = await response.json();
+        const syncedUserData = await response.json();
 
-        if (!userData) {
+        if (!syncedUserData) {
           console.error("No user data found");
           setLoading(false);
           return;
@@ -62,15 +78,15 @@ export const PortfolioProvider = ({ children }) => {
         const { data, error } = await supabase
           .from("portfolios")
           .select("*")
-          .eq("user_id", userData.id)
+          .eq("user_id", syncedUserData.id)
           .maybeSingle();
 
-        portfolio = data;
+        portfolioData = data;
         portfolioError = error;
       }
 
       // If no portfolio found by user_id and url_name is available, try searching by url_name
-      if (!portfolio && url_name) {
+      if (!portfolioData && url_name) {
         // First get the user by url_name
         const { data: userByUrl, error: userError } = await supabase
           .from("users")
@@ -99,13 +115,13 @@ export const PortfolioProvider = ({ children }) => {
           .eq("user_id", userByUrl.id)
           .maybeSingle();
 
-        portfolio = data;
+        portfolioData = data;
         portfolioError = error;
         userData = userByUrl;
       }
 
       console.log("Portfolio query result:", {
-        data: portfolio,
+        data: portfolioData,
         error: portfolioError,
         url_name,
         userId: user?.id,
@@ -114,26 +130,22 @@ export const PortfolioProvider = ({ children }) => {
       if (portfolioError) {
         console.error("Error fetching portfolio:", portfolioError);
         setPortfolio(null);
-        setLoading(false);
-        return;
       }
 
-      if (!portfolio) {
+      if (!portfolioData) {
         console.log("No portfolio found with user_id or url_name");
         setPortfolio(null);
-        setLoading(false);
-        return;
       }
 
       // Merge portfolio data with user data, using default values if user data is not found
       setPortfolio({
-        ...portfolio,
+        ...portfolioData,
         components: userData?.components || {},
         theme: userData?.theme || "default",
       });
     } catch (error) {
-      console.error("Unexpected error in fetchPortfolio:", error);
-      setPortfolio(null);
+      console.error("Error in fetchPortfolio:", error);
+      setError("Failed to fetch portfolio");
     } finally {
       setLoading(false);
     }
@@ -157,7 +169,14 @@ export const PortfolioProvider = ({ children }) => {
 
   return (
     <PortfolioContext.Provider
-      value={{ portfolio, loading, refetchPortfolio: fetchPortfolio }}
+      value={{
+        portfolio,
+        loading,
+        error,
+        fetchPortfolio,
+        isPro,
+        refetchPortfolio: fetchPortfolio,
+      }}
     >
       {children}
     </PortfolioContext.Provider>
