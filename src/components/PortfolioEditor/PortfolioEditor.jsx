@@ -294,7 +294,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
 
               <label
                 htmlFor="profileImage"
-                className="cursor-pointer rounded-lg px-4 py-2 w-full border text-gray-500 border-gray-300 group-hover:border-primary-500 group-hover:text-primary-500 transition-all duration-300 text-center"
+                className="cursor-pointer rounded-lg px-4 py-2 w-full border text-gray-500 border-gray-300 group-hover:border-primary-500 group-hover:text-primary-500 transition-all duration-300 text-center break-all"
               >
                 {selectedFile
                   ? selectedFile.name
