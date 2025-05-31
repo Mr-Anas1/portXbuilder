@@ -631,7 +631,7 @@ const Dashboard = () => {
 
       console.log("Update successful:", data);
       setShowUrlModal(false);
-      setPortfolioUrl(`${window.location.origin}/${enteredName}`);
+      setPortfolioUrl(`${window.location.origin}/portfolio/${enteredName}`);
       setShowSuccessModal(true);
     } catch (error) {
       console.error("Error in handleUrlNameSubmit:", error);
@@ -689,8 +689,8 @@ const Dashboard = () => {
         return;
       }
 
-      // Set the portfolio URL using the existing url_name
-      setPortfolioUrl(`${window.location.origin}/${data.url_name}`);
+      // Set the portfolio URL using the correct format
+      setPortfolioUrl(`${window.location.origin}/portfolio/${data.url_name}`);
       // If URL name exists, show success modal
       setShowSuccessModal(true);
     } catch (error) {
