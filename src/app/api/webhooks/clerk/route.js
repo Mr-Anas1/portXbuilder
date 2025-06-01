@@ -1,6 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
 
 export async function POST(req) {
   // Get the headers
@@ -50,8 +51,18 @@ export async function POST(req) {
     eventType === "subscription.updated" ||
     eventType === "subscription.cancelled"
   ) {
-    // Call the sync-user endpoint
+    // Get the full user data from Clerk
+    const userId = evt.data.user?.id || evt.data.userId;
+    if (!userId) {
+      console.error("No user ID found in webhook data");
+      return new Response("No user ID found", { status: 400 });
+    }
+
     try {
+      // Get the full user data from Clerk
+      const user = await clerkClient.users.getUser(userId);
+
+      // Call the sync-user endpoint with the full user data
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_APP_URL}/api/sync-user`,
         {
@@ -59,7 +70,7 @@ export async function POST(req) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(evt.data),
+          body: JSON.stringify(user),
         }
       );
 

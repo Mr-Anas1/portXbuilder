@@ -9,7 +9,7 @@ import Footer from "./Footer";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 
-function Page() {
+function Page({ hasProPlan }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -46,7 +46,7 @@ function Page() {
       <div className="absolute top-1/4 right-[10px] w-32 h-32 bg-secondary-400/20 rounded-full blur-2xl" />
       <div className="absolute bottom-[50px] left-1/4 w-32 h-32 bg-primary-400/20 rounded-full blur-2xl" />
 
-      <Navbar />
+      <Navbar hasProPlan={hasProPlan} />
       <Hero />
       <Features />
       <PricingSectionCards />

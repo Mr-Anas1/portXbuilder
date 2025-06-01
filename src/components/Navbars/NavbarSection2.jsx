@@ -16,22 +16,6 @@ const NavbarSection2 = ({
 
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) {
-    return (
-      <nav
-        className={`w-full ${theme.bg} ${theme.shadow}`}
-        id="navbar"
-        ref={sectionRef}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className={`text-xl font-bold ${theme.text}`}>Loading...</div>
-          </div>
-        </div>
-      </nav>
-    );
-  }
-
   return (
     <nav
       ref={sectionRef}

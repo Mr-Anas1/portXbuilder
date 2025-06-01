@@ -14,6 +14,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   const [creationProgress, setCreationProgress] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     // Initialize projects array if it doesn't exist
@@ -114,6 +115,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     let updatedFormState = { ...formState };
 
     if (selectedFile) {
@@ -201,7 +203,11 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
     }
 
     // Call onSave with the section and the updated form state
-    onSave(section, updatedFormState);
+    try {
+      await onSave(section, updatedFormState);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const isFormValid = () => {
@@ -404,19 +410,27 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
           <button
             onClick={onClose}
             className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+            disabled={isSaving}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className={`px-4 py-2 rounded ${
+            className={`px-4 py-2 rounded flex items-center gap-2 ${
               isFormValid()
                 ? "bg-primary-500 text-white hover:bg-primary-600"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
-            disabled={!isFormValid()}
+            disabled={!isFormValid() || isSaving}
           >
-            Save
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
         </div>
       </div>

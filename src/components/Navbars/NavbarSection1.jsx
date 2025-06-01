@@ -34,8 +34,6 @@ const NavbarSection1 = ({
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <nav className={`w-full ${bg} ${shadow}`} id="navbar" ref={sectionRef}>
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-6 h-20">

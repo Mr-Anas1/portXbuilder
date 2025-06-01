@@ -1,20 +1,30 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
-import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { useClerk, UserButton } from "@clerk/nextjs";
+import { UserButton, useClerk } from "@clerk/nextjs";
+import { useProStatusClient } from "@/context/useProStatusClient";
 
 const Navbar = ({ isDashboard }) => {
+  const hasProPlan = useProStatusClient();
   const { user } = useAuthContext();
   const { signOut } = useClerk();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    console.log("Navbar Debug:", {
+      hasProPlan,
+      user: user?.id,
+      userMetadata: user?.publicMetadata,
+      isOpen,
+    });
+  }, [hasProPlan, user, isOpen]);
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -85,6 +95,11 @@ const Navbar = ({ isDashboard }) => {
           <div className="hidden md:block">
             {user ? (
               <div className="flex justify-center items-center gap-4">
+                {hasProPlan && (
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    PRO
+                  </div>
+                )}
                 <Link
                   href="/dashboard"
                   className="cursor-pointer hover:text-secondary-500 transition-colors"
@@ -143,12 +158,12 @@ const Navbar = ({ isDashboard }) => {
         </div>
       </div>
       {isOpen && (
-        <div className="md:hidden  fixed inset-0 z-[999] h-full  overflow-hidden  bg-background w-full text-black  pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
+        <div className="md:hidden fixed inset-0 z-[999] h-full overflow-hidden bg-background w-full text-black pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
           {!user ? (
             <div className="flex flex-col gap-8 justify-center items-center">
               <Link
                 href={"#features"}
-                className="cursor-pointer "
+                className="cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Features
@@ -170,38 +185,34 @@ const Navbar = ({ isDashboard }) => {
               </Link>
             </div>
           ) : (
-            ""
-          )}
-          <div>
-            {user ? (
-              <div className="flex justify-center items-center gap-12 flex-col">
-                <Link
-                  href="/dashboard"
-                  className="cursor-pointer"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {" "}
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="cursor-pointer text-red-500"
-                >
-                  {" "}
-                  Logout
-                </button>
+            <div className="flex flex-col gap-8 justify-center items-center">
+              <div className="text-center">
+                {hasProPlan ? (
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                    PRO
+                  </div>
+                ) : (
+                  <div className="text-gray-500">Not a PRO user</div>
+                )}
               </div>
-            ) : (
-              <Button variant="outline" asChild>
-                <Link
-                  href="/sign-up"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl"
-                >
-                  Get Started
-                </Link>
-              </Button>
-            )}
-          </div>
+              <Link
+                href="/dashboard"
+                className="cursor-pointer"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       )}
     </section>

@@ -6,16 +6,22 @@ export async function isUserSubscribed(userId) {
       userId
     );
 
+    console.log("Raw subscription data:", subscriptions);
+
     // Check if user has an active subscription
     const isPro = subscriptions.some(
       (sub) =>
         sub.status === "active" &&
-        (sub.plan === "pro" || sub.plan === "premium") // Add any other pro plan names you use
+        (sub.plan === "pro" || sub.plan === "premium" || sub.plan === "Pro") // Add any other pro plan names you use
     );
 
     console.log("Subscription check:", {
       userId,
-      subscriptions,
+      subscriptions: subscriptions.map((sub) => ({
+        plan: sub.plan,
+        status: sub.status,
+        currentPeriodEnd: sub.currentPeriodEnd,
+      })),
       isPro,
     });
 

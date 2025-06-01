@@ -16,7 +16,6 @@ export default function AboutSection3({
 }) {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   const aboutData = [
     {
       icon: <FontAwesomeIcon icon={faUser} size="lg" />,

@@ -2,6 +2,7 @@ import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { isUserSubscribed } from "@/lib/clerk";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export async function POST(request) {
   try {
@@ -35,6 +36,19 @@ export async function POST(request) {
     // Check actual subscription status
     const isPro = await isUserSubscribed(user.id);
     console.log("User subscription status:", { userId: user.id, isPro });
+
+    // Update user's metadata in Clerk
+    try {
+      await clerkClient.users.updateUser(user.id, {
+        publicMetadata: {
+          ...user.publicMetadata,
+          plan: isPro ? "pro" : "free",
+        },
+      });
+      console.log("Updated user metadata in Clerk");
+    } catch (error) {
+      console.error("Error updating user metadata in Clerk:", error);
+    }
 
     if (existingUser) {
       // Update existing user's plan status if it has changed

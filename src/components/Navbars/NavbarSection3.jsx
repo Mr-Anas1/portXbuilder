@@ -15,8 +15,6 @@ const NavbarSection3 = ({
 
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <nav
       className={`w-full ${theme.bg} ${theme.shadow}`}

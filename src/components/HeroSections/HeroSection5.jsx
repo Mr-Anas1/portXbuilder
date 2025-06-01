@@ -10,7 +10,6 @@ export default function HomeSection5({
 }) {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   return (
     <section
       ref={sectionRef}

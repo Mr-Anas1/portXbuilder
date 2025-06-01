@@ -5,8 +5,6 @@ import { usePortfolio } from "@/context/PortfolioContext";
 export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading projects...</p>;
-
   // Normalize fallback project data
   const formattedProjectData = ProjectData.map((project) => ({
     project_img: project.image,

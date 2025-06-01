@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   return (
     <section
       ref={sectionRef}

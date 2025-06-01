@@ -5,7 +5,6 @@ import { usePortfolio } from "@/context/PortfolioContext";
 const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
   const { portfolio, loading } = usePortfolio();
 
-  if (loading) return <p>Loading...</p>;
   return (
     <section
       ref={sectionRef}
