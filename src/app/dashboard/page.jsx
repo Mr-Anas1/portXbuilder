@@ -103,6 +103,7 @@ export default function Dashboard() {
     portfolio,
     refetchPortfolio,
     loading: portfolioLoading,
+    updatePortfolioData,
   } = usePortfolio();
 
   usePortfolioRedirect();
@@ -468,40 +469,9 @@ export default function Dashboard() {
         return;
       }
 
-      // Get the user's Supabase ID
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("id")
-        .eq("clerk_id", user.id)
-        .single();
-
-      if (userError) {
-        console.error("Error fetching user data:", userError);
-        return;
-      }
-
-      if (!userData) {
-        console.error("No user data found");
-        return;
-      }
-
-      // Update user components and theme
-      const { error: userUpdateError } = await supabase
-        .from("users")
-        .update({
-          components: formData.components || [],
-          theme: formData.theme || "default",
-        })
-        .eq("clerk_id", user.id);
-
-      if (userUpdateError) {
-        console.error("Error updating user:", userUpdateError);
-        return;
-      }
-
       // Prepare portfolio data with all fields for the section
       const portfolioData = {
-        user_id: userData.id,
+        user_id: user.id, // Use clerk_id directly since we're using it in the API
       };
 
       // Add all fields for this section to the portfolio data
@@ -510,8 +480,6 @@ export default function Dashboard() {
           portfolioData[fieldName] = formData[fieldName];
         }
       });
-
-      console.log("Sending portfolio data:", portfolioData);
 
       // Update portfolio using API route
       const response = await fetch("/api/portfolio", {
@@ -546,8 +514,18 @@ export default function Dashboard() {
       // Close the editor
       setEditingSection(null);
 
-      // Refresh portfolio data
-      await refetchPortfolio();
+      // Update local state immediately
+      if (portfolio) {
+        updatePortfolioData(
+          fieldNames.reduce(
+            (acc, fieldName) => ({
+              ...acc,
+              [fieldName]: formData[fieldName],
+            }),
+            {}
+          )
+        );
+      }
 
       toast.success("Portfolio updated successfully!");
     } catch (error) {

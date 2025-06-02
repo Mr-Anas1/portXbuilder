@@ -10,7 +10,7 @@ const NavbarSection4 = ({
   sectionRef,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const navLinks = ["Home", "About", "Works"];
+  const navLinks = ["Home", "About", "Projects"];
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const { portfolio, loading } = usePortfolio();

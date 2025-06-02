@@ -32,82 +32,48 @@ export async function POST(request) {
       );
     }
 
-    console.log("Received portfolio data:", portfolioData);
-
-    // Create or update portfolio using service role
-    const { data: existingData, error: fetchError } = await supabaseAdmin
-      .from("portfolios")
-      .select("*")
-      .eq("user_id", portfolioData.user_id)
+    // First get the Supabase user ID from the clerk_id
+    const { data: userData, error: userError } = await supabaseAdmin
+      .from("users")
+      .select("id")
+      .eq("clerk_id", portfolioData.user_id)
       .single();
 
-    console.log("Fetch result:", { existingData, fetchError });
-
-    // If no portfolio exists yet, create a new one with default values
-    if (fetchError && fetchError.code === "PGRST116") {
-      console.log("No existing portfolio found, creating new one");
-      const insertData = {
-        user_id: portfolioData.user_id,
-        ...portfolioData,
-      };
-      console.log("Inserting new portfolio with data:", insertData);
-
-      const { data, error } = await supabaseAdmin
-        .from("portfolios")
-        .insert(insertData)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("Error creating portfolio:", error);
-        return NextResponse.json(
-          { error: "Error creating portfolio" },
-          { status: 500 }
-        );
-      }
-
-      console.log("Successfully created new portfolio:", data);
-      return NextResponse.json(data);
-    }
-
-    if (fetchError) {
-      console.error("Error fetching existing portfolio:", fetchError);
+    if (userError) {
+      console.error("Error fetching user:", userError);
       return NextResponse.json(
-        { error: "Error fetching existing portfolio" },
+        { error: "Error fetching user data" },
         { status: 500 }
       );
     }
 
-    // Merge existing data with new data, ensuring we don't overwrite with undefined values
-    const mergedData = {
-      ...existingData,
-      ...Object.fromEntries(
-        Object.entries(portfolioData).filter(
-          ([_, value]) => value !== undefined
-        )
-      ),
+    if (!userData) {
+      console.error("No user found with clerk_id:", portfolioData.user_id);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Replace clerk_id with Supabase user ID
+    const updatedPortfolioData = {
+      ...portfolioData,
+      user_id: userData.id,
     };
 
-    console.log("Merged data for update:", mergedData);
-
+    // Use upsert with the correct user_id
     const { data, error } = await supabaseAdmin
       .from("portfolios")
-      .upsert(mergedData, {
+      .upsert(updatedPortfolioData, {
         onConflict: "user_id",
-      })
-      .select()
-      .single();
+      });
 
     if (error) {
-      console.error("Error creating/updating portfolio:", error);
+      console.error("Error updating portfolio:", error);
       return NextResponse.json(
-        { error: "Error creating/updating portfolio" },
+        { error: "Error updating portfolio" },
         { status: 500 }
       );
     }
 
-    console.log("Successfully updated portfolio:", data);
-    return NextResponse.json(data);
+    return NextResponse.json(updatedPortfolioData);
   } catch (error) {
     console.error("Error in portfolio API:", error);
     return NextResponse.json(
