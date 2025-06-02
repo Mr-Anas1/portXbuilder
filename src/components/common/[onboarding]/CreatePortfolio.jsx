@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
 import { useEffect } from "react";
 import { removeBackground } from "@imgly/background-removal";
+import { toast } from "react-hot-toast";
 
 function CreatePortfolio() {
   const { user, loading } = useAuthContext();
@@ -257,19 +258,19 @@ function CreatePortfolio() {
       if (!response.ok) {
         const error = await response.json();
         console.error("Error syncing user:", error);
-        return;
+        throw new Error("Failed to sync user data");
       }
 
       const userData = await response.json();
       console.log("Found user data:", userData);
 
-      if (!userData) {
+      if (!userData || !userData.id) {
         console.error("No user data found for Clerk ID:", user.id);
-        return;
+        throw new Error("No user data found");
       }
 
       const fullData = {
-        user_id: userData.id, // Use the Supabase user ID from the API response
+        user_id: user.id, // Use clerk_id directly since we're using it in the API
         name: formData.name,
         age: formData.age,
         profession: formData.profession,
@@ -300,7 +301,7 @@ function CreatePortfolio() {
       if (!portfolioResponse.ok) {
         const error = await portfolioResponse.json();
         console.error("Error creating portfolio:", error);
-        return;
+        throw new Error(error.error || "Failed to create portfolio");
       }
 
       setFormData((prev) => ({
@@ -309,10 +310,28 @@ function CreatePortfolio() {
         profileImage: profileImagePath,
       }));
 
+      setCreationProgress("Syncing your portfolio data...");
+
+      // Wait for a moment to ensure data is synced
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Force a refetch of the portfolio data
+      const syncResponse = await fetch("/api/portfolio", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!syncResponse.ok) {
+        console.error("Error syncing portfolio data");
+      }
+
       setCreationProgress("Redirecting to your dashboard...");
       router.push("/dashboard");
     } catch (err) {
       console.error("Unexpected error:", err.message || err);
+      toast.error(err.message || "Failed to create portfolio");
     } finally {
       setIsCreating(false);
     }

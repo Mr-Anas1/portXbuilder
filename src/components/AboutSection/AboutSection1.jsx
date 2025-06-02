@@ -31,7 +31,7 @@ const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
 
       {/* Right Section with More Info */}
       <div
-        className={`w-full ${
+        className={`w-full justify-center ${
           isMobileLayout ? "md:px-6" : "md:w-1/2"
         } flex flex-col justify-center px-8 py-16 md:px-16`}
       >

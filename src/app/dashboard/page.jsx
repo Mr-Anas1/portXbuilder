@@ -152,7 +152,7 @@ export default function Dashboard() {
           .eq("user_id", userData.id)
           .single();
 
-        if (error) {
+        if (error && error.code !== "PGRST116") {
           console.error("Error checking portfolio:", error);
         } else {
           setHasPortfolio(!!data);
@@ -168,10 +168,8 @@ export default function Dashboard() {
   }, [user, loading]);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!hasPortfolio) {
-        router.push("/create");
-      }
+    if (!isLoading && !hasPortfolio) {
+      router.push("/create");
     }
   }, [isLoading, hasPortfolio, router]);
 

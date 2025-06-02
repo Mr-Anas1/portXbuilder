@@ -1,7 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { clerkClient } from "@clerk/nextjs";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -22,17 +20,6 @@ export async function POST(request) {
       return NextResponse.json(
         { error: "No user data provided" },
         { status: 400 }
-      );
-    }
-
-    // Get auth cookie
-    const cookieStore = await cookies();
-    const supabaseToken = cookieStore.get("sb-uetkztxlnpwfltzogidh-auth-token");
-
-    if (!supabaseToken) {
-      return NextResponse.json(
-        { error: "No auth token found" },
-        { status: 401 }
       );
     }
 

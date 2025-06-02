@@ -5,26 +5,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAuthContext } from "@/context/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
-import { UserButton, useClerk } from "@clerk/nextjs";
+import { UserButton, useClerk, SignedIn, SignedOut } from "@clerk/nextjs";
 import { useProStatusClient } from "@/context/useProStatusClient";
 
 const Navbar = ({ isDashboard }) => {
   const hasProPlan = useProStatusClient();
-  const { user } = useAuthContext();
   const { signOut } = useClerk();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("Navbar Debug:", {
-      hasProPlan,
-      user: user?.id,
-      userMetadata: user?.publicMetadata,
-      isOpen,
-    });
-  }, [hasProPlan, user, isOpen]);
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -67,7 +55,7 @@ const Navbar = ({ isDashboard }) => {
             </div>
           </div>
 
-          {!user ? (
+          <SignedOut>
             <div className="hidden absolute left-1/2 transform -translate-x-1/2 md:flex gap-5 lg:gap-10">
               <Link
                 href={"/#features"}
@@ -88,17 +76,19 @@ const Navbar = ({ isDashboard }) => {
                 Templates
               </Link>
             </div>
-          ) : (
-            ""
-          )}
+          </SignedOut>
 
           <div className="hidden md:block">
-            {user ? (
+            <SignedIn>
               <div className="flex justify-center items-center gap-4">
-                {hasProPlan && (
+                {hasProPlan ? (
                   <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                     PRO
                   </div>
+                ) : (
+                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Go Pro
+                  </button>
                 )}
                 <Link
                   href="/dashboard"
@@ -115,7 +105,8 @@ const Navbar = ({ isDashboard }) => {
                   }}
                 />
               </div>
-            ) : (
+            </SignedIn>
+            <SignedOut>
               <Button variant="outline" asChild>
                 <Link
                   href="/sign-up"
@@ -124,11 +115,11 @@ const Navbar = ({ isDashboard }) => {
                   Get Started
                 </Link>
               </Button>
-            )}
+            </SignedOut>
           </div>
 
           <div className="md:hidden flex justify-center items-center">
-            {!user ? (
+            <SignedOut>
               <button className="cursor-pointer">
                 {isOpen ? (
                   <X
@@ -144,22 +135,35 @@ const Navbar = ({ isDashboard }) => {
                   />
                 )}
               </button>
-            ) : (
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox: "w-8 h-8",
-                  },
-                }}
-              />
-            )}
+            </SignedOut>
+            <SignedIn>
+              <div className="flex justify-center items-center gap-4">
+                {hasProPlan ? (
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    PRO
+                  </div>
+                ) : (
+                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Go Pro
+                  </button>
+                )}
+
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-10 h-10",
+                    },
+                  }}
+                />
+              </div>
+            </SignedIn>
           </div>
         </div>
       </div>
       {isOpen && (
         <div className="md:hidden fixed inset-0 z-[999] h-full overflow-hidden bg-background w-full text-black pt-12 space-y-4 flex justify-start items-center flex-col gap-10 top-20">
-          {!user ? (
+          <SignedOut>
             <div className="flex flex-col gap-8 justify-center items-center">
               <Link
                 href={"#features"}
@@ -184,7 +188,8 @@ const Navbar = ({ isDashboard }) => {
                 Templates
               </Link>
             </div>
-          ) : (
+          </SignedOut>
+          <SignedIn>
             <div className="flex flex-col gap-8 justify-center items-center">
               <div className="text-center">
                 {hasProPlan ? (
@@ -192,7 +197,9 @@ const Navbar = ({ isDashboard }) => {
                     PRO
                   </div>
                 ) : (
-                  <div className="text-gray-500">Not a PRO user</div>
+                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                    Go Pro
+                  </button>
                 )}
               </div>
               <Link
@@ -212,7 +219,7 @@ const Navbar = ({ isDashboard }) => {
                 Sign Out
               </button>
             </div>
-          )}
+          </SignedIn>
         </div>
       )}
     </section>
