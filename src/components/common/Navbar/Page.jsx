@@ -5,7 +5,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlignJustify, BriefcaseBusiness, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { UserButton, useClerk, SignedIn, SignedOut } from "@clerk/nextjs";
+import {
+  UserButton,
+  useClerk,
+  SignedIn,
+  SignedOut,
+  PricingTable,
+} from "@clerk/nextjs";
 import { useProStatusClient } from "@/context/useProStatusClient";
 
 const Navbar = ({ isDashboard }) => {
@@ -82,12 +88,21 @@ const Navbar = ({ isDashboard }) => {
             <SignedIn>
               <div className="flex justify-center items-center gap-4">
                 {hasProPlan ? (
-                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    PRO
-                  </div>
+                  <button class="group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 font-medium  transition hover:scale-110">
+                    <span>Pro</span>
+                    <div class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
+                      <div class="relative h-full w-8 bg-white/20"></div>
+                    </div>
+                  </button>
                 ) : (
-                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Go Pro
+                  <button
+                    class="group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 font-medium  transition hover:scale-110"
+                    onClick={() => router.push("/pricing")}
+                  >
+                    <span>GO PRO</span>
+                    <div class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
+                      <div class="relative h-full w-8 bg-white/20"></div>
+                    </div>
                   </button>
                 )}
                 <Link
@@ -139,13 +154,16 @@ const Navbar = ({ isDashboard }) => {
             <SignedIn>
               <div className="flex justify-center items-center gap-4">
                 {hasProPlan ? (
-                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-md text-sm font-semibold">
                     PRO
                   </div>
                 ) : (
-                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Go Pro
-                  </button>
+                  <Link
+                    href="/pricing"
+                    className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-md text-sm font-semibold"
+                  >
+                    GO PRO
+                  </Link>
                 )}
 
                 <UserButton
@@ -197,9 +215,12 @@ const Navbar = ({ isDashboard }) => {
                     PRO
                   </div>
                 ) : (
-                  <button className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
+                  <Link
+                    href="/pricing"
+                    className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block"
+                  >
                     Go Pro
-                  </button>
+                  </Link>
                 )}
               </div>
               <Link

@@ -10,7 +10,7 @@ html {
 
 #rfs-btn {
     @apply w-full rounded-md text-gray-500 group-hover:border-primary-500 transition-all duration-300;
-    /* Add any other Tailwind styles you need */
+
 }
 
 .ReactFlagsSelect-module_selectValue__152eS {
@@ -21,4 +21,12 @@ html {
 .flag-group:hover .ReactFlagsSelect-module_selectValue__152eS {
     color: #8b5cf6;
     /* text-primary-500 */
+}
+
+.cl-drawerRoot {
+    z-index: 9999;
+}
+
+.cl-pricingTableCardFooterButton {
+    @apply py-3
 }

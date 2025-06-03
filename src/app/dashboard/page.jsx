@@ -35,6 +35,7 @@ import PortfolioEditor from "@/components/PortfolioEditor/PortfolioEditor";
 import LaunchSuccessModal from "@/components/ui/LaunchSuccessModal";
 import { toast } from "react-hot-toast";
 import { useProStatusClient } from "@/context/useProStatusClient";
+import PricingSectionCards from "@/components/Home/PricingSection";
 
 export default function Dashboard() {
   const { user, loading, isOffline, retrySync } = useAuthContext();
@@ -49,6 +50,7 @@ export default function Dashboard() {
   const [hasPortfolio, setHasPortfolio] = useState(false);
   const [activeSection, setActiveSection] = useState("navbar");
   const [showOverlay, setShowOverlay] = useState(false);
+  const [pricingOverlay, setPricingOverlay] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
   const router = useRouter();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -99,12 +101,7 @@ export default function Dashboard() {
     },
   ]);
 
-  const {
-    portfolio,
-    refetchPortfolio,
-    loading: portfolioLoading,
-    updatePortfolioData,
-  } = usePortfolio();
+  const { portfolio, refetchPortfolio, portfolioLoading } = usePortfolio();
 
   usePortfolioRedirect();
 
@@ -152,7 +149,7 @@ export default function Dashboard() {
           .eq("user_id", userData.id)
           .single();
 
-        if (error && error.code !== "PGRST116") {
+        if (error) {
           console.error("Error checking portfolio:", error);
         } else {
           setHasPortfolio(!!data);
@@ -168,8 +165,10 @@ export default function Dashboard() {
   }, [user, loading]);
 
   useEffect(() => {
-    if (!isLoading && !hasPortfolio) {
-      router.push("/create");
+    if (!isLoading) {
+      if (!hasPortfolio) {
+        router.push("/create");
+      }
     }
   }, [isLoading, hasPortfolio, router]);
 
@@ -467,9 +466,40 @@ export default function Dashboard() {
         return;
       }
 
+      // Get the user's Supabase ID
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("clerk_id", user.id)
+        .single();
+
+      if (userError) {
+        console.error("Error fetching user data:", userError);
+        return;
+      }
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Update user components and theme
+      const { error: userUpdateError } = await supabase
+        .from("users")
+        .update({
+          components: formData.components || [],
+          theme: formData.theme || "default",
+        })
+        .eq("clerk_id", user.id);
+
+      if (userUpdateError) {
+        console.error("Error updating user:", userUpdateError);
+        return;
+      }
+
       // Prepare portfolio data with all fields for the section
       const portfolioData = {
-        user_id: user.id, // Use clerk_id directly since we're using it in the API
+        user_id: userData.id,
       };
 
       // Add all fields for this section to the portfolio data
@@ -478,6 +508,8 @@ export default function Dashboard() {
           portfolioData[fieldName] = formData[fieldName];
         }
       });
+
+      console.log("Sending portfolio data:", portfolioData);
 
       // Update portfolio using API route
       const response = await fetch("/api/portfolio", {
@@ -512,18 +544,8 @@ export default function Dashboard() {
       // Close the editor
       setEditingSection(null);
 
-      // Update local state immediately
-      if (portfolio) {
-        updatePortfolioData(
-          fieldNames.reduce(
-            (acc, fieldName) => ({
-              ...acc,
-              [fieldName]: formData[fieldName],
-            }),
-            {}
-          )
-        );
-      }
+      // Refresh portfolio data
+      await refetchPortfolio();
 
       toast.success("Portfolio updated successfully!");
     } catch (error) {
@@ -718,6 +740,12 @@ export default function Dashboard() {
   if (hasPortfolio) {
     return (
       <section className="relative min-h-screen flex flex-col bg-background">
+        {pricingOverlay && (
+          <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
+            <PricingSectionCards />
+          </div>
+        )}
+
         {editingSection && (
           <PortfolioEditor
             section={editingSection}
@@ -834,104 +862,98 @@ export default function Dashboard() {
             />
           )}
 
-          {portfolioLoading ? (
-            <div className="flex-1 flex justify-center items-center">
-              <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          ) : (
-            <div className="flex-1 mt-16 ">
-              <div
-                className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
-                  isMobileLayout
-                    ? " mx-auto md:ml-[45%] md:max-w-[420px] mb-16"
-                    : ""
-                }`}
-              >
-                {/* Fixed outline container */}
-                <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
-                  <SectionWrapper
-                    id="navbar"
-                    innerRef={navbarRef}
-                    Component={selectedComponent.navbar.component}
-                    componentMeta={selectedComponent.navbar}
-                    theme={theme}
-                    handleScrollToSection={handleScrollToSection}
-                    changeFunction={changeSingleComponent}
-                    componentList={navbarComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
+          <div className="flex-1 mt-16 ">
+            <div
+              className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
+                isMobileLayout
+                  ? " mx-auto md:ml-[45%] md:max-w-[420px] mb-16"
+                  : ""
+              }`}
+            >
+              {/* Fixed outline container */}
+              <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
+                <SectionWrapper
+                  id="navbar"
+                  innerRef={navbarRef}
+                  Component={selectedComponent.navbar.component}
+                  componentMeta={selectedComponent.navbar}
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                  changeFunction={changeSingleComponent}
+                  componentList={navbarComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
 
-                  <SectionWrapper
-                    id="home"
-                    innerRef={homeRef}
-                    Component={selectedComponent.home.component}
-                    componentMeta={selectedComponent.home}
-                    theme={theme}
-                    handleScrollToSection={handleScrollToSection}
-                    changeFunction={changeSingleComponent}
-                    componentList={heroComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
+                <SectionWrapper
+                  id="home"
+                  innerRef={homeRef}
+                  Component={selectedComponent.home.component}
+                  componentMeta={selectedComponent.home}
+                  theme={theme}
+                  handleScrollToSection={handleScrollToSection}
+                  changeFunction={changeSingleComponent}
+                  componentList={heroComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
 
-                  <SectionWrapper
-                    id="about"
-                    innerRef={aboutRef}
-                    Component={selectedComponent.about.component}
-                    componentMeta={selectedComponent.about}
-                    theme={theme}
-                    changeFunction={changeSingleComponent}
-                    componentList={aboutComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
+                <SectionWrapper
+                  id="about"
+                  innerRef={aboutRef}
+                  Component={selectedComponent.about.component}
+                  componentMeta={selectedComponent.about}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={aboutComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
 
-                  <SectionWrapper
-                    id="projects"
-                    innerRef={projectsRef}
-                    Component={selectedComponent.projects.component}
-                    componentMeta={selectedComponent.projects}
-                    theme={theme}
-                    changeFunction={changeSingleComponent}
-                    componentList={projectsComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
+                <SectionWrapper
+                  id="projects"
+                  innerRef={projectsRef}
+                  Component={selectedComponent.projects.component}
+                  componentMeta={selectedComponent.projects}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={projectsComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
 
-                  <SectionWrapper
-                    id="contact"
-                    innerRef={contactRef}
-                    Component={selectedComponent.contact.component}
-                    componentMeta={selectedComponent.contact}
-                    theme={theme}
-                    changeFunction={changeSingleComponent}
-                    componentList={contactComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
+                <SectionWrapper
+                  id="contact"
+                  innerRef={contactRef}
+                  Component={selectedComponent.contact.component}
+                  componentMeta={selectedComponent.contact}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={contactComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
 
-                  <SectionWrapper
-                    id="footer"
-                    innerRef={footerRef}
-                    Component={selectedComponent.footer.component}
-                    componentMeta={selectedComponent.footer}
-                    theme={theme}
-                    changeFunction={changeSingleComponent}
-                    componentList={footerComponents}
-                    isMobileLayout={isMobileLayout}
-                    setIsMobileLayout={setIsMobileLayout}
-                    setEditingSection={setEditingSection}
-                  />
-                </div>
+                <SectionWrapper
+                  id="footer"
+                  innerRef={footerRef}
+                  Component={selectedComponent.footer.component}
+                  componentMeta={selectedComponent.footer}
+                  theme={theme}
+                  changeFunction={changeSingleComponent}
+                  componentList={footerComponents}
+                  isMobileLayout={isMobileLayout}
+                  setIsMobileLayout={setIsMobileLayout}
+                  setEditingSection={setEditingSection}
+                />
               </div>
             </div>
-          )}
+          </div>
 
           <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
             <button
