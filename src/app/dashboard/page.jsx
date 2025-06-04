@@ -455,6 +455,13 @@ export default function Dashboard() {
     try {
       console.log("Saving section:", section);
       console.log("Form data:", formData);
+      console.log("Current user:", user);
+
+      if (!user || !user.id) {
+        console.error("No user or user ID available");
+        toast.error("Please sign in to save changes");
+        return;
+      }
 
       // Get the field names for this section
       const fieldNames = Array.isArray(sectionToField[section])
@@ -475,11 +482,13 @@ export default function Dashboard() {
 
       if (userError) {
         console.error("Error fetching user data:", userError);
+        toast.error("Error fetching user data. Please try again.");
         return;
       }
 
       if (!userData) {
-        console.error("No user data found");
+        console.error("No user data found for clerk_id:", user.id);
+        toast.error("User data not found. Please try signing out and back in.");
         return;
       }
 
@@ -494,6 +503,7 @@ export default function Dashboard() {
 
       if (userUpdateError) {
         console.error("Error updating user:", userUpdateError);
+        toast.error("Error updating user settings. Please try again.");
         return;
       }
 

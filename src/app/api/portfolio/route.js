@@ -32,36 +32,10 @@ export async function POST(request) {
       );
     }
 
-    // First get the Supabase user ID from the clerk_id
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from("users")
-      .select("id")
-      .eq("clerk_id", portfolioData.user_id)
-      .single();
-
-    if (userError) {
-      console.error("Error fetching user:", userError);
-      return NextResponse.json(
-        { error: "Error fetching user data" },
-        { status: 500 }
-      );
-    }
-
-    if (!userData) {
-      console.error("No user found with clerk_id:", portfolioData.user_id);
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Replace clerk_id with Supabase user ID
-    const updatedPortfolioData = {
-      ...portfolioData,
-      user_id: userData.id,
-    };
-
-    // Use upsert with the correct user_id
+    // Use upsert with the provided user_id
     const { data, error } = await supabaseAdmin
       .from("portfolios")
-      .upsert(updatedPortfolioData, {
+      .upsert(portfolioData, {
         onConflict: "user_id",
       });
 
@@ -73,7 +47,7 @@ export async function POST(request) {
       );
     }
 
-    return NextResponse.json(updatedPortfolioData);
+    return NextResponse.json(portfolioData);
   } catch (error) {
     console.error("Error in portfolio API:", error);
     return NextResponse.json(

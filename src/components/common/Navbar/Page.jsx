@@ -88,10 +88,10 @@ const Navbar = ({ isDashboard }) => {
             <SignedIn>
               <div className="flex justify-center items-center gap-4">
                 {hasProPlan ? (
-                  <button class="group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 font-medium  transition hover:scale-110">
+                  <button className="group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 font-medium  transition hover:scale-110">
                     <span>Pro</span>
-                    <div class="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
-                      <div class="relative h-full w-8 bg-white/20"></div>
+                    <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
+                      <div className="relative h-full w-8 bg-white/20"></div>
                     </div>
                   </button>
                 ) : (
