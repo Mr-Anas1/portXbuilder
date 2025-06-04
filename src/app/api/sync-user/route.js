@@ -71,7 +71,8 @@ export async function POST(request) {
       .update({
         email: user.emailAddresses[0]?.emailAddress,
         name: user.firstName + " " + user.lastName,
-        url_name: user.username,
+        // Only update url_name if it's not already set
+        ...(existingUser.url_name ? {} : { url_name: user.username }),
       })
       .eq("clerk_id", user.id)
       .select()

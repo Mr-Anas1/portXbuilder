@@ -671,6 +671,7 @@ export default function Dashboard() {
       }
 
       const userData = await response.json();
+      console.log("User data from sync:", userData);
 
       if (!userData) {
         console.error("No user data found");
@@ -684,25 +685,24 @@ export default function Dashboard() {
         .eq("id", userData.id)
         .single();
 
+      console.log("URL name check result:", { data, error });
+
       if (error) {
-        if (error.code === "PGRST116") {
-          // If no rows found, show URL modal
-          setShowUrlModal(true);
-          return;
-        }
         console.error("Error checking URL name:", error);
         return;
       }
 
-      if (!data?.url_name) {
-        setShowUrlModal(true);
+      // Check if url_name exists and is not empty
+      if (data?.url_name && data.url_name.trim() !== "") {
+        console.log("URL name exists:", data.url_name);
+        setPortfolioUrl(`${window.location.origin}/portfolio/${data.url_name}`);
+        setShowSuccessModal(true);
         return;
       }
 
-      // Set the portfolio URL using the correct format
-      setPortfolioUrl(`${window.location.origin}/portfolio/${data.url_name}`);
-      // If URL name exists, show success modal
-      setShowSuccessModal(true);
+      console.log("No URL name found or empty, showing overlay");
+      // If no url_name exists or it's empty, show the URL modal
+      setShowUrlModal(true);
     } catch (error) {
       console.error("Error in handleLaunchClick:", error);
     } finally {
