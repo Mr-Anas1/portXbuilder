@@ -8,6 +8,7 @@ import CtaSection from "./CtaSection";
 import Footer from "./Footer";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Preview from "./Preview";
 
 function Page({ hasProPlan }) {
   const [loading, setLoading] = useState(true);
@@ -48,6 +49,7 @@ function Page({ hasProPlan }) {
 
       <Navbar hasProPlan={hasProPlan} />
       <Hero />
+      <Preview />
       <Features />
       <PricingSectionCards />
       <CtaSection />
