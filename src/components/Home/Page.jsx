@@ -49,7 +49,9 @@ function Page({ hasProPlan }) {
 
       <Navbar hasProPlan={hasProPlan} />
       <Hero />
+
       <Preview />
+
       <Features />
       <PricingSectionCards />
       <CtaSection />
