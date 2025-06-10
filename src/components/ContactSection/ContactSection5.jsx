@@ -13,7 +13,7 @@ const ContactSection5 = ({ theme, isMobileLayout, sectionRef }) => {
   return (
     <section
       ref={sectionRef}
-      className={`w-full min-h-screen flex flex-col justify-between ${theme.text} ${theme.bg}`}
+      className={`w-full max-w-7xl mx-auto min-h-screen flex flex-col justify-between ${theme.text} ${theme.bg}`}
       id="contact"
     >
       {/* Centered Main Content */}

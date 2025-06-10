@@ -12,7 +12,7 @@ const ContactSection3 = ({ theme, isMobileLayout, sectionRef }) => {
   return (
     <section
       ref={sectionRef}
-      className={`flex flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen`}
+      className={`flex max-w-7xl mx-auto flex-col items-center justify-center text-center py-20 px-4 ${theme.text} ${theme.bg} min-h-screen`}
       id="contact"
     >
       <p className={`text-sm font-semibold ${theme.subtext}`}>

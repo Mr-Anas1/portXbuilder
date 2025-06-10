@@ -5,7 +5,7 @@ const FooterSection2 = ({ theme, sectionRef }) => {
   return (
     <footer
       ref={sectionRef}
-      className={`w-full py-6 px-4 text-center ${theme.bg} ${theme.text} `}
+      className={`w-full max-w-7xl mx-auto py-6 px-4 text-center ${theme.bg} ${theme.text} `}
       id="footer"
     >
       <p className={`text-sm ${theme.subtext}`}>

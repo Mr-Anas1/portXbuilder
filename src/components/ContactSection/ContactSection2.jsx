@@ -10,7 +10,7 @@ const ContactSection2 = ({ theme, isMobileLayout, sectionRef }) => {
   return (
     <section
       ref={sectionRef}
-      className={`${theme.bg} ${theme.text} min-h-screen px-4 flex flex-col justify-center items-center`}
+      className={`${theme.bg} ${theme.text} max-w-7xl mx-auto min-h-screen px-4 flex flex-col justify-center items-center`}
       id="contact"
     >
       <div className="flex flex-col justify-center items-center text-center h-full py-16">
@@ -33,7 +33,7 @@ const ContactSection2 = ({ theme, isMobileLayout, sectionRef }) => {
               className="flex flex-col items-center space-y-2 group transition-all duration-300 hover:scale-[1.05]"
             >
               <div
-                className={`w-16 h-16 flex items-center justify-center rounded-full bg-gray-200
+                className={`w-16 h-16 flex items-center justify-center rounded-full bg-gray-500
                 group-hover:${theme.buttonBg} group-hover:${theme.buttonText} transition`}
               >
                 {cloneElement(item.icon, {

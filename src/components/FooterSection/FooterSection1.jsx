@@ -6,7 +6,7 @@ const Footer = ({ theme, sectionRef }) => {
   return (
     <footer
       ref={sectionRef}
-      className={`w-full py-4 text-center text-sm ${theme.subtext} ${theme.bg}`}
+      className={`w-full max-w-7xl mx-auto py-4 text-center text-sm ${theme.subtext} ${theme.bg}`}
       id="footer"
     >
       © {new Date().getFullYear()} {portfolio?.name || ""} – All rights

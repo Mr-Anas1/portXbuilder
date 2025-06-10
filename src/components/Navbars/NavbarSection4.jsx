@@ -21,7 +21,7 @@ const NavbarSection4 = ({
       id="navbar"
       ref={sectionRef}
     >
-      <div className="flex items-center justify-between px-6 py-4 md:px-12 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between px-6 py-4 md:px-12">
         {/* Logo */}
         <div className={`text-xl font-bold ${theme.text}`}>
           {portfolio?.name}

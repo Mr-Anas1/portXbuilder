@@ -83,7 +83,15 @@ export default function Dashboard() {
     home: ["home_title", "home_subtitle", "profileImage"],
     about: "about_me",
     projects: "projects",
-    contact: ["email", "phone"],
+    contact: [
+      "email",
+      "phone",
+      "github",
+      "linkedin",
+      "x",
+      "instagram",
+      "facebook",
+    ],
     footer: "name",
   };
 
@@ -359,22 +367,134 @@ export default function Dashboard() {
     return components[randomIndex];
   };
 
-  const handleComponentChange = () => {
-    setSelectedComponent({
+  const handleComponentChange = async () => {
+    const newComponents = {
       navbar: getRandomComponent(navbarComponents),
       home: getRandomComponent(heroComponents),
       about: getRandomComponent(aboutComponents),
       projects: getRandomComponent(projectsComponents),
       contact: getRandomComponent(contactComponents),
       footer: getRandomComponent(footerComponents),
-    });
+    };
+
+    setSelectedComponent(newComponents);
+
+    try {
+      // Get the user's Supabase ID
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        return;
+      }
+
+      const userData = await response.json();
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Create components object with just the names
+      const components = {
+        home: newComponents.home.name,
+        about: newComponents.about.name,
+        footer: newComponents.footer.name,
+        navbar: newComponents.navbar.name,
+        contact: newComponents.contact.name,
+        projects: newComponents.projects.name,
+      };
+
+      // Update components in the database
+      const { error } = await supabase
+        .from("users")
+        .update({
+          components: components,
+        })
+        .eq("id", userData.id);
+
+      if (error) {
+        console.error("Error updating components:", error);
+        toast.error("Failed to save component changes");
+      } else {
+        toast.success("Components updated successfully");
+      }
+    } catch (error) {
+      console.error("Error in handleComponentChange:", error);
+      toast.error("Failed to save component changes");
+    }
   };
 
-  const changeSingleComponent = (key, componentsArray) => {
+  const changeSingleComponent = async (key, componentsArray) => {
+    const newComponent = getRandomComponent(componentsArray);
+
     setSelectedComponent((prev) => ({
       ...prev,
-      [key]: getRandomComponent(componentsArray),
+      [key]: newComponent,
     }));
+
+    try {
+      // Get the user's Supabase ID
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("Error syncing user:", error);
+        return;
+      }
+
+      const userData = await response.json();
+
+      if (!userData) {
+        console.error("No user data found");
+        return;
+      }
+
+      // Get current components from the database
+      const { data: currentData, error: fetchError } = await supabase
+        .from("users")
+        .select("components")
+        .eq("id", userData.id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching current components:", fetchError);
+        return;
+      }
+
+      // Update the specific component while preserving others
+      const updatedComponents = {
+        ...currentData.components,
+        [key]: newComponent.name,
+      };
+
+      // Update components in the database
+      const { error } = await supabase
+        .from("users")
+        .update({
+          components: updatedComponents,
+        })
+        .eq("id", userData.id);
+
+      if (error) {
+        console.error("Error updating component:", error);
+      }
+    } catch (error) {
+      console.error("Error in changeSingleComponent:", error);
+    }
   };
 
   const removeSection = (id) => {

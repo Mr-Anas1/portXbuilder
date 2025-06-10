@@ -13,7 +13,7 @@ export default function HomeSection5({
   return (
     <section
       ref={sectionRef}
-      className={`min-h-screen px-6 flex flex-col ${
+      className={`min-h-screen max-w-7xl mx-auto px-6 flex flex-col ${
         isMobileLayout
           ? "gap-8 items-center justify-center text-center py-10"
           : "md:flex-row items-center justify-between gap-4 py-12 text-left"

@@ -8,7 +8,7 @@ export default function AboutSection3({ theme, isMobileLayout, sectionRef }) {
   return (
     <section
       ref={sectionRef}
-      className={`w-full min-h-screen flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
+      className={`w-full min-h-screen max-w-7xl mx-auto flex items-center justify-center px-6 md:px-20 py-24 ${theme.bg}`}
     >
       <div
         className={`max-w-7xl mx-auto flex ${

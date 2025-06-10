@@ -10,7 +10,7 @@ export default function AboutSection1({ theme, isMobileLayout, sectionRef }) {
     <section
       ref={sectionRef}
       id="about"
-      className={`flex flex-col ${
+      className={`flex max-w-7xl mx-auto flex-col ${
         isMobileLayout ? "md:px-4" : "md:flex-row"
       } items-center justify-center gap-5 px-6 md:px-16 py-20 transition-opacity duration-1000 ${
         theme.bg

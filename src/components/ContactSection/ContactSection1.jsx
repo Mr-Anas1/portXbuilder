@@ -29,7 +29,7 @@ const ContactSection1 = ({ theme, isMobileLayout, sectionRef }) => {
     <section
       ref={sectionRef}
       id="contact"
-      className={`${theme.bg} ${theme.text} py-16 px-4 flex flex-col items-center justify-center text-center min-h-screen`}
+      className={`${theme.bg} ${theme.text} max-w-7xl mx-auto py-16 px-4 flex flex-col items-center justify-center text-center min-h-screen`}
     >
       {/* Heading */}
       <h2 className={`text-4xl font-semibold mb-2 ${theme.accentText}`}>

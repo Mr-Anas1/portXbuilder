@@ -19,7 +19,7 @@ const NavbarSection2 = ({
   return (
     <nav
       ref={sectionRef}
-      className={`w-full ${theme.bg} ${theme.shadow}`}
+      className={`w-full max-w-7xl mx-auto ${theme.bg} ${theme.shadow}`}
       id="navbar"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

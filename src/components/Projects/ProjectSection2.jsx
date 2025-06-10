@@ -44,7 +44,7 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
   return (
     <section
       ref={sectionRef}
-      className={`py-20 ${theme.bg} ${theme.text} min-h-screen flex justify-center items-center`}
+      className={`py-20 max-w-7xl mx-auto ${theme.bg} ${theme.text} min-h-screen flex justify-center items-center`}
       id="projects"
     >
       <div className="w-full">
@@ -55,7 +55,7 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
           } `}
         >
           <h2
-            className={`text-3xl md:text-5xl font-bold text-center md:text-start ${
+            className={`text-3xl md:text-5xl mx-auto font-bold text-center  ${
               theme.accentText
             }  ${isMobileLayout ? "md:text-center" : ""}`}
           >
@@ -66,7 +66,9 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
         {/* Projects */}
         <div
           className={`flex ${
-            isMobileLayout ? "flex-col items-center gap-8" : "flex-row gap-10"
+            isMobileLayout
+              ? "flex-col items-center gap-8"
+              : "flex-row items-center justify-center gap-10"
           }`}
         >
           {projectsToRender.map((project, index) => (
@@ -78,7 +80,7 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
               className={`rounded-2xl overflow-hidden shadow-md ${
                 theme.bg
               } transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg w-full ${
-                isMobileLayout ? "max-w-[90%]" : "max-w-xl"
+                isMobileLayout ? "max-w-[90%]" : "max-w-md"
               }`}
             >
               <div className="relative overflow-hidden w-full h-[400px]">

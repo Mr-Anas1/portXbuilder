@@ -27,7 +27,7 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
   if (!projectsToRender || projectsToRender.length === 0) {
     return (
       <section
-        className={`w-full px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
+        className={`w-full max-w-7xl mx-auto px-6 md:px-16 py-20 ${theme.bg} ${theme.text} min-h-screen flex flex-col justify-center items-center`}
         id="projects"
       >
         <h2

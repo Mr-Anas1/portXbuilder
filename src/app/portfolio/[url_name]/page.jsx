@@ -147,20 +147,20 @@ const Page = () => {
     <div className={`min-h-screen ${currentTheme.bg} `}>
       {renderComponent(portfolio.components?.navbar, "navbar")}
       <main className="relative">
-        <section ref={sectionRefs.home} className="max-w-7xl mx-auto">
+        <section ref={sectionRefs.home}>
           {renderComponent(portfolio.components?.home, "home")}
         </section>
-        <section ref={sectionRefs.about} className="max-w-7xl mx-auto">
+        <section ref={sectionRefs.about}>
           {renderComponent(portfolio.components?.about, "about")}
         </section>
-        <section ref={sectionRefs.projects} className="max-w-7xl mx-auto">
+        <section ref={sectionRefs.projects}>
           {renderComponent(portfolio.components?.projects, "projects")}
         </section>
-        <section ref={sectionRefs.contact} className="max-w-7xl mx-auto">
+        <section ref={sectionRefs.contact}>
           {renderComponent(portfolio.components?.contact, "contact")}
         </section>
       </main>
-      <section ref={sectionRefs.footer} className="max-w-7xl mx-auto">
+      <section ref={sectionRefs.footer}>
         {renderComponent(portfolio.components?.footer, "footer")}
       </section>
     </div>

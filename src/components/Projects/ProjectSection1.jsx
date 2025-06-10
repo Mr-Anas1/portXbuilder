@@ -46,7 +46,7 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
   return (
     <section
       ref={sectionRef}
-      className={`py-20 ${theme.bg} ${theme.text} min-h-screen`}
+      className={`py-20 max-w-7xl mx-auto ${theme.bg} ${theme.text} min-h-screen`}
       id="projects"
     >
       <div className="text-center">
