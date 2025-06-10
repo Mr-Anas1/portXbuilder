@@ -17,7 +17,7 @@ const NavbarSection4 = ({
 
   return (
     <nav
-      className={`w-full ${theme.bg} ${theme.shadow}`}
+      className={`w-full max-w-7xl mx-auto ${theme.bg} ${theme.shadow}`}
       id="navbar"
       ref={sectionRef}
     >

@@ -144,23 +144,23 @@ const Page = () => {
   const currentTheme = previewThemes[userTheme] || previewThemes.default;
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg}`}>
+    <div className={`min-h-screen ${currentTheme.bg} `}>
       {renderComponent(portfolio.components?.navbar, "navbar")}
       <main className="relative">
-        <section ref={sectionRefs.home}>
+        <section ref={sectionRefs.home} className="max-w-7xl mx-auto">
           {renderComponent(portfolio.components?.home, "home")}
         </section>
-        <section ref={sectionRefs.about}>
+        <section ref={sectionRefs.about} className="max-w-7xl mx-auto">
           {renderComponent(portfolio.components?.about, "about")}
         </section>
-        <section ref={sectionRefs.projects}>
+        <section ref={sectionRefs.projects} className="max-w-7xl mx-auto">
           {renderComponent(portfolio.components?.projects, "projects")}
         </section>
-        <section ref={sectionRefs.contact}>
+        <section ref={sectionRefs.contact} className="max-w-7xl mx-auto">
           {renderComponent(portfolio.components?.contact, "contact")}
         </section>
       </main>
-      <section ref={sectionRefs.footer}>
+      <section ref={sectionRefs.footer} className="max-w-7xl mx-auto">
         {renderComponent(portfolio.components?.footer, "footer")}
       </section>
     </div>

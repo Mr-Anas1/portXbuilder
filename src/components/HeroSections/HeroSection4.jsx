@@ -33,7 +33,7 @@ export default function HeroSection4({
   return (
     <section
       ref={sectionRef}
-      className={`w-full px-6 h-[calc(100vh-64px)] ${
+      className={`w-full max-w-7xl mx-auto px-6 h-[calc(100vh-64px)] ${
         theme.bg
       } flex flex-col-reverse ${
         isMobileLayout
@@ -43,9 +43,7 @@ export default function HeroSection4({
     >
       {/* Left Text Section */}
       <div
-        className={`flex-1 w-full ${
-          isMobileLayout ? "text-center" : "text-left"
-        }`}
+        className={`flex-1  ${isMobileLayout ? "text-center" : "text-left"}`}
       >
         <div
           className={`flex flex-col ${
@@ -91,7 +89,7 @@ export default function HeroSection4({
 
       {/* Right Image Section */}
       <div
-        className={`relative ${
+        className={`relative flex-1 ${
           isMobileLayout
             ? "w-[250px] h-[250px] mt-10"
             : "w-[300px] sm:w-[400px] md:w-[500px] h-[300px] sm:h-[400px] md:h-[500px] mt-20"
