@@ -92,11 +92,11 @@ export default function HeroSection4({
         className={`relative flex-1 ${
           isMobileLayout
             ? "w-[250px] h-[250px] mt-10"
-            : "w-[300px] sm:w-[400px] md:w-[500px] h-[300px] sm:h-[400px] md:h-[500px] mt-20"
+            : "w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] md:w-[350px] md:h-[350px] lg:w-[450px] lg:h-[450px] xl:w-[550px] xl:h-[550px] mt-20"
         } mx-auto`}
       >
         <div
-          className={`absolute inset-0 ${theme.buttonBg} rounded-[42%_58%_70%_30%_/_40%_45%_55%_60%]`}
+          className={`absolute inset-0 ${theme.buttonBg} rounded-[50%_50%_40%_60%_/_60%_40%_60%_40%]`}
         ></div>
         <div className="relative w-full h-full">
           <Image
@@ -104,7 +104,7 @@ export default function HeroSection4({
             alt="Profile picture"
             width={550}
             height={550}
-            className="w-full h-full object-cover rounded-[42%_58%_70%_30%_/_40%_45%_55%_60%]"
+            className="w-full h-full object-cover rounded-[50%_50%_40%_60%_/_60%_40%_60%_40%]"
             priority
           />
         </div>

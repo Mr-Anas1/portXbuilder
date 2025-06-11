@@ -87,14 +87,16 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
                 <p className={`text-sm ${theme.subtext} mb-4`}>
                   {project.project_description}
                 </p>
-                <a
-                  href={project.project_link}
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${theme.buttonBg} ${theme.buttonText} text-sm font-medium ${theme.buttonHover} transition-colors duration-300`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View project →
-                </a>
+                {project.project_link && (
+                  <a
+                    href={project.project_link}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${theme.buttonBg} ${theme.buttonText} text-sm font-medium ${theme.buttonHover} transition-colors duration-300`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View project →
+                  </a>
+                )}
               </div>
             </div>
           ))}

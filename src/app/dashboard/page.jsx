@@ -367,7 +367,7 @@ export default function Dashboard() {
     return components[randomIndex];
   };
 
-  const handleComponentChange = async () => {
+  const handleComponentChange = () => {
     const newComponents = {
       navbar: getRandomComponent(navbarComponents),
       home: getRandomComponent(heroComponents),
@@ -378,7 +378,21 @@ export default function Dashboard() {
     };
 
     setSelectedComponent(newComponents);
+  };
 
+  const changeSingleComponent = (key, componentsArray) => {
+    const newComponent = getRandomComponent(componentsArray);
+
+    setSelectedComponent((prev) => ({
+      ...prev,
+      [key]: newComponent,
+    }));
+  };
+
+  const handleLaunchClick = async () => {
+    if (disableLaunchButton) return;
+
+    setIsLaunching(true);
     try {
       // Get the user's Supabase ID
       const response = await fetch("/api/sync-user", {
@@ -404,12 +418,12 @@ export default function Dashboard() {
 
       // Create components object with just the names
       const components = {
-        home: newComponents.home.name,
-        about: newComponents.about.name,
-        footer: newComponents.footer.name,
-        navbar: newComponents.navbar.name,
-        contact: newComponents.contact.name,
-        projects: newComponents.projects.name,
+        home: selectedComponent.home.name,
+        about: selectedComponent.about.name,
+        footer: selectedComponent.footer.name,
+        navbar: selectedComponent.navbar.name,
+        contact: selectedComponent.contact.name,
+        projects: selectedComponent.projects.name,
       };
 
       // Update components in the database
@@ -417,83 +431,43 @@ export default function Dashboard() {
         .from("users")
         .update({
           components: components,
+          theme: themeKey,
         })
         .eq("id", userData.id);
 
       if (error) {
         console.error("Error updating components:", error);
-        toast.error("Failed to save component changes");
-      } else {
-        toast.success("Components updated successfully");
-      }
-    } catch (error) {
-      console.error("Error in handleComponentChange:", error);
-      toast.error("Failed to save component changes");
-    }
-  };
-
-  const changeSingleComponent = async (key, componentsArray) => {
-    const newComponent = getRandomComponent(componentsArray);
-
-    setSelectedComponent((prev) => ({
-      ...prev,
-      [key]: newComponent,
-    }));
-
-    try {
-      // Get the user's Supabase ID
-      const response = await fetch("/api/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Error syncing user:", error);
+        toast.error("Failed to save changes");
         return;
       }
 
-      const userData = await response.json();
-
-      if (!userData) {
-        console.error("No user data found");
-        return;
-      }
-
-      // Get current components from the database
-      const { data: currentData, error: fetchError } = await supabase
+      // Check if url_name exists
+      const { data: userData2, error: urlError } = await supabase
         .from("users")
-        .select("components")
+        .select("url_name")
         .eq("id", userData.id)
         .single();
 
-      if (fetchError) {
-        console.error("Error fetching current components:", fetchError);
+      if (urlError) {
+        console.error("Error checking URL name:", urlError);
         return;
       }
 
-      // Update the specific component while preserving others
-      const updatedComponents = {
-        ...currentData.components,
-        [key]: newComponent.name,
-      };
-
-      // Update components in the database
-      const { error } = await supabase
-        .from("users")
-        .update({
-          components: updatedComponents,
-        })
-        .eq("id", userData.id);
-
-      if (error) {
-        console.error("Error updating component:", error);
+      // If url_name exists and is not empty, show success modal
+      if (userData2?.url_name && userData2.url_name.trim() !== "") {
+        setPortfolioUrl(
+          `${window.location.origin}/portfolio/${userData2.url_name}`
+        );
+        setShowSuccessModal(true);
+      } else {
+        // If no url_name exists or it's empty, show the URL modal
+        setShowUrlModal(true);
       }
     } catch (error) {
-      console.error("Error in changeSingleComponent:", error);
+      console.error("Error in handleLaunchClick:", error);
+      toast.error("Failed to save changes");
+    } finally {
+      setIsLaunching(false);
     }
   };
 
@@ -767,66 +741,6 @@ export default function Dashboard() {
       console.error("Error in handleUrlNameSubmit:", error);
     } finally {
       setIsChecking(false);
-    }
-  };
-
-  const handleLaunchClick = async () => {
-    if (disableLaunchButton) return;
-
-    try {
-      setIsLaunching(true);
-      // First get the user's Supabase ID from the API route
-      const response = await fetch("/api/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Error syncing user:", error);
-        return;
-      }
-
-      const userData = await response.json();
-      console.log("User data from sync:", userData);
-
-      if (!userData) {
-        console.error("No user data found");
-        return;
-      }
-
-      // Then check for URL name using the Supabase user ID
-      const { data, error } = await supabase
-        .from("users")
-        .select("url_name")
-        .eq("id", userData.id)
-        .single();
-
-      console.log("URL name check result:", { data, error });
-
-      if (error) {
-        console.error("Error checking URL name:", error);
-        return;
-      }
-
-      // Check if url_name exists and is not empty
-      if (data?.url_name && data.url_name.trim() !== "") {
-        console.log("URL name exists:", data.url_name);
-        setPortfolioUrl(`${window.location.origin}/portfolio/${data.url_name}`);
-        setShowSuccessModal(true);
-        return;
-      }
-
-      console.log("No URL name found or empty, showing overlay");
-      // If no url_name exists or it's empty, show the URL modal
-      setShowUrlModal(true);
-    } catch (error) {
-      console.error("Error in handleLaunchClick:", error);
-    } finally {
-      setIsLaunching(false);
     }
   };
 

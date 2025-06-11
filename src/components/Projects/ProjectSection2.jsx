@@ -65,39 +65,62 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
 
         {/* Projects */}
         <div
-          className={`flex ${
+          className={`flex px-4 ${
             isMobileLayout
               ? "flex-col items-center gap-8"
               : "flex-row items-center justify-center gap-10"
           }`}
         >
-          {projectsToRender.map((project, index) => (
-            <a
-              key={project.project_title || index}
-              href={project.project_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`rounded-2xl overflow-hidden shadow-md ${
-                theme.bg
-              } transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg w-full ${
-                isMobileLayout ? "max-w-[90%]" : "max-w-md"
-              }`}
-            >
-              <div className="relative overflow-hidden w-full h-[400px]">
-                <img
-                  src={project.project_img?.data || "/default-project.png"}
-                  alt={project.project_img?.name || "Project image"}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+          {projectsToRender.map((project, index) =>
+            project.project_link ? (
+              <a
+                key={project.project_title || index}
+                href={project.project_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`rounded-2xl overflow-hidden shadow-md ${
+                  theme.bg
+                } transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg w-full ${
+                  isMobileLayout ? "max-w-[90%]" : "max-w-md"
+                }`}
+              >
+                <div className="relative overflow-hidden w-full h-[400px]">
+                  <img
+                    src={project.project_img?.data || "/default-project.png"}
+                    alt={project.project_img?.name || "Project image"}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <p className={`text-sm ${theme.text} mt-2`}>
+                    {project.project_description}
+                  </p>
+                </div>
+              </a>
+            ) : (
+              <div
+                key={project.project_title || index}
+                className={`rounded-2xl overflow-hidden shadow-md ${
+                  theme.bg
+                } w-full ${isMobileLayout ? "max-w-[90%]" : "max-w-md"}`}
+              >
+                <div className="relative overflow-hidden w-full h-[400px]">
+                  <img
+                    src={project.project_img?.data || "/default-project.png"}
+                    alt={project.project_img?.name || "Project image"}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <p className={`text-sm ${theme.text} mt-2`}>
+                    {project.project_description}
+                  </p>
+                </div>
               </div>
-              <div className="p-5">
-                <h3 className="text-xl font-semibold">{project.title}</h3>
-                <p className={`text-sm ${theme.text} mt-2`}>
-                  {project.project_description}
-                </p>
-              </div>
-            </a>
-          ))}
+            )
+          )}
         </div>
       </div>
     </section>

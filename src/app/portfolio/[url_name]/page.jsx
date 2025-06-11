@@ -65,9 +65,12 @@ const Page = () => {
     const section = sectionRefs[sectionId]?.current;
     if (section) {
       const navbarHeight = sectionRefs.navbar?.current?.offsetHeight || 0;
-      const sectionTop = section.offsetTop - navbarHeight;
+      const yOffset = -navbarHeight;
+      const y =
+        section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
       window.scrollTo({
-        top: sectionTop,
+        top: y,
         behavior: "smooth",
       });
     }

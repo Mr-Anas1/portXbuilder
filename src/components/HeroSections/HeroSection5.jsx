@@ -29,7 +29,9 @@ export default function HomeSection5({
           <img
             src={portfolio?.profileImage || "/default-avatar.png"}
             alt="Profile"
-            className="w-12 h-12 rounded-full object-cover"
+            className={`w-12 h-12 rounded-full object-cover ${
+              isMobileLayout ? "mx-auto" : "mx-0"
+            }`}
           />
           <h1
             className={`${

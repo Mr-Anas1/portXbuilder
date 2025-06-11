@@ -80,14 +80,16 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
             <p className={`text-lg mb-4 ${theme.subtext}`}>
               {project.project_description}
             </p>
-            <a
-              href={project.project_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-block ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded ${theme.buttonHover} transition-colors duration-300`}
-            >
-              Live Site
-            </a>
+            {project.project_link && (
+              <a
+                href={project.project_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-block ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded ${theme.buttonHover} transition-colors duration-300`}
+              >
+                Live Site
+              </a>
+            )}
           </div>
         </div>
       ))}
