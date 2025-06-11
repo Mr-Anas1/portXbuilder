@@ -48,51 +48,53 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
       ref={sectionRef}
       id="projects"
     >
-      <h1
-        className={`text-4xl md:text-5xl font-bold text-center mb-12 ${theme.accentText}`}
-      >
-        My Projects
-      </h1>
-      {projectsToRender.map((project, index) => (
-        <div
-          key={project.project_title || index}
-          className={`flex px-8 ${
-            isMobileLayout ? "flex-col" : "flex-col md:flex-row"
-          } items-center gap-10 mb-16 ${
-            !isMobileLayout && index % 2 !== 0 ? "md:flex-row-reverse" : ""
-          }`}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1
+          className={`text-4xl md:text-5xl font-bold text-center mb-12 ${theme.accentText}`}
         >
-          <div className="relative flex-1 rounded-xl overflow-hidden w-full h-[400px]">
-            <img
-              src={project.project_img?.data || "/default-project.png"}
-              alt={project.project_img?.name || "Project image"}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-          </div>
+          My Projects
+        </h1>
+        {projectsToRender.map((project, index) => (
           <div
-            className={`w-full flex-1 md:w-1/2 text-center md:text-left ${
-              isMobileLayout ? "md:w-full" : ""
+            key={project.project_title || index}
+            className={`flex flex-col md:flex-row items-center gap-10 mb-16 ${
+              !isMobileLayout && index % 2 !== 0 ? "md:flex-row-reverse" : ""
             }`}
           >
-            <h2 className="text-3xl font-semibold mb-4">
-              {project.project_title}
-            </h2>
-            <p className={`text-lg mb-4 ${theme.subtext}`}>
-              {project.project_description}
-            </p>
-            {project.project_link && (
-              <a
-                href={project.project_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`inline-block ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded ${theme.buttonHover} transition-colors duration-300`}
-              >
-                Live Site
-              </a>
-            )}
+            <div className="w-full md:w-1/2">
+              <div className="relative rounded-xl overflow-hidden h-[300px] sm:h-[350px] md:h-[400px]">
+                <img
+                  src={project.project_img?.data || "/default-project.png"}
+                  alt={project.project_img?.name || "Project image"}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            </div>
+            <div
+              className={`w-full md:w-1/2 text-center md:text-left ${
+                isMobileLayout ? "md:w-full" : ""
+              }`}
+            >
+              <h2 className="text-3xl font-semibold mb-4">
+                {project.project_title}
+              </h2>
+              <p className={`text-lg mb-4 ${theme.subtext}`}>
+                {project.project_description}
+              </p>
+              {project.project_link && (
+                <a
+                  href={project.project_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-block ${theme.buttonBg} ${theme.buttonText} px-6 py-2 rounded ${theme.buttonHover} transition-colors duration-300`}
+                >
+                  Live Site
+                </a>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </section>
   );
 };
