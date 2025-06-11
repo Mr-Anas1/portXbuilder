@@ -1,7 +1,7 @@
 import Footer from "@/components/Home/Footer";
 import React from "react";
 import Navbar from "@/components/common/Navbar/Page";
-import { PricingTable } from "@clerk/nextjs";
+import PricingSectionCards from "@/components/Home/PricingSection";
 
 const page = () => {
   return (
@@ -16,8 +16,8 @@ const page = () => {
         <p className="text-lg text-gray-700 mb-4 text-center mx-4">
           Explore our pricing plans and choose the one that suits you best.
         </p>
-        <div className="min-w-[70vw] md:min-w-[60vw] my-8 ">
-          <PricingTable />
+        <div className="w-full max-w-7xl mx-auto">
+          <PricingSectionCards />
         </div>
       </div>
       <Footer />

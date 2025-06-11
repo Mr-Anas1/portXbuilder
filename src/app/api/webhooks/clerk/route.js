@@ -44,13 +44,8 @@ export async function POST(req) {
   const eventType = evt.type;
   console.log("Webhook event type:", eventType);
 
-  // Handle both user updates and subscription events
-  if (
-    eventType === "user.updated" ||
-    eventType === "subscription.created" ||
-    eventType === "subscription.updated" ||
-    eventType === "subscription.cancelled"
-  ) {
+  // Only handle user updates
+  if (eventType === "user.updated") {
     // Get the full user data from Clerk
     const userId = evt.data.user?.id || evt.data.userId;
     if (!userId) {

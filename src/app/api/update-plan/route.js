@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { clerkClient } from "@clerk/nextjs";
 
 // Initialize Supabase client with service role key
 const supabase = createClient(
@@ -17,13 +16,6 @@ export async function POST(req) {
         { status: 400 }
       );
     }
-
-    // Update user metadata in Clerk
-    await clerkClient.users.updateUser(userId, {
-      publicMetadata: {
-        plan,
-      },
-    });
 
     // Get user's Supabase ID
     const { data: userData, error: userError } = await supabase
