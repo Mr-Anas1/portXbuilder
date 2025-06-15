@@ -4,6 +4,7 @@ import { clerkClient } from "@clerk/nextjs";
 export async function POST(req) {
   try {
     const event = await req.json();
+    console.log("Received PayPal webhook:", event.event_type);
 
     // Verify this is a subscription event
     if (event.event_type !== "BILLING.SUBSCRIPTION.CREATED") {
@@ -11,33 +12,36 @@ export async function POST(req) {
     }
 
     const subscription = event.resource;
+    const userId = subscription.custom_id;
+
+    if (!userId) {
+      console.error("No user ID found in subscription");
+      return NextResponse.json({ error: "No user ID found" }, { status: 400 });
+    }
 
     // Handle the subscription creation
     if (subscription.status === "APPROVAL_PENDING") {
-      // The subscription is waiting for user approval
       console.log("Subscription pending approval:", subscription.id);
+      // Store the pending subscription in the user's metadata
+      await clerkClient.users.updateUser(userId, {
+        publicMetadata: {
+          subscriptionId: subscription.id,
+          subscriptionStatus: "pending",
+        },
+      });
       return NextResponse.json({ received: true });
     }
 
     if (subscription.status === "ACTIVE") {
-      // The subscription is active, update the user's plan
-      try {
-        // You'll need to implement a way to associate the subscription with a user
-        // This could be through a database lookup or by storing the user ID when creating the subscription
-        const userId = ""; // TODO: Get the user ID associated with this subscription
-
-        if (userId) {
-          await clerkClient.users.updateUser(userId, {
-            publicMetadata: {
-              plan: "pro",
-              subscriptionId: subscription.id,
-              subscriptionStatus: "active",
-            },
-          });
-        }
-      } catch (error) {
-        console.error("Error updating user plan:", error);
-      }
+      console.log("Subscription active:", subscription.id);
+      // Update the user's plan
+      await clerkClient.users.updateUser(userId, {
+        publicMetadata: {
+          plan: "pro",
+          subscriptionId: subscription.id,
+          subscriptionStatus: "active",
+        },
+      });
     }
 
     return NextResponse.json({ received: true });
