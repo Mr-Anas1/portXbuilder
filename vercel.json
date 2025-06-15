@@ -8,9 +8,5 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
-  ],
-  "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "https://uetkztxlnpwfltzogidh.supabase.co",
-    "SUPABASE_SERVICE_ROLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVldGt6dHhsbnB3Zmx0em9naWRoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczODk5NjQ5MCwiZXhwIjoyMDU0NTcyNDkwfQ.8QZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQ"
-  }
+  ]
 } 
