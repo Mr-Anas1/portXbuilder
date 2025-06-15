@@ -2,35 +2,27 @@
 
 "use client";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { PortfolioProvider } from "@/context/PortfolioContext";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
-import { To } from "react-flags-select";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 // export const metadata = {
 //   title: "Your App",
 //   description: "Awesome stuff",
 // };
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ClerkProvider>
           <AuthProvider>
             <PortfolioProvider>
@@ -39,6 +31,11 @@ export default function RootLayout({ children }) {
             </PortfolioProvider>
           </AuthProvider>
         </ClerkProvider>
+        {/* PayPal Script */}
+        <Script
+          src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`}
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

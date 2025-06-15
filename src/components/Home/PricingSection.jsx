@@ -13,87 +13,7 @@ import { CheckIcon, MinusIcon, X } from "lucide-react";
 import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-
-const planFeatures = [
-  {
-    type: "Financial data",
-    features: [
-      {
-        name: "Open/High/Low/Close",
-        free: true,
-        startup: true,
-        team: true,
-        enterprise: true,
-      },
-      {
-        name: "Price-volume difference indicator",
-        free: true,
-        startup: true,
-        team: true,
-        enterprise: true,
-      },
-    ],
-  },
-  {
-    type: "On-chain data",
-    features: [
-      {
-        name: "Network growth",
-        free: true,
-        startup: false,
-        team: true,
-        enterprise: true,
-      },
-      {
-        name: "Average token age consumed",
-        free: true,
-        startup: false,
-        team: true,
-        enterprise: true,
-      },
-      {
-        name: "Exchange flow",
-        free: false,
-        startup: false,
-        team: true,
-        enterprise: true,
-      },
-      {
-        name: "Total ERC20 exchange funds flow",
-        free: false,
-        startup: false,
-        team: true,
-        enterprise: true,
-      },
-    ],
-  },
-  {
-    type: "Social data",
-    features: [
-      {
-        name: "Dev activity",
-        free: false,
-        startup: true,
-        team: false,
-        enterprise: true,
-      },
-      {
-        name: "Topic search",
-        free: true,
-        startup: true,
-        team: true,
-        enterprise: true,
-      },
-      {
-        name: "Relative social dominance",
-        free: true,
-        startup: true,
-        team: false,
-        enterprise: true,
-      },
-    ],
-  },
-];
+import PaypalButton from "../ui/PaypalButton";
 
 export default function PricingSectionCards() {
   const { user } = useUser();
@@ -135,22 +55,28 @@ export default function PricingSectionCards() {
   };
 
   return (
-    <section id="pricing">
+    <section id="pricing" className="relative">
+      {/* Background effects */}
+      <div className="absolute inset-0  bg-background" />
+
       {/* Pricing */}
-      <div className="flex flex-col my-16 px-5 gap-10 lg:mx-20">
+      <div className="flex flex-col my-16 px-5 gap-10 lg:mx-20 relative">
         {/* Title */}
-        <div className="max-w-2xl mx-auto text-center mb-4 lg:mb-4">
-          <h2 className="scroll-m-20 text-neutral-900 pb-2 text-2xl lg:text-4xl font-bold tracking-tight transition-colors first:mt-0">
+        <div className="max-w-2xl mx-auto text-center mb-4 lg:mb-8">
+          <h2 className="scroll-m-20 text-neutral-900 pb-2 text-3xl lg:text-5xl font-bold tracking-tight transition-colors first:mt-0">
             Choose Your Plan
           </h2>
+          <p className="text-lg text-gray-600 mt-4">
+            Start building your portfolio today with our flexible plans
+          </p>
         </div>
-        {/* End Title */}
+
         {/* Grid */}
-        <div className="flex flex-col w-full md:flex-row justify-center items-center gap-6 lg:items-center mb-16">
-          {/* Card */}
-          <Card className="flex flex-col w-full transition duration-300 hover:scale-105">
+        <div className="flex flex-col w-full md:flex-row justify-center items-center gap-8 lg:items-stretch mb-16 max-w-5xl mx-auto">
+          {/* Free Card */}
+          <Card className="flex flex-col w-full max-w-md transition duration-300 hover:scale-105 hover:shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
-              <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
+              <span className="font-bold text-2xl text-neutral-800 lg:text-3xl">
                 Free
               </span>
             </CardHeader>
@@ -159,33 +85,33 @@ export default function PricingSectionCards() {
               <span className="text-base font-normal text-gray-500">/year</span>
             </CardDescription>
             <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+              <ul className="mt-7 space-y-3 text-sm">
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     Basic Templates
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     Ads + Watermark
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     15 Credits
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <X className="flex-shrink-0 mt-0.5 h-6 w-6 text-red-500" />
+                <li className="flex items-center space-x-3">
+                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground text-lg">
                     Specific Subdomain
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <X className="flex-shrink-0 mt-0.5 h-6 w-6 text-red-500" />
+                <li className="flex items-center space-x-3">
+                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground text-lg">
                     Download Source Code
                   </span>
@@ -202,11 +128,14 @@ export default function PricingSectionCards() {
               </Button>
             </CardFooter>
           </Card>
-          {/* End Card */}
-          {/* Card */}
-          <Card className="border-primary-500 border-2 flex flex-col w-full transition duration-300 hover:scale-105">
+
+          {/* Pro Card */}
+          <Card className="border-primary-500 border-2 flex flex-col w-full max-w-md transition duration-300 hover:scale-105 hover:shadow-lg bg-white/80 backdrop-blur-sm">
             <CardHeader className="text-center pb-2">
-              <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
+              <div className="inline-block px-4 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium mb-2">
+                Most Popular
+              </div>
+              <span className="font-bold text-2xl text-neutral-800 lg:text-3xl">
                 Pro
               </span>
             </CardHeader>
@@ -215,33 +144,33 @@ export default function PricingSectionCards() {
               <span className="text-base font-normal text-gray-500">/year</span>
             </CardDescription>
             <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+              <ul className="mt-7 space-y-3 text-sm">
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     Premium Templates
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     No Ads + Watermark
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     Specific Subdomain
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
+                <li className="flex items-center space-x-3">
+                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
                   <span className="text-muted-foreground text-lg">
                     Unlimited Credits
                   </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <X className="flex-shrink-0 mt-0.5 h-6 w-6 text-red-500" />
+                <li className="flex items-center space-x-3">
+                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
                   <span className="text-muted-foreground text-lg">
                     Download Source Code
                   </span>
@@ -249,82 +178,20 @@ export default function PricingSectionCards() {
               </ul>
             </CardContent>
             <CardFooter>
-              <Button
-                className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
+              {/* <Button
+                className="w-full bg-primary-500 text-white hover:bg-primary-600 transition duration-300 text-md"
                 size="lg"
-                variant={"outline"}
                 onClick={() => handleUpgrade("pro")}
                 disabled={isUpgrading}
               >
-                {isUpgrading ? "Upgrading..." : "Go Pro"}
-              </Button>
+                {isUpgrading ? "Upgrading..." : "Upgrade to Pro"}
+              </Button> */}
+
+              <PaypalButton />
             </CardFooter>
           </Card>
-          {/* End Card */}
-          {/* Card */}
-          <Card className="flex flex-col w-full transition duration-300 hover:scale-105">
-            <CardHeader className="text-center pb-2">
-              <span className="font-bold text-2xl text-neutral-800 lgt:text-4xl">
-                Ultimate
-              </span>
-            </CardHeader>
-            <CardDescription className="text-center font-bold text-4xl text-neutral-800">
-              $28.99
-              <span className="text-base font-normal text-gray-500">
-                /Lifetime
-              </span>
-            </CardDescription>
-            <CardContent className="flex-1">
-              <ul className="mt-7 space-y-2.5 text-sm">
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Premium Templates
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    No Ads + Watermark
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Specific Subdomain
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Unlimited Credits
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckIcon className="flex-shrink-0 mt-0.5 h-6 w-6 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Download Source Code
-                  </span>
-                </li>
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
-                size="lg"
-                variant={"outline"}
-                onClick={() => handleUpgrade("ultimate")}
-                disabled={isUpgrading}
-              >
-                {isUpgrading ? "Upgrading..." : "Go Ultimate"}
-              </Button>
-            </CardFooter>
-          </Card>
-          {/* End Card */}
         </div>
-        {/* End Grid */}
       </div>
-      {/* End Pricing */}
     </section>
   );
 }
