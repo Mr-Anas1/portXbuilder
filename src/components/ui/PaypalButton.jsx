@@ -28,6 +28,12 @@ export default function PayPalButton() {
           createSubscription: function (data, actions) {
             return actions.subscription.create({
               plan_id: "P-0CF348034T804343WNBGDFZY",
+              application_context: {
+                user_action: "SUBSCRIBE_NOW",
+                return_url: `${window.location.origin}/dashboard`,
+                cancel_url: `${window.location.origin}/pricing`,
+              },
+              custom_id: user.id,
             });
           },
           onApprove: async function (data, actions) {
