@@ -1,13 +1,14 @@
+"use client";
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "../../lib/supabase";
 
 export default function SubscribeButton() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const { user } = useUser();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
     try {
@@ -128,15 +129,13 @@ export default function SubscribeButton() {
   };
 
   return (
-    <div>
-      <button
-        onClick={handleSubscribe}
-        disabled={loading}
-        className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 disabled:opacity-50"
-      >
-        {loading ? "Subscribing..." : "Subscribe Now"}
-      </button>
-      {error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
-    </div>
+    <button
+      onClick={handleSubscribe}
+      disabled={loading}
+      className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? "Processing..." : "Subscribe Now"}
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+    </button>
   );
 }
