@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function SubscribeButton() {
   const [loading, setLoading] = useState(false);
@@ -14,41 +15,76 @@ export default function SubscribeButton() {
       setError(null);
 
       if (!user) {
-        throw new Error("Please sign in to subscribe");
+        setError("Please sign in to subscribe");
+        return;
       }
 
       console.log("Creating subscription for user:", user.id);
-      const res = await fetch("/api/create-subscription", {
+
+      // First, ensure user exists in Supabase
+      const { data: supabaseUser, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("clerk_id", user.id)
+        .single();
+
+      if (userError) {
+        console.error("Error finding user in Supabase:", userError);
+        setError("Error finding user account");
+        return;
+      }
+
+      // Create subscription
+      const response = await fetch("/api/create-subscription", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          name: user.fullName || user.username,
-          email: user.primaryEmailAddress?.emailAddress,
-          contact: user.phoneNumbers?.[0]?.phoneNumber,
+          userId: user.id,
+          email: user.emailAddresses[0].emailAddress,
         }),
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to create subscription");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create subscription");
       }
 
-      const { subscriptionId } = await res.json();
+      const { subscriptionId, customerId } = await response.json();
       console.log("Subscription created:", subscriptionId);
+
+      // Store subscription info in Supabase
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          subscription_id: subscriptionId,
+          razorpay_customer_id: customerId,
+        })
+        .eq("clerk_id", user.id);
+
+      if (updateError) {
+        console.error(
+          "Error updating user with subscription info:",
+          updateError
+        );
+        setError("Error updating subscription information");
+        return;
+      }
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         subscription_id: subscriptionId,
-        name: "PortXbuilder",
-        description: "Monthly Subscription",
-        // image: '/logo.png',
+        name: "PortX Builder",
+        description: "Pro Plan Subscription",
         handler: async function (response) {
-          console.log("Payment successful:", response);
           try {
-            // Verify the payment on the backend
-            const verifyRes = await fetch("/api/verify-payment", {
+            console.log("Payment successful:", response);
+            const verifyResponse = await fetch("/api/verify-payment", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+              },
               body: JSON.stringify({
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_subscription_id: response.razorpay_subscription_id,
@@ -56,36 +92,36 @@ export default function SubscribeButton() {
               }),
             });
 
-            if (!verifyRes.ok) {
-              throw new Error("Payment verification failed");
+            if (!verifyResponse.ok) {
+              const error = await verifyResponse.json();
+              throw new Error(error.error || "Payment verification failed");
             }
 
-            alert(
-              "Subscription successful! Your plan has been upgraded to Pro."
-            );
-            router.refresh(); // Refresh the page to show updated plan
-          } catch (err) {
-            console.error("Payment verification error:", err);
+            const result = await verifyResponse.json();
+            console.log("Payment verified:", result);
+            alert("Subscription successful! Welcome to the Pro plan!");
+            router.refresh();
+          } catch (error) {
+            console.error("Payment verification error:", error);
             alert(
               "Payment successful but verification failed. Please contact support."
             );
           }
         },
         prefill: {
-          name: user.fullName || user.username,
-          email: user.primaryEmailAddress?.emailAddress,
-          contact: user.phoneNumbers?.[0]?.phoneNumber,
+          email: user.emailAddresses[0].emailAddress,
+          contact: user.phoneNumbers[0]?.phoneNumber || "",
         },
         theme: {
-          color: "#3399cc",
+          color: "#6366f1",
         },
       };
 
-      const razor = new window.Razorpay(options);
-      razor.open();
-    } catch (err) {
-      console.error("Subscription error:", err);
-      setError(err.message);
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error("Subscription error:", error);
+      setError(error.message || "Failed to create subscription");
     } finally {
       setLoading(false);
     }

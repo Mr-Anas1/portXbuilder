@@ -16,7 +16,7 @@ const supabaseAdmin = createClient(
 export async function POST(request) {
   try {
     const body = await request.json();
-    console.log("Verifying payment:", body);
+    console.log("Verifying payment - Request body:", body);
 
     const {
       razorpay_payment_id,
@@ -31,29 +31,59 @@ export async function POST(request) {
       .update(razorpay_payment_id + "|" + razorpay_subscription_id)
       .digest("hex");
 
+    console.log("Generated signature:", generated_signature);
+    console.log("Received signature:", razorpay_signature);
+
     if (generated_signature !== razorpay_signature) {
       console.error("Invalid signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    // Get user from Supabase using subscription ID
-    const { data: user, error: userError } = await supabaseAdmin
+    // First try to find user by subscription ID
+    console.log(
+      "Looking for user with subscription ID:",
+      razorpay_subscription_id
+    );
+    const { data: userBySub, error: userBySubError } = await supabaseAdmin
       .from("users")
       .select("*")
       .eq("subscription_id", razorpay_subscription_id)
       .single();
 
-    if (userError) {
-      console.error("Error finding user:", userError);
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (userBySubError) {
+      console.log(
+        "User not found by subscription ID, trying to find by payment ID"
+      );
+
+      // If not found by subscription ID, try to find by payment ID
+      const { data: userByPayment, error: userByPaymentError } =
+        await supabaseAdmin
+          .from("users")
+          .select("*")
+          .eq("razorpay_payment_id", razorpay_payment_id)
+          .single();
+
+      if (userByPaymentError) {
+        console.error("Error finding user by payment ID:", userByPaymentError);
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      console.log("Found user by payment ID:", userByPayment);
+      var user = userByPayment;
+    } else {
+      console.log("Found user by subscription ID:", userBySub);
+      var user = userBySub;
     }
 
     // Update user's plan to pro
+    console.log("Updating user plan for user:", user.clerk_id);
     const { data: updatedUser, error: updateError } = await supabaseAdmin
       .from("users")
       .update({
         plan: "pro",
         subscription_status: "active",
+        subscription_id: razorpay_subscription_id,
+        razorpay_payment_id: razorpay_payment_id,
       })
       .eq("clerk_id", user.clerk_id)
       .select()
