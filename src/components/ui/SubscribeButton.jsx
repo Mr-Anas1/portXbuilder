@@ -61,7 +61,7 @@ export default function SubscribeButton() {
         .from("users")
         .update({
           subscription_id: subscriptionId,
-          razorpay_customer_id: customerId,
+          subscription_status: "pending",
         })
         .eq("clerk_id", user.id);
 

@@ -60,7 +60,7 @@ export async function POST(request) {
         await supabaseAdmin
           .from("users")
           .select("*")
-          .eq("razorpay_payment_id", razorpay_payment_id)
+          .eq("subscription_id", razorpay_subscription_id)
           .single();
 
       if (userByPaymentError) {
@@ -88,7 +88,6 @@ export async function POST(request) {
         plan: "pro",
         subscription_status: "active",
         subscription_id: razorpay_subscription_id,
-        razorpay_payment_id: razorpay_payment_id,
         subscription_start_date: new Date().toISOString(),
         subscription_end_date: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
