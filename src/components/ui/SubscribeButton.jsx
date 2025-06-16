@@ -94,19 +94,20 @@ export default function SubscribeButton() {
               }),
             });
 
+            const result = await verifyResponse.json();
+
             if (!verifyResponse.ok) {
-              const error = await verifyResponse.json();
-              throw new Error(error.error || "Payment verification failed");
+              console.error("Payment verification failed:", result);
+              throw new Error(result.error || "Payment verification failed");
             }
 
-            const result = await verifyResponse.json();
             console.log("Payment verified:", result);
             alert("Subscription successful! Welcome to the Pro plan!");
             router.refresh();
           } catch (error) {
             console.error("Payment verification error:", error);
             alert(
-              "Payment successful but verification failed. Please contact support."
+              `Payment successful but verification failed: ${error.message}. Please contact support.`
             );
           }
         },

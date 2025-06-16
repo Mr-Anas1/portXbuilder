@@ -75,6 +75,11 @@ export async function POST(request) {
       var user = userBySub;
     }
 
+    if (!user) {
+      console.error("No user found");
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     // Update user's plan to pro
     console.log("Updating user plan for user:", user.clerk_id);
     const { data: updatedUser, error: updateError } = await supabaseAdmin
@@ -84,6 +89,10 @@ export async function POST(request) {
         subscription_status: "active",
         subscription_id: razorpay_subscription_id,
         razorpay_payment_id: razorpay_payment_id,
+        subscription_start_date: new Date().toISOString(),
+        subscription_end_date: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).toISOString(), // 30 days from now
       })
       .eq("clerk_id", user.clerk_id)
       .select()
@@ -92,7 +101,15 @@ export async function POST(request) {
     if (updateError) {
       console.error("Error updating user plan:", updateError);
       return NextResponse.json(
-        { error: "Failed to update user plan" },
+        { error: "Failed to update user plan: " + updateError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!updatedUser) {
+      console.error("No user was updated");
+      return NextResponse.json(
+        { error: "Failed to update user plan: No user was updated" },
         { status: 500 }
       );
     }
