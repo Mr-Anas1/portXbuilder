@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
-import { usePortfolio } from "@/context/PortfolioContext";
 
 const ShippingAndDelivery = () => {
-  const { portfolio } = usePortfolio();
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
@@ -23,7 +20,7 @@ const ShippingAndDelivery = () => {
             <ul className="list-disc pl-6 text-gray-600 mb-4">
               <li>1-2 business days for standard orders</li>
               <li>24 hours for express orders</li>
-              <li>Immediate for digital products</li>
+              <li>Immediately for digital products</li>
             </ul>
           </section>
 
@@ -38,7 +35,7 @@ const ShippingAndDelivery = () => {
               <li>Standard Shipping (3-5 business days)</li>
               <li>Express Shipping (1-2 business days)</li>
               <li>Digital Delivery (Instant)</li>
-              <li>Local Pickup (Available in select locations)</li>
+              <li>Local Pickup (available in select locations)</li>
             </ul>
           </section>
 
@@ -65,10 +62,7 @@ const ShippingAndDelivery = () => {
             <ul className="list-disc pl-6 text-gray-600 mb-4">
               <li>Delivery times vary by country (5-15 business days)</li>
               <li>Customs duties and taxes may apply</li>
-              <li>International shipping available to most countries</li>
-              <li>
-                Tracking information provided for all international shipments
-              </li>
+              <li>Tracking information provided for all shipments</li>
             </ul>
           </section>
 
@@ -90,12 +84,9 @@ const ShippingAndDelivery = () => {
               6. Contact Us
             </h2>
             <p className="text-gray-600 mb-4">
-              For any questions regarding shipping and delivery, please contact
-              us at:
+              For questions about shipping and delivery, please contact us at:
             </p>
-            <p className="text-gray-600">
-              {portfolio?.email || "support@example.com"}
-            </p>
+            <p className="text-gray-600">support@example.com</p>
           </section>
         </div>
       </div>

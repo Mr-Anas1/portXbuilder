@@ -1,10 +1,7 @@
 "use client";
 import React from "react";
-import { usePortfolio } from "@/context/PortfolioContext";
 
 const PrivacyPolicy = () => {
-  const { portfolio } = usePortfolio();
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
@@ -81,9 +78,7 @@ const PrivacyPolicy = () => {
               If you have any questions about this Privacy Policy, please
               contact us at:
             </p>
-            <p className="text-gray-600">
-              {portfolio?.email || "support@example.com"}
-            </p>
+            <p className="text-gray-600">support@example.com</p>
           </section>
         </div>
       </div>
