@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function SubscribeButton() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { user } = useUser();
+  const router = useRouter();
 
   const handleSubscribe = async () => {
     try {
@@ -15,6 +17,7 @@ export default function SubscribeButton() {
         throw new Error("Please sign in to subscribe");
       }
 
+      console.log("Creating subscription for user:", user.id);
       const res = await fetch("/api/create-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,6 +34,7 @@ export default function SubscribeButton() {
       }
 
       const { subscriptionId } = await res.json();
+      console.log("Subscription created:", subscriptionId);
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -38,9 +42,34 @@ export default function SubscribeButton() {
         name: "PortXbuilder",
         description: "Monthly Subscription",
         // image: '/logo.png',
-        handler: function (response) {
-          alert("Subscription successful! Your plan has been upgraded to Pro.");
-          // You can verify on backend if needed
+        handler: async function (response) {
+          console.log("Payment successful:", response);
+          try {
+            // Verify the payment on the backend
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            if (!verifyRes.ok) {
+              throw new Error("Payment verification failed");
+            }
+
+            alert(
+              "Subscription successful! Your plan has been upgraded to Pro."
+            );
+            router.refresh(); // Refresh the page to show updated plan
+          } catch (err) {
+            console.error("Payment verification error:", err);
+            alert(
+              "Payment successful but verification failed. Please contact support."
+            );
+          }
         },
         prefill: {
           name: user.fullName || user.username,
