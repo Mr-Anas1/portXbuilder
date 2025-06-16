@@ -13,8 +13,7 @@ import { CheckIcon, MinusIcon, X } from "lucide-react";
 import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import PaypalButton from "../ui/PaypalButton";
-
+import SubscribeButton from "../ui/SubscribeButton";
 export default function PricingSectionCards() {
   const { user } = useUser();
   const router = useRouter();
@@ -178,16 +177,7 @@ export default function PricingSectionCards() {
               </ul>
             </CardContent>
             <CardFooter>
-              {/* <Button
-                className="w-full bg-primary-500 text-white hover:bg-primary-600 transition duration-300 text-md"
-                size="lg"
-                onClick={() => handleUpgrade("pro")}
-                disabled={isUpgrading}
-              >
-                {isUpgrading ? "Upgrading..." : "Upgrade to Pro"}
-              </Button> */}
-
-              <PaypalButton />
+              <SubscribeButton />
             </CardFooter>
           </Card>
         </div>

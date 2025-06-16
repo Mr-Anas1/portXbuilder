@@ -32,10 +32,7 @@ export default function RootLayout({ children }) {
           </AuthProvider>
         </ClerkProvider>
         {/* PayPal Script */}
-        <Script
-          src={`https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}&currency=USD`}
-          strategy="afterInteractive"
-        />
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
       </body>
     </html>
   );
