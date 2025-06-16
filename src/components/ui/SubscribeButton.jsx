@@ -42,8 +42,9 @@ export default function SubscribeButton() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id,
+          name: user.fullName || user.username || "User",
           email: user.emailAddresses[0].emailAddress,
+          userId: user.id,
         }),
       });
 
@@ -110,6 +111,7 @@ export default function SubscribeButton() {
           }
         },
         prefill: {
+          name: user.fullName || user.username || "User",
           email: user.emailAddresses[0].emailAddress,
           contact: user.phoneNumbers[0]?.phoneNumber || "",
         },
