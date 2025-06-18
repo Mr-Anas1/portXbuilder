@@ -270,7 +270,7 @@ function CreatePortfolio() {
       }
 
       const fullData = {
-        user_id: user.id, // Use clerk_id directly since we're using it in the API
+        user_id: userData.id, // Use Supabase user ID instead of Clerk ID
         name: formData.name,
         age: formData.age,
         profession: formData.profession,
