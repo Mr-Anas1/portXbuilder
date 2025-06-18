@@ -123,7 +123,9 @@ export default function SubscribeButton() {
                 },
               }
             );
-            router.refresh();
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           } catch (error) {
             console.error("Payment verification error:", error);
             toast.error(

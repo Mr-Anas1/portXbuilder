@@ -130,7 +130,9 @@ const PricingPage = () => {
       try {
         const { data, error } = await supabase
           .from("users")
-          .select("plan, subscription_status, subscription_end_date")
+          .select(
+            "plan, subscription_status, subscription_end_date, subscription_cancelled_at"
+          )
           .eq("clerk_id", user.id)
           .single();
 
@@ -180,6 +182,15 @@ const PricingPage = () => {
       );
     }
 
+    const isPro = subscriptionInfo?.plan === "pro";
+    const isCancelled = subscriptionInfo?.subscription_status === "cancelled";
+    const endDate = subscriptionInfo?.subscription_end_date
+      ? new Date(subscriptionInfo.subscription_end_date)
+      : null;
+    const cancelledAt = subscriptionInfo?.subscription_cancelled_at
+      ? new Date(subscriptionInfo.subscription_cancelled_at)
+      : null;
+
     return (
       <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -190,8 +201,13 @@ const PricingPage = () => {
             <div>
               <p className="text-gray-600">Current Plan</p>
               <p className="text-xl font-semibold text-gray-800">
-                {subscriptionInfo?.plan === "pro" ? "Pro Plan" : "Free Plan"}
+                {isPro ? "Pro Plan" : "Free Plan"}
               </p>
+              {isCancelled && (
+                <p className="text-sm text-amber-600 mt-1">
+                  Cancelled - Active until {endDate?.toLocaleDateString()}
+                </p>
+              )}
             </div>
             <div className="px-3 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium">
               {subscriptionInfo?.subscription_status ||
@@ -199,15 +215,18 @@ const PricingPage = () => {
             </div>
           </div>
 
-          {subscriptionInfo?.subscription_end_date && (
+          {endDate && (
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-600">Subscription Period</p>
               <p className="text-lg font-semibold text-gray-800">
-                Ends on{" "}
-                {new Date(
-                  subscriptionInfo.subscription_end_date
-                ).toLocaleDateString()}
+                {isCancelled ? "Access until" : "Next billing date"}:{" "}
+                {endDate.toLocaleDateString()}
               </p>
+              {isCancelled && cancelledAt && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Cancelled on {cancelledAt.toLocaleDateString()}
+                </p>
+              )}
             </div>
           )}
 
@@ -216,13 +235,14 @@ const PricingPage = () => {
               Available Actions
             </h3>
             <div className="space-y-4">
-              {subscriptionInfo?.plan === "pro" ? (
+              {isPro ? (
                 <div className="space-y-2">
                   <p className="text-gray-600 mb-2">
-                    You are currently on the Pro plan. You can cancel your
-                    subscription at any time.
+                    {isCancelled
+                      ? "Your subscription has been cancelled but you'll continue to have access to Pro features until the end of your billing period."
+                      : "You are currently on the Pro plan. You can cancel your subscription at any time."}
                   </p>
-                  <CancelSubscriptionButton />
+                  {!isCancelled && <CancelSubscriptionButton />}
                 </div>
               ) : (
                 <div className="space-y-2">

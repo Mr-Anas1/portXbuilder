@@ -41,11 +41,13 @@ export async function POST(request) {
     );
 
     // Update user's subscription status in Supabase
+    // Keep the plan as "pro" but mark the subscription as cancelled
     const { error: updateError } = await supabaseAdmin
       .from("users")
       .update({
         subscription_status: "cancelled",
-        plan: "free", // This will take effect after the current billing period ends
+        subscription_cancelled_at: new Date().toISOString(),
+        // Don't change the plan to free yet - it will be changed when the subscription actually ends
       })
       .eq("clerk_id", userId);
 
@@ -60,7 +62,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       message:
-        "Subscription will be cancelled at the end of the current billing period",
+        "Subscription will be cancelled at the end of the current billing period. You'll continue to have access to Pro features until then.",
     });
   } catch (error) {
     console.error("Error cancelling subscription:", error);
