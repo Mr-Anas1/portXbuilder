@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
+import { toast } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 export default function SubscribeButton() {
   const { user } = useUser();
@@ -102,12 +104,46 @@ export default function SubscribeButton() {
             }
 
             console.log("Payment verified:", result);
-            alert("Subscription successful! Welcome to the Pro plan!");
+            toast.success(
+              <div className="flex flex-col gap-1">
+                <p className="font-semibold">Subscription Successful!</p>
+                <p className="text-sm text-gray-600">
+                  Welcome to the Pro plan. Enjoy all premium features!
+                </p>
+              </div>,
+              {
+                duration: 5000,
+                style: {
+                  background: "#fff",
+                  color: "#333",
+                  boxShadow:
+                    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                  borderRadius: "0.5rem",
+                  padding: "1rem",
+                },
+              }
+            );
             router.refresh();
           } catch (error) {
             console.error("Payment verification error:", error);
-            alert(
-              `Payment successful but verification failed: ${error.message}. Please contact support.`
+            toast.error(
+              <div className="flex flex-col gap-1">
+                <p className="font-semibold">Payment Verification Failed</p>
+                <p className="text-sm text-gray-600">
+                  {error.message}. Please contact support.
+                </p>
+              </div>,
+              {
+                duration: 5000,
+                style: {
+                  background: "#fff",
+                  color: "#333",
+                  boxShadow:
+                    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                  borderRadius: "0.5rem",
+                  padding: "1rem",
+                },
+              }
             );
           }
         },
@@ -126,6 +162,25 @@ export default function SubscribeButton() {
     } catch (error) {
       console.error("Subscription error:", error);
       setError(error.message || "Failed to create subscription");
+      toast.error(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Subscription Error</p>
+          <p className="text-sm text-gray-600">
+            {error.message || "Failed to create subscription"}
+          </p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -135,9 +190,16 @@ export default function SubscribeButton() {
     <button
       onClick={handleSubscribe}
       disabled={loading}
-      className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
     >
-      {loading ? "Processing..." : "Subscribe Now"}
+      {loading ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Processing...
+        </>
+      ) : (
+        "Subscribe Now"
+      )}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </button>
   );

@@ -28,6 +28,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import FullPageLoader from "@/components/ui/FullPageLoader";
+import { toast } from "react-hot-toast";
 
 const PricingPage = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -36,7 +37,25 @@ const PricingPage = () => {
 
   const handleDowngrade = async () => {
     if (!user) {
-      alert("Please sign in to manage your subscription");
+      toast.error(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Authentication Required</p>
+          <p className="text-sm text-gray-600">
+            Please sign in to manage your subscription.
+          </p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
       return;
     }
 
@@ -57,11 +76,45 @@ const PricingPage = () => {
         throw new Error(data.error || "Failed to downgrade subscription");
       }
 
-      alert(data.message);
+      toast.success(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Subscription Downgraded</p>
+          <p className="text-sm text-gray-600">{data.message}</p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
       window.location.reload(); // Refresh the page to update the UI
     } catch (error) {
       console.error("Error downgrading subscription:", error);
-      alert("Failed to downgrade subscription. Please try again.");
+      toast.error(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Downgrade Failed</p>
+          <p className="text-sm text-gray-600">
+            Failed to downgrade subscription. Please try again.
+          </p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
     }
   };
 
@@ -173,7 +226,7 @@ const PricingPage = () => {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <p className="text-gray-600 mb-2">
+                  <p className="text-gray-600 mb-4">
                     Upgrade to Pro to unlock all premium features and remove
                     limitations.
                   </p>

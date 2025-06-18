@@ -13,6 +13,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./alert-dialog";
+import { toast } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 
 export default function CancelSubscriptionButton() {
   const { user } = useUser();
@@ -40,11 +42,50 @@ export default function CancelSubscriptionButton() {
         throw new Error(data.error || "Failed to cancel subscription");
       }
 
-      alert(data.message);
+      toast.success(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Subscription Cancelled</p>
+          <p className="text-sm text-gray-600">
+            You'll continue to have access to Pro features until the end of your
+            billing period.
+          </p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
+
       window.location.reload(); // Refresh the page to update the UI
     } catch (error) {
       console.error("Error cancelling subscription:", error);
       setError(error.message || "Failed to cancel subscription");
+      toast.error(
+        <div className="flex flex-col gap-1">
+          <p className="font-semibold">Error</p>
+          <p className="text-sm text-gray-600">
+            {error.message || "Failed to cancel subscription"}
+          </p>
+        </div>,
+        {
+          duration: 5000,
+          style: {
+            background: "#fff",
+            color: "#333",
+            boxShadow:
+              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          },
+        }
+      );
     } finally {
       setLoading(false);
     }
@@ -59,7 +100,14 @@ export default function CancelSubscriptionButton() {
             className="w-full text-md"
             disabled={loading}
           >
-            {loading ? "Cancelling..." : "Cancel Subscription"}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Cancelling...
+              </>
+            ) : (
+              "Cancel Subscription"
+            )}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
