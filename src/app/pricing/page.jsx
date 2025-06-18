@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import FullPageLoader from "@/components/ui/FullPageLoader";
 import { toast } from "react-hot-toast";
+import PaymentStatus from "@/components/ui/PaymentStatus";
 
 const PricingPage = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -196,6 +197,9 @@ const PricingPage = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Your Subscription Status
         </h2>
+
+        <PaymentStatus subscriptionInfo={subscriptionInfo} />
+
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
             <div>
@@ -261,6 +265,12 @@ const PricingPage = () => {
   };
 
   const renderPlans = () => {
+    const isPro = subscriptionInfo?.plan === "pro";
+    const isCancelled = subscriptionInfo?.subscription_status === "cancelled";
+    const isPaymentFailed =
+      subscriptionInfo?.subscription_status === "payment_failed";
+    const isEnded = subscriptionInfo?.subscription_status === "ended";
+
     return (
       <div className="flex flex-col w-full md:flex-row justify-center items-center gap-8 lg:items-stretch mb-16 max-w-5xl mx-auto">
         {/* Free Card */}
@@ -309,48 +319,56 @@ const PricingPage = () => {
             </ul>
           </CardContent>
           <CardFooter>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
-                  size="lg"
-                  variant={"outline"}
-                  disabled={subscriptionInfo?.plan === "free"}
-                >
-                  {subscriptionInfo?.plan === "free"
-                    ? "Current Plan"
-                    : "Downgrade to Free"}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Downgrade to Free Plan</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to downgrade to the Free plan? You'll
-                    continue to have access to Pro features until the end of
-                    your current billing period. After that, your account will
-                    be downgraded to the Free plan with the following
-                    limitations:
-                    <ul className="list-disc pl-6 mt-2 space-y-1">
-                      <li>Basic templates only</li>
-                      <li>Ads and watermarks on your portfolio</li>
-                      <li>Limited to 15 credits</li>
-                      <li>No specific subdomain</li>
-                      <li>No source code download</li>
-                    </ul>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Keep Pro Plan</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDowngrade}
-                    className="bg-red-600 hover:bg-red-700 text-white"
+            {isPro && !isCancelled && !isPaymentFailed && !isEnded ? (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
+                    size="lg"
+                    variant={"outline"}
                   >
-                    Yes, Downgrade to Free
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    Downgrade to Free
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Downgrade to Free Plan</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to downgrade to the Free plan?
+                      You'll continue to have access to Pro features until the
+                      end of your current billing period. After that, your
+                      account will be downgraded to the Free plan with the
+                      following limitations:
+                      <ul className="list-disc pl-6 mt-2 space-y-1">
+                        <li>Basic templates only</li>
+                        <li>Ads and watermarks on your portfolio</li>
+                        <li>Limited to 15 credits</li>
+                        <li>No specific subdomain</li>
+                        <li>No source code download</li>
+                      </ul>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Keep Pro Plan</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDowngrade}
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      Yes, Downgrade to Free
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            ) : (
+              <Button
+                className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
+                size="lg"
+                variant={"outline"}
+                disabled
+              >
+                {isPro ? "Current Plan" : "Free Plan"}
+              </Button>
+            )}
           </CardFooter>
         </Card>
 
@@ -403,13 +421,17 @@ const PricingPage = () => {
             </ul>
           </CardContent>
           <CardFooter>
-            {subscriptionInfo?.plan === "pro" ? (
+            {isPro ? (
               <Button
                 className="w-full bg-primary-500 text-white hover:bg-primary-600 transition duration-300 text-md"
                 size="lg"
                 disabled
               >
-                Current Plan
+                {isCancelled
+                  ? "Cancelled"
+                  : isPaymentFailed
+                  ? "Payment Failed"
+                  : "Current Plan"}
               </Button>
             ) : (
               <SubscribeButton />

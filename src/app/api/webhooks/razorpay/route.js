@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import crypto from "crypto";
 
+// Constants for payment handling
+const MAX_PAYMENT_FAILURES = 3;
+const GRACE_PERIOD_DAYS = 7;
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -21,6 +25,7 @@ export async function POST(request) {
     const { event, payload } = body;
     console.log("Received webhook event:", event);
 
+    // Handle successful payment
     if (event === "subscription.charged") {
       const { subscription } = payload;
       const customerId = subscription.customer_id;
@@ -40,9 +45,7 @@ export async function POST(request) {
         return NextResponse.json({ error: "User not found" }, { status: 404 });
       }
 
-      console.log("Found user:", user);
-
-      // Update user's plan to pro
+      // Update user's plan to pro and reset payment failure tracking
       const { data: updatedUser, error: updateError } = await supabaseAdmin
         .from("users")
         .update({
@@ -55,6 +58,8 @@ export async function POST(request) {
           subscription_end_date: new Date(
             subscription.end_at * 1000
           ).toISOString(),
+          payment_failure_count: 0,
+          grace_period_end: null,
         })
         .eq("clerk_id", user.clerk_id)
         .select()
@@ -72,7 +77,69 @@ export async function POST(request) {
       return NextResponse.json({ success: true, user: updatedUser });
     }
 
-    // Handle subscription end event
+    // Handle failed payment
+    if (event === "payment.failed" || event === "subscription.payment_failed") {
+      const { payment, subscription } = payload;
+      const customerId = subscription.customer_id;
+
+      console.log("Processing payment failure event:", event);
+      console.log("Customer ID:", customerId);
+
+      // Find user by Razorpay customer ID
+      const { data: user, error: userError } = await supabaseAdmin
+        .from("users")
+        .select("*")
+        .eq("razorpay_customer_id", customerId)
+        .single();
+
+      if (userError) {
+        console.error("Error finding user:", userError);
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      const failureCount = (user.payment_failure_count || 0) + 1;
+      const now = new Date();
+      const gracePeriodEnd = new Date(
+        now.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000
+      );
+
+      // Update user's payment status
+      const { error: updateError } = await supabaseAdmin
+        .from("users")
+        .update({
+          subscription_status:
+            failureCount >= MAX_PAYMENT_FAILURES
+              ? "cancelled"
+              : "payment_failed",
+          last_payment_attempt: now.toISOString(),
+          payment_failure_count: failureCount,
+          grace_period_end: gracePeriodEnd.toISOString(),
+        })
+        .eq("clerk_id", user.clerk_id);
+
+      if (updateError) {
+        console.error("Error updating user payment status:", updateError);
+        return NextResponse.json(
+          { error: "Failed to update payment status" },
+          { status: 500 }
+        );
+      }
+
+      // If max failures reached, cancel the subscription
+      if (failureCount >= MAX_PAYMENT_FAILURES) {
+        try {
+          await razorpay.subscriptions.cancel(subscription.id, {
+            cancel_at_cycle_end: 1,
+          });
+        } catch (error) {
+          console.error("Error cancelling subscription:", error);
+        }
+      }
+
+      return NextResponse.json({ success: true });
+    }
+
+    // Handle subscription end events
     if (
       event === "subscription.cancelled" ||
       event === "subscription.completed"
@@ -106,6 +173,8 @@ export async function POST(request) {
             plan: "free",
             subscription_status: "ended",
             subscription_ended_at: new Date().toISOString(),
+            payment_failure_count: 0,
+            grace_period_end: null,
           })
           .eq("clerk_id", user.clerk_id)
           .select()
