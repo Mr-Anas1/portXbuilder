@@ -147,7 +147,8 @@ const Page = () => {
   const currentTheme = previewThemes[userTheme] || previewThemes.default;
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} `}>
+    <div className={`min-h-screen ${currentTheme.bg} relative`}>
+      <div className={`absolute inset-0 ${currentTheme.bg} -z-10`}></div>
       {renderComponent(portfolio.components?.navbar, "navbar")}
       <main className="relative">
         <section ref={sectionRefs.home}>
