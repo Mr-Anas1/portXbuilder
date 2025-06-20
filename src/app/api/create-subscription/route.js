@@ -69,12 +69,24 @@ export async function POST(request) {
       }
     }
 
-    if (!process.env.RAZORPAY_PLAN_ID) {
+    // Debug logs for environment variables and plan selection
+    console.log("Monthly Plan ID:", process.env.RAZORPAY_MONTHLY_PLAN_ID);
+    console.log("Yearly Plan ID:", process.env.RAZORPAY_YEARLY_PLAN_ID);
+    console.log("Billing period from request:", body.billingPeriod);
+
+    const planId =
+      body.billingPeriod === "yearly"
+        ? process.env.RAZORPAY_YEARLY_PLAN_ID
+        : process.env.RAZORPAY_MONTHLY_PLAN_ID;
+
+    console.log("Selected Plan ID:", planId);
+
+    if (!planId) {
       throw new Error("Missing Razorpay plan ID");
     }
 
     const subscription = await razorpay.subscriptions.create({
-      plan_id: process.env.RAZORPAY_PLAN_ID,
+      plan_id: planId,
       customer_notify: 1,
       total_count: 12, // how many billing cycles
       customer_id: customer.id,
