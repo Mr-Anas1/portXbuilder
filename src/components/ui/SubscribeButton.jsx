@@ -6,7 +6,7 @@ import { supabase } from "../../lib/supabase";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
-export default function SubscribeButton() {
+export default function SubscribeButton({ billingPeriod = "yearly" }) {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -47,6 +47,7 @@ export default function SubscribeButton() {
           name: user.fullName || user.username || "User",
           email: user.emailAddresses[0].emailAddress,
           userId: user.id,
+          billingPeriod,
         }),
       });
 
@@ -192,7 +193,7 @@ export default function SubscribeButton() {
     <button
       onClick={handleSubscribe}
       disabled={loading}
-      className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
     >
       {loading ? (
         <>

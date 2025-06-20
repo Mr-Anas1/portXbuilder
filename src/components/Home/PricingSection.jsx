@@ -14,10 +14,23 @@ import React, { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import SubscribeButton from "../ui/SubscribeButton";
+
+const PRICING = {
+  monthly: {
+    free: { price: 0, label: "/month" },
+    pro: { price: 1.99, label: "/month" },
+  },
+  yearly: {
+    free: { price: 0, label: "/year" },
+    pro: { price: 14.99, label: "/year" },
+  },
+};
+
 export default function PricingSectionCards() {
   const { user } = useUser();
   const router = useRouter();
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState("yearly");
 
   const handleUpgrade = async (plan) => {
     if (!user) {
@@ -70,6 +83,34 @@ export default function PricingSectionCards() {
           </p>
         </div>
 
+        {/* Billing Toggle */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex rounded-full bg-gray-100 p-1">
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                billingPeriod === "monthly"
+                  ? "bg-primary-500 text-white"
+                  : "text-gray-700"
+              }`}
+              onClick={() => setBillingPeriod("monthly")}
+              type="button"
+            >
+              Monthly
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                billingPeriod === "yearly"
+                  ? "bg-primary-500 text-white"
+                  : "text-gray-700"
+              }`}
+              onClick={() => setBillingPeriod("yearly")}
+              type="button"
+            >
+              Yearly
+            </button>
+          </div>
+        </div>
+
         {/* Grid */}
         <div className="flex flex-col w-full md:flex-row justify-center items-center gap-8 lg:items-stretch mb-16 max-w-5xl mx-auto">
           {/* Free Card */}
@@ -80,8 +121,10 @@ export default function PricingSectionCards() {
               </span>
             </CardHeader>
             <CardDescription className="text-center font-bold text-4xl text-neutral-800">
-              $0
-              <span className="text-base font-normal text-gray-500">/year</span>
+              ${PRICING[billingPeriod].free.price}
+              <span className="text-base font-normal text-gray-500">
+                {PRICING[billingPeriod].free.label}
+              </span>
             </CardDescription>
             <CardContent className="flex-1">
               <ul className="mt-7 space-y-3 text-sm">
@@ -139,8 +182,10 @@ export default function PricingSectionCards() {
               </span>
             </CardHeader>
             <CardDescription className="text-center font-bold text-4xl text-neutral-800">
-              $14.99
-              <span className="text-base font-normal text-gray-500">/year</span>
+              ${PRICING[billingPeriod].pro.price}
+              <span className="text-base font-normal text-gray-500">
+                {PRICING[billingPeriod].pro.label}
+              </span>
             </CardDescription>
             <CardContent className="flex-1">
               <ul className="mt-7 space-y-3 text-sm">
@@ -177,7 +222,7 @@ export default function PricingSectionCards() {
               </ul>
             </CardContent>
             <CardFooter>
-              <SubscribeButton />
+              <SubscribeButton billingPeriod={billingPeriod} />
             </CardFooter>
           </Card>
         </div>

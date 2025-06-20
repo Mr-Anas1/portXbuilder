@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     });
 
     const subscription = await razorpay.subscriptions.create({
-      plan_id: process.env.RAZORPAY_PLAN_ID,
+      plan_id:
+        req.body.billingPeriod === "yearly"
+          ? process.env.RAZORPAY_YEARLY_PLAN_ID
+          : process.env.RAZORPAY_MONTHLY_PLAN_ID,
       customer_notify: 1,
       total_count: 12, // how many billing cycles
       customer_id: customer.id,
