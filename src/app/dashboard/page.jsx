@@ -112,16 +112,29 @@ export default function Dashboard() {
 
   usePortfolioRedirect();
 
-  useEffect(() => {
-    if (!loading && !user) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (!user) {
+    if (typeof window !== "undefined") {
       router.push("/sign-in");
     }
-  }, [loading, user, router]);
+    return null;
+  }
+
+  // Helper to map saved component names to actual component objects
+  function getComponentByName(name, componentsArray) {
+    if (!name) return componentsArray[0];
+    return componentsArray.find((c) => c.name === name) || componentsArray[0];
+  }
 
   useEffect(() => {
+    if (!user) return;
     const loadUserComponents = async () => {
-      if (loading || !user) return;
-
       try {
         // Get user's Supabase ID
         const response = await fetch("/api/sync-user", {
@@ -160,8 +173,24 @@ export default function Dashboard() {
           // Set selected components based on saved data
           if (data.components) {
             setSelectedComponent((prev) => ({
-              ...prev,
-              ...data.components,
+              navbar: getComponentByName(
+                data.components.navbar,
+                navbarComponents
+              ),
+              home: getComponentByName(data.components.home, heroComponents),
+              about: getComponentByName(data.components.about, aboutComponents),
+              projects: getComponentByName(
+                data.components.projects,
+                projectsComponents
+              ),
+              contact: getComponentByName(
+                data.components.contact,
+                contactComponents
+              ),
+              footer: getComponentByName(
+                data.components.footer,
+                footerComponents
+              ),
             }));
           }
 
@@ -178,17 +207,8 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-
     loadUserComponents();
-  }, [user, loading]);
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="min-h-screen flex justify-center items-center">
-  //       <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-  //     </div>
-  //   );
-  // }
+  }, [user]);
 
   // For Theme change
 
@@ -236,6 +256,7 @@ export default function Dashboard() {
       }
 
       // Update local state
+      setThemeKey(newTheme);
       setSelectedComponent((prev) => ({
         ...prev,
         theme: newTheme,
@@ -409,14 +430,6 @@ export default function Dashboard() {
             Retry Connection
           </button>
         </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -931,47 +944,50 @@ export default function Dashboard() {
             Theme {themeOverlay ? <ChevronDown /> : <ChevronUp />}
           </button>
 
-          {themeOverlay ? (
-            <div className="absolute left-1/2 transform -translate-x-1/2 -top-28 md:-top-16 flex items-center gap-2 bg-white px-2 py-2 rounded-lg border border-primary-500 w-[270px] md:w-[520px] flex-wrap md:flex-nowrap justify-center">
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-[#1e1e1e] text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("dark")}
-              >
-                Dark
-              </button>
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-orange-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("sunset")}
-              >
-                Sunset
-              </button>
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-white-500 text-gray-800  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("default")}
-              >
-                Light
-              </button>
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-blue-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("ocean")}
-              >
-                Ocean
-              </button>
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-green-600 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("forest")}
-              >
-                Forest
-              </button>
-              <button
-                className="px-4 py-2  rounded-md border border-gray-300 bg-[#00ffff] text-gray-800 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                onClick={() => handleThemeChange("neon")}
-              >
-                Neon
-              </button>
+          {themeOverlay && (
+            <div className="absolute left-1/2 bottom-16 transform -translate-x-1/2 z-50 bg-white rounded-2xl shadow-2xl p-6 min-w-[320px] max-w-[95vw] border border-primary-200 animate-fade-in">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-bold text-primary-700">
+                  Choose a Theme
+                </h3>
+                <button
+                  onClick={handleThemeButtonClick}
+                  className="text-gray-400 hover:text-primary-500 transition-colors text-xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {Object.entries(previewThemes).map(([key, t]) => (
+                  <button
+                    key={key}
+                    onClick={() => handleThemeChange(key)}
+                    className={`group relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all duration-200 shadow-sm focus:outline-none
+                      ${
+                        themeKey === key
+                          ? "border-primary-500 ring-2 ring-primary-200"
+                          : "border-gray-200 hover:border-primary-400"
+                      }
+                      bg-gradient-to-br from-white to-gray-50 hover:shadow-lg`}
+                  >
+                    {/* Mini preview swatch */}
+                    <div className="w-14 h-8 rounded-lg mb-2 flex overflow-hidden border border-gray-200">
+                      <div className={`flex-1 ${t.bg}`}></div>
+                      <div className={`flex-1 ${t.buttonBg}`}></div>
+                      <div className={`flex-1 ${t.accentBg}`}></div>
+                    </div>
+                    <span className="text-xs font-medium capitalize text-gray-700 group-hover:text-primary-600">
+                      {key}
+                    </span>
+                    {themeKey === key && (
+                      <span className="absolute top-2 right-2 text-primary-500 text-lg">
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : (
-            ""
           )}
         </div>
 

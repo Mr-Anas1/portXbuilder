@@ -89,11 +89,9 @@ export default function HeroSection4({
 
       {/* Right Image Section */}
       <div
-        className={`relative flex-1 ${
-          isMobileLayout
-            ? "w-[250px] h-[250px] mt-10"
-            : "w-[250px] h-[250px] sm:w-[350px] sm:h-[350px] md:w-[350px] md:h-[350px] lg:w-[450px] lg:h-[450px] xl:w-[550px] xl:h-[550px] mt-20"
-        } mx-auto`}
+        className={`relative flex-1 mx-auto w-full max-w-[250px] h-auto aspect-square sm:max-w-[350px] md:max-w-[350px] lg:max-w-[450px] xl:max-w-[550px] ${
+          isMobileLayout ? "mt-10" : "mt-20"
+        }`}
       >
         <div
           className={`absolute inset-0 ${theme.buttonBg} rounded-[50%_50%_40%_60%_/_60%_40%_60%_40%]`}
