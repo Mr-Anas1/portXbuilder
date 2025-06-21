@@ -64,14 +64,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (isUserLoaded) {
-      if (clerkUser && !isOffline) {
-        syncUser(clerkUser);
-      } else {
+    const handleUserSync = async () => {
+      if (isUserLoaded) {
+        if (clerkUser && !isOffline) {
+          try {
+            const syncedUser = await syncUser(clerkUser);
+            setUserData(syncedUser);
+          } catch (error) {
+            // Handle sync error silently for now
+          }
+        }
         setLoading(false);
       }
-    }
-  }, [clerkUser, isUserLoaded, router, isOffline]);
+    };
+
+    handleUserSync();
+  }, [clerkUser, isUserLoaded, isOffline]);
 
   return (
     <AuthContext.Provider

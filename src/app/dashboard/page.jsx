@@ -47,7 +47,6 @@ export default function Dashboard() {
   const contactRef = useRef(null);
   const footerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasPortfolio, setHasPortfolio] = useState(false);
   const [activeSection, setActiveSection] = useState("navbar");
   const [showOverlay, setShowOverlay] = useState(false);
   const [pricingOverlay, setPricingOverlay] = useState(false);
@@ -120,67 +119,6 @@ export default function Dashboard() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    const checkPortfolio = async () => {
-      if (loading || !user) {
-        return;
-      }
-
-      setIsLoading(true);
-
-      try {
-        // First get the user's Supabase ID from the users table using the API route
-        const response = await fetch("/api/sync-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          console.error("Error syncing user:", error);
-          return;
-        }
-
-        const userData = await response.json();
-
-        if (!userData) {
-          console.error("No user data found");
-          return;
-        }
-
-        // Then check for portfolio using the Supabase user ID
-        const { data, error } = await supabase
-          .from("portfolios")
-          .select("id")
-          .eq("user_id", userData.id)
-          .single();
-
-        if (error) {
-          console.error("Error checking portfolio:", error);
-        } else {
-          setHasPortfolio(!!data);
-        }
-      } catch (error) {
-        console.error("Error in checkPortfolio:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkPortfolio();
-  }, [user, loading]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      if (!hasPortfolio) {
-        router.push("/create");
-      }
-    }
-  }, [isLoading, hasPortfolio, router]);
-
-  useEffect(() => {
     const loadUserComponents = async () => {
       if (loading || !user) return;
 
@@ -195,11 +133,16 @@ export default function Dashboard() {
         });
 
         if (!response.ok) {
-          console.error("Error syncing user:", await response.json());
+          toast.error("Error syncing user data");
           return;
         }
 
         const userData = await response.json();
+
+        if (!userData) {
+          toast.error("No user data found");
+          return;
+        }
 
         // Get user's saved components
         const { data, error } = await supabase
@@ -209,42 +152,30 @@ export default function Dashboard() {
           .single();
 
         if (error) {
-          console.error("Error fetching user components:", error);
+          toast.error("Error fetching user components");
           return;
         }
 
-        if (data?.components) {
-          // Map the saved component names to actual components
-          const newSelectedComponents = {
-            navbar:
-              navbarComponents.find((c) => c.name === data.components.navbar) ||
-              navbarComponents[0],
-            home:
-              heroComponents.find((c) => c.name === data.components.home) ||
-              heroComponents[0],
-            about:
-              aboutComponents.find((c) => c.name === data.components.about) ||
-              aboutComponents[0],
-            projects:
-              projectsComponents.find(
-                (c) => c.name === data.components.projects
-              ) || projectsComponents[0],
-            contact:
-              contactComponents.find(
-                (c) => c.name === data.components.contact
-              ) || contactComponents[0],
-            footer:
-              footerComponents.find((c) => c.name === data.components.footer) ||
-              footerComponents[0],
-          };
-          setSelectedComponent(newSelectedComponents);
+        if (data) {
+          // Set selected components based on saved data
+          if (data.components) {
+            setSelectedComponent((prev) => ({
+              ...prev,
+              ...data.components,
+            }));
+          }
+
+          // Set theme
+          if (data.theme) {
+            setThemeKey(data.theme);
+          }
         }
 
-        if (data?.theme) {
-          setThemeKey(data.theme);
-        }
+        // Set loading to false once everything is loaded
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error loading user components:", error);
+        toast.error("Error loading user components");
+        setIsLoading(false);
       }
     };
 
@@ -454,7 +385,8 @@ export default function Dashboard() {
     (section) => section.isCustom
   ).length;
 
-  if (loading) {
+  // Show loading spinner while loading user data
+  if (loading || isLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
@@ -743,102 +675,113 @@ export default function Dashboard() {
     }
   };
 
-  if (hasPortfolio) {
-    return (
-      <section className="relative min-h-screen flex flex-col bg-background">
-        {pricingOverlay && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
-            <PricingSectionCards />
-          </div>
-        )}
+  return (
+    <section className="relative min-h-screen flex flex-col bg-background">
+      {pricingOverlay && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
+          <PricingSectionCards />
+        </div>
+      )}
 
-        {editingSection && (
-          <PortfolioEditor
-            section={editingSection}
-            data={portfolio}
-            onClose={() => setEditingSection(null)}
-            onSave={saveSection}
-            style={{ "z-index": "99" }}
-          />
-        )}
+      {editingSection && (
+        <PortfolioEditor
+          section={editingSection}
+          data={portfolio}
+          onClose={() => setEditingSection(null)}
+          onSave={saveSection}
+          style={{ "z-index": "99" }}
+        />
+      )}
 
-        {showUrlModal && (
-          <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
+      {showUrlModal && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
+          <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
+            <button
+              onClick={() => setShowUrlModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
+            <div className="relative">
+              <input
+                className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 outline-none ${
+                  !isValid || isNameTaken
+                    ? "border-red-500 focus:ring-2 focus:ring-red-400"
+                    : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                }`}
+                placeholder="e.g. john"
+                value={enteredName}
+                onChange={handleUrlNameChange}
+              />
+              {isChecking && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-2 space-y-2">
+              {!isValid && (
+                <p className="text-red-500 text-sm">
+                  Only lowercase letters, numbers, and hyphens (-) are allowed.
+                </p>
+              )}
+              {isNameTaken && (
+                <p className="text-red-500 text-sm">
+                  This name is already taken. Please choose a different one.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setShowUrlModal(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
               >
-                <X size={20} />
+                Cancel
               </button>
-
-              <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
-              <div className="relative">
-                <input
-                  className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 outline-none ${
-                    !isValid || isNameTaken
-                      ? "border-red-500 focus:ring-2 focus:ring-red-400"
-                      : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  }`}
-                  placeholder="e.g. john"
-                  value={enteredName}
-                  onChange={handleUrlNameChange}
-                />
-                {isChecking && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-2 space-y-2">
-                {!isValid && (
-                  <p className="text-red-500 text-sm">
-                    Only lowercase letters, numbers, and hyphens (-) are
-                    allowed.
-                  </p>
-                )}
-                {isNameTaken && (
-                  <p className="text-red-500 text-sm">
-                    This name is already taken. Please choose a different one.
-                  </p>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => setShowUrlModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUrlNameSubmit}
-                  disabled={
-                    !isValid || isNameTaken || isChecking || !enteredName
-                  }
-                  className={`px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
-                    !isValid || isNameTaken || isChecking || !enteredName
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-primary-500 hover:bg-primary-600"
-                  }`}
-                >
-                  Save & Continue
-                </button>
-              </div>
+              <button
+                onClick={handleUrlNameSubmit}
+                disabled={!isValid || isNameTaken || isChecking || !enteredName}
+                className={`px-4 py-2 rounded-md text-white font-semibold transition-all duration-200 ${
+                  !isValid || isNameTaken || isChecking || !enteredName
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-primary-500 hover:bg-primary-600"
+                }`}
+              >
+                Save & Continue
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <LaunchSuccessModal
-          isOpen={showSuccessModal}
-          onClose={() => setShowSuccessModal(false)}
-          portfolioUrl={portfolioUrl}
+      <LaunchSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        portfolioUrl={portfolioUrl}
+      />
+
+      <Navbar isDashboard={true} />
+      <div className="flex">
+        <Sidebar
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          showOverlay={showOverlay}
+          setShowOverlay={setShowOverlay}
+          newSectionName={newSectionName}
+          setNewSectionName={setNewSectionName}
+          removeSection={removeSection}
+          customSectionCount={customSectionsCount}
+          sections={sections}
+          setSections={setSections}
+          handleScrollToSection={handleScrollToSection}
         />
-
-        <Navbar isDashboard={true} />
-        <div className="flex">
-          <Sidebar
+        {mobileSidebarOpen && (
+          <MobileSidebar
+            setMobileSidebarOpen={setMobileSidebarOpen}
             activeSection={activeSection}
             setActiveSection={setActiveSection}
             showOverlay={showOverlay}
@@ -851,214 +794,216 @@ export default function Dashboard() {
             setSections={setSections}
             handleScrollToSection={handleScrollToSection}
           />
-          {mobileSidebarOpen && (
-            <MobileSidebar
-              setMobileSidebarOpen={setMobileSidebarOpen}
-              activeSection={activeSection}
-              setActiveSection={setActiveSection}
-              showOverlay={showOverlay}
-              setShowOverlay={setShowOverlay}
-              newSectionName={newSectionName}
-              setNewSectionName={setNewSectionName}
-              removeSection={removeSection}
-              customSectionCount={customSectionsCount}
-              sections={sections}
-              setSections={setSections}
-              handleScrollToSection={handleScrollToSection}
-            />
-          )}
+        )}
 
-          <div className="flex-1 mt-16 ">
-            <div
-              className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
-                isMobileLayout
-                  ? " mx-auto md:ml-[45%] md:max-w-[420px] mb-16"
-                  : ""
-              }`}
-            >
-              {/* Fixed outline container */}
-              <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
-                <SectionWrapper
-                  id="navbar"
-                  innerRef={navbarRef}
-                  Component={selectedComponent.navbar.component}
-                  componentMeta={selectedComponent.navbar}
-                  theme={theme}
-                  handleScrollToSection={handleScrollToSection}
-                  changeFunction={changeSingleComponent}
-                  componentList={navbarComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
+        <div className="flex-1 mt-16 ">
+          <div
+            className={`flex-1 ml-[0] md:ml-[20%] py-4 px-4 transition-all duration-300 ${
+              isMobileLayout
+                ? " mx-auto md:ml-[45%] md:max-w-[420px] mb-16"
+                : ""
+            }`}
+          >
+            {/* Fixed outline container */}
+            <div className="h-[85vh] overflow-y-auto border-[2px] border-dashed border-primary-500 rounded-xl  bg-white shadow-sm">
+              <SectionWrapper
+                id="navbar"
+                innerRef={navbarRef}
+                Component={selectedComponent.navbar.component}
+                componentMeta={selectedComponent.navbar}
+                theme={theme}
+                handleScrollToSection={handleScrollToSection}
+                changeFunction={changeSingleComponent}
+                componentList={navbarComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
 
-                <SectionWrapper
-                  id="home"
-                  innerRef={homeRef}
-                  Component={selectedComponent.home.component}
-                  componentMeta={selectedComponent.home}
-                  theme={theme}
-                  handleScrollToSection={handleScrollToSection}
-                  changeFunction={changeSingleComponent}
-                  componentList={heroComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
+              <SectionWrapper
+                id="home"
+                innerRef={homeRef}
+                Component={selectedComponent.home.component}
+                componentMeta={selectedComponent.home}
+                theme={theme}
+                handleScrollToSection={handleScrollToSection}
+                changeFunction={changeSingleComponent}
+                componentList={heroComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
 
-                <SectionWrapper
-                  id="about"
-                  innerRef={aboutRef}
-                  Component={selectedComponent.about.component}
-                  componentMeta={selectedComponent.about}
-                  theme={theme}
-                  changeFunction={changeSingleComponent}
-                  componentList={aboutComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
+              <SectionWrapper
+                id="about"
+                innerRef={aboutRef}
+                Component={selectedComponent.about.component}
+                componentMeta={selectedComponent.about}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={aboutComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
 
-                <SectionWrapper
-                  id="projects"
-                  innerRef={projectsRef}
-                  Component={selectedComponent.projects.component}
-                  componentMeta={selectedComponent.projects}
-                  theme={theme}
-                  changeFunction={changeSingleComponent}
-                  componentList={projectsComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
+              <SectionWrapper
+                id="projects"
+                innerRef={projectsRef}
+                Component={selectedComponent.projects.component}
+                componentMeta={selectedComponent.projects}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={projectsComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
 
-                <SectionWrapper
-                  id="contact"
-                  innerRef={contactRef}
-                  Component={selectedComponent.contact.component}
-                  componentMeta={selectedComponent.contact}
-                  theme={theme}
-                  changeFunction={changeSingleComponent}
-                  componentList={contactComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
+              <SectionWrapper
+                id="contact"
+                innerRef={contactRef}
+                Component={selectedComponent.contact.component}
+                componentMeta={selectedComponent.contact}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={contactComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
 
-                <SectionWrapper
-                  id="footer"
-                  innerRef={footerRef}
-                  Component={selectedComponent.footer.component}
-                  componentMeta={selectedComponent.footer}
-                  theme={theme}
-                  changeFunction={changeSingleComponent}
-                  componentList={footerComponents}
-                  isMobileLayout={isMobileLayout}
-                  setIsMobileLayout={setIsMobileLayout}
-                  setEditingSection={setEditingSection}
-                />
-              </div>
+              <SectionWrapper
+                id="footer"
+                innerRef={footerRef}
+                Component={selectedComponent.footer.component}
+                componentMeta={selectedComponent.footer}
+                theme={theme}
+                changeFunction={changeSingleComponent}
+                componentList={footerComponents}
+                isMobileLayout={isMobileLayout}
+                setIsMobileLayout={setIsMobileLayout}
+                setEditingSection={setEditingSection}
+              />
+
+              {/* Custom sections */}
+              {sections
+                .filter((section) => section.isCustom)
+                .map((section) => (
+                  <SectionWrapper
+                    key={section.id}
+                    id={section.id}
+                    Component={section.component}
+                    componentMeta={section}
+                    theme={theme}
+                    changeFunction={changeSingleComponent}
+                    componentList={[]}
+                    isMobileLayout={isMobileLayout}
+                    setIsMobileLayout={setIsMobileLayout}
+                    setEditingSection={setEditingSection}
+                  />
+                ))}
             </div>
-          </div>
-
-          <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
-            <button
-              className="md:hidden px-2 py-1 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            >
-              Edit
-            </button>
-
-            <button
-              className="px-2 py-1 md:px-4 md:py-2 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-              onClick={handleComponentChange}
-            >
-              Change
-            </button>
-
-            <div>
-              <button
-                className="px-2 py-1 md:px-4 md:py-2 relative rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg  hover:scale-105 flex justify-center items-center gap-1"
-                onClick={handleThemeButtonClick}
-              >
-                Theme {themeOverlay ? <ChevronDown /> : <ChevronUp />}
-              </button>
-
-              {themeOverlay ? (
-                <div className="absolute left-1/2 transform -translate-x-1/2 -top-28 md:-top-16 flex items-center gap-2 bg-white px-2 py-2 rounded-lg border border-primary-500 w-[270px] md:w-[520px] flex-wrap md:flex-nowrap justify-center">
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-[#1e1e1e] text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("dark")}
-                  >
-                    Dark
-                  </button>
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-orange-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("sunset")}
-                  >
-                    Sunset
-                  </button>
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-white-500 text-gray-800  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("default")}
-                  >
-                    Light
-                  </button>
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-blue-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("ocean")}
-                  >
-                    Ocean
-                  </button>
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-green-600 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("forest")}
-                  >
-                    Forest
-                  </button>
-                  <button
-                    className="px-4 py-2  rounded-md border border-gray-300 bg-[#00ffff] text-gray-800 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
-                    onClick={() => handleThemeChange("neon")}
-                  >
-                    Neon
-                  </button>
-                </div>
-              ) : (
-                ""
-              )}
-            </div>
-
-            <button
-              className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
-              onClick={handleMobileLayoutClick}
-            >
-              <Smartphone />
-            </button>
-
-            <button
-              className={`px-2 py-1 md:px-4 md:py-2 rounded-md text-md font-semibold transition-all duration-200 ease-in flex justify-center items-center 
-              ${
-                disableLaunchButton
-                  ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "text-white cursor-pointer hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500"
-              }`}
-              disabled={disableLaunchButton || isLaunching}
-              onClick={handleLaunchClick}
-            >
-              {isLaunching ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Launching...
-                </>
-              ) : (
-                <>
-                  Launch <Rocket className="ml-2" size={16} />
-                </>
-              )}
-            </button>
           </div>
         </div>
-      </section>
-    );
-  }
+      </div>
+
+      <div className="z-50 fixed left-1/2 bottom-4 transform -translate-x-1/2 flex items-center gap-4 bg-white px-2 py-2 shadow-lg rounded-lg border border-primary-500 ">
+        <button
+          className="md:hidden px-2 py-1 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+        >
+          Edit
+        </button>
+
+        <button
+          className="px-2 py-1 md:px-4 md:py-2 rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+          onClick={handleComponentChange}
+        >
+          Change
+        </button>
+
+        <div>
+          <button
+            className="px-2 py-1 md:px-4 md:py-2 relative rounded-md text-primary-500 border border-primary-500 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg  hover:scale-105 flex justify-center items-center gap-1"
+            onClick={handleThemeButtonClick}
+          >
+            Theme {themeOverlay ? <ChevronDown /> : <ChevronUp />}
+          </button>
+
+          {themeOverlay ? (
+            <div className="absolute left-1/2 transform -translate-x-1/2 -top-28 md:-top-16 flex items-center gap-2 bg-white px-2 py-2 rounded-lg border border-primary-500 w-[270px] md:w-[520px] flex-wrap md:flex-nowrap justify-center">
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-[#1e1e1e] text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("dark")}
+              >
+                Dark
+              </button>
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-orange-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("sunset")}
+              >
+                Sunset
+              </button>
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-white-500 text-gray-800  text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("default")}
+              >
+                Light
+              </button>
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-blue-500 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("ocean")}
+              >
+                Ocean
+              </button>
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-green-600 text-white text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("forest")}
+              >
+                Forest
+              </button>
+              <button
+                className="px-4 py-2  rounded-md border border-gray-300 bg-[#00ffff] text-gray-800 text-md cursor-pointer font-semibold transition-all duration-200 ease-in hover:shadow-lg hover:scale-105"
+                onClick={() => handleThemeChange("neon")}
+              >
+                Neon
+              </button>
+            </div>
+          ) : (
+            ""
+          )}
+        </div>
+
+        <button
+          className="hidden md:block px-4 py-2 rounded-md text-primary-500 cursor-pointer font-semibold transition-all duration-200 ease-in border border-primary-500 hover:shadow-lg hover:scale-105"
+          onClick={handleMobileLayoutClick}
+        >
+          <Smartphone />
+        </button>
+
+        <button
+          className={`px-2 py-1 md:px-4 md:py-2 rounded-md text-md font-semibold transition-all duration-200 ease-in flex justify-center items-center 
+          ${
+            disableLaunchButton
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "text-white cursor-pointer hover:shadow-lg hover:scale-105 bg-gradient-to-r from-primary-500 to-secondary-500"
+          }`}
+          disabled={disableLaunchButton || isLaunching}
+          onClick={handleLaunchClick}
+        >
+          {isLaunching ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Launching...
+            </>
+          ) : (
+            <>
+              Launch <Rocket className="ml-2" size={16} />
+            </>
+          )}
+        </button>
+      </div>
+    </section>
+  );
 }
