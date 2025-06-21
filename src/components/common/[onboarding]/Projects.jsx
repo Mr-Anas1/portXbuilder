@@ -72,7 +72,7 @@ const Projects = ({ formData, setFormData }) => {
       <button
         onClick={addCard}
         disabled={cards.length >= 3}
-        className={`mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg
+        className={`mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg mx-auto
           ${
             cards.length >= 3
               ? "bg-gray-300 cursor-not-allowed hover:scale-100 hover:none"

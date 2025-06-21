@@ -107,7 +107,9 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
               >
                 <div className="relative overflow-hidden w-full h-[400px]">
                   <img
-                    src={project.project_img?.data || "/default-project.png"}
+                    src={
+                      project.project_img?.data || "/images/default-project.png"
+                    }
                     alt={project.project_img?.name || "Project image"}
                     className="absolute inset-0 w-full h-full object-cover"
                   />

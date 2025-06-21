@@ -72,8 +72,8 @@ const BasicInfo = ({
       validationRules["age"].test(newFormData.age) &&
       validationRules["email"].test(newFormData.email) &&
       validationRules["phone"].test(newFormData.phone) &&
-      validationRules["location"].test(newFormData.location);
-    validationRules["experience"].test(newFormData.experience);
+      validationRules["location"].test(newFormData.location) &&
+      validationRules["experience"].test(newFormData.experience);
 
     setProceed(!!allValid);
   };

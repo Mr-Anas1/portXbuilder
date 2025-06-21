@@ -74,7 +74,9 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
             >
               <div className="relative overflow-hidden w-full h-[300px]">
                 <img
-                  src={project.project_img?.data || "/default-project.png"}
+                  src={
+                    project.project_img?.data || "/images/default-project.png"
+                  }
                   alt={project.project_img?.name || "Project image"}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

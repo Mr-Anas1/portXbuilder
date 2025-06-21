@@ -64,7 +64,9 @@ const ProjectSection3 = ({ theme, isMobileLayout, sectionRef }) => {
             <div className="w-full md:w-1/2">
               <div className="relative rounded-xl overflow-hidden h-[300px] sm:h-[350px] md:h-[400px]">
                 <img
-                  src={project.project_img?.data || "/default-project.png"}
+                  src={
+                    project.project_img?.data || "/images/default-project.png"
+                  }
                   alt={project.project_img?.name || "Project image"}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

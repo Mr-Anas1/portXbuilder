@@ -7,6 +7,15 @@ import { Loader2 } from "lucide-react";
 import Projects from "../common/[onboarding]/Projects";
 import { useAuthContext } from "@/context/AuthContext";
 
+// Browser-compatible UUID generation
+const generateSecureId = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 const PortfolioEditor = ({ section, data, onClose, onSave }) => {
   const { user } = useAuthContext();
   const [formState, setFormState] = useState({});
@@ -146,7 +155,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
         }
 
         const fileExt = selectedFile.name.split(".").pop();
-        const fileName = `${userData.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${generateSecureId()}-${Date.now()}.${fileExt}`;
         const filePath = `profile-images/${fileName}`;
         let processedBlob = null;
 

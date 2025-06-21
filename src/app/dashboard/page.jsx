@@ -545,6 +545,22 @@ export default function Dashboard() {
   // Get the current theme object
   const theme = previewThemes[themeKey] || previewThemes.default;
 
+  // Add loading state for portfolio data
+  if (portfolioLoading || !portfolio) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">
+            {portfolioLoading
+              ? "Loading your portfolio..."
+              : "Setting up your portfolio..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const handleSave = async (section, formData) => {
     try {
       console.log("Saving section:", section);

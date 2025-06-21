@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+import {
+  validateInput,
+  checkRateLimit,
+  createErrorResponse,
+  createSuccessResponse,
+} from "@/lib/auth-middleware";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -13,81 +19,95 @@ const supabaseAdmin = createClient(
   }
 );
 
+// Input validation schema
+const paymentSchema = {
+  razorpay_payment_id: { required: true, maxLength: 100 },
+  razorpay_subscription_id: { required: true, maxLength: 100 },
+  razorpay_signature: { required: true, maxLength: 200 },
+};
+
 export async function POST(request) {
   try {
-    const body = await request.json();
-    console.log("Verifying payment - Request body:", body);
+    // Rate limiting
+    const clientIP = request.headers.get("x-forwarded-for") || "unknown";
+    if (!checkRateLimit(clientIP)) {
+      return createErrorResponse("Rate limit exceeded", 429);
+    }
 
-    const {
-      razorpay_payment_id,
-      razorpay_subscription_id,
-      razorpay_signature,
-    } = body;
+    // Get request body
+    const body = await request.json();
+    if (!body) {
+      return createErrorResponse("No payment data provided");
+    }
+
+    // Input validation
+    let validatedData;
+    try {
+      validatedData = validateInput(body, paymentSchema);
+    } catch (validationError) {
+      return createErrorResponse(validationError.message);
+    }
 
     // Verify the payment signature
     const secret = process.env.RAZORPAY_KEY_SECRET;
+    if (!secret) {
+      console.error("Missing Razorpay secret key");
+      return createErrorResponse("Payment service configuration error", 500);
+    }
+
     const generated_signature = crypto
       .createHmac("sha256", secret)
-      .update(razorpay_payment_id + "|" + razorpay_subscription_id)
+      .update(
+        validatedData.razorpay_payment_id +
+          "|" +
+          validatedData.razorpay_subscription_id
+      )
       .digest("hex");
 
-    console.log("Generated signature:", generated_signature);
-    console.log("Received signature:", razorpay_signature);
-
-    if (generated_signature !== razorpay_signature) {
-      console.error("Invalid signature");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    if (generated_signature !== validatedData.razorpay_signature) {
+      console.error("Invalid payment signature");
+      return createErrorResponse("Invalid payment signature", 400);
     }
 
     // First try to find user by subscription ID
-    console.log(
-      "Looking for user with subscription ID:",
-      razorpay_subscription_id
-    );
     const { data: userBySub, error: userBySubError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("subscription_id", razorpay_subscription_id)
+      .eq("subscription_id", validatedData.razorpay_subscription_id)
       .single();
 
+    let user;
     if (userBySubError) {
-      console.log(
-        "User not found by subscription ID, trying to find by payment ID"
-      );
-
       // If not found by subscription ID, try to find by payment ID
       const { data: userByPayment, error: userByPaymentError } =
         await supabaseAdmin
           .from("users")
           .select("*")
-          .eq("subscription_id", razorpay_subscription_id)
+          .eq("subscription_id", validatedData.razorpay_subscription_id)
           .single();
 
       if (userByPaymentError) {
         console.error("Error finding user by payment ID:", userByPaymentError);
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
+        return createErrorResponse("User not found", 404);
       }
 
-      console.log("Found user by payment ID:", userByPayment);
-      var user = userByPayment;
+      user = userByPayment;
     } else {
-      console.log("Found user by subscription ID:", userBySub);
-      var user = userBySub;
+      user = userBySub;
     }
 
     if (!user) {
       console.error("No user found");
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return createErrorResponse("User not found", 404);
     }
 
     // Update user's plan to pro
-    console.log("Updating user plan for user:", user.clerk_id);
     const { data: updatedUser, error: updateError } = await supabaseAdmin
       .from("users")
       .update({
         plan: "pro",
         subscription_status: "active",
-        subscription_id: razorpay_subscription_id,
+        subscription_id: validatedData.razorpay_subscription_id,
         subscription_start_date: new Date().toISOString(),
         subscription_end_date: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
@@ -99,27 +119,30 @@ export async function POST(request) {
 
     if (updateError) {
       console.error("Error updating user plan:", updateError);
-      return NextResponse.json(
-        { error: "Failed to update user plan: " + updateError.message },
-        { status: 500 }
-      );
+      return createErrorResponse("Failed to update user plan", 500);
     }
 
     if (!updatedUser) {
       console.error("No user was updated");
-      return NextResponse.json(
-        { error: "Failed to update user plan: No user was updated" },
-        { status: 500 }
-      );
+      return createErrorResponse("Failed to update user plan", 500);
     }
 
-    console.log("Successfully updated user:", updatedUser);
-    return NextResponse.json({ success: true, user: updatedUser });
+    return createSuccessResponse({ success: true, user: updatedUser });
   } catch (error) {
     console.error("Payment verification error:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
-    );
+    return createErrorResponse(error.message || "Internal server error", 500);
   }
+}
+
+// Handle OPTIONS requests for CORS
+export async function OPTIONS(request) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_APP_URL || "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Max-Age": "86400",
+    },
+  });
 }

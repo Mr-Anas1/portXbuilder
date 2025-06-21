@@ -33,16 +33,22 @@ const Footer = () => {
             Templates
           </Link>
           <Link
-            href={"/policy"}
+            href={"/privacy-policy"}
             className="cursor-pointer  hover:text-secondary-500 transition-colors"
           >
             Privacy Policy
           </Link>
           <Link
-            href={"/terms"}
+            href={"/terms-and-conditions"}
             className="cursor-pointer  hover:text-secondary-500 transition-colors"
           >
-            Terms and Conditions
+            Terms & Conditions
+          </Link>
+          <Link
+            href={"/subscription-policy"}
+            className="cursor-pointer  hover:text-secondary-500 transition-colors"
+          >
+            Subscription Policy
           </Link>
         </div>
 

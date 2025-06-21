@@ -17,6 +17,15 @@ import { useEffect } from "react";
 import { removeBackground } from "@imgly/background-removal";
 import { toast } from "react-hot-toast";
 
+// Browser-compatible UUID generation
+const generateSecureId = () => {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 function CreatePortfolio() {
   const { user, loading } = useAuthContext();
   const router = useRouter();
@@ -25,6 +34,8 @@ function CreatePortfolio() {
   const [hasPortfolio, setHasPortfolio] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [creationProgress, setCreationProgress] = useState("");
+  const [currentStep, setCurrentStep] = useState(0);
+  const [totalSteps, setTotalSteps] = useState(8); // Total number of steps
 
   const [formData, setFormData] = useState({
     name: "",
@@ -159,6 +170,12 @@ function CreatePortfolio() {
 
     try {
       setIsCreating(true);
+      setCurrentStep(1);
+
+      // Adjust total steps based on whether profile image is provided
+      const hasProfileImage = !!formData.profileImage;
+      setTotalSteps(hasProfileImage ? 8 : 6);
+
       setCreationProgress("Preparing your portfolio...");
 
       if (
@@ -172,6 +189,7 @@ function CreatePortfolio() {
         return;
       }
 
+      setCurrentStep(2);
       setCreationProgress("Generating AI content...");
       const aiFields = await generateFields({
         name: formData.name,
@@ -185,15 +203,26 @@ function CreatePortfolio() {
         return;
       }
 
+      setCurrentStep(3);
+      setCreationProgress(
+        "AI content generated successfully! Processing your profile image..."
+      );
+
       let profileImagePath = "";
       if (formData.profileImage) {
-        setCreationProgress("Processing your profile image...");
+        setCurrentStep(4);
+        setCreationProgress(
+          "Processing your profile image... (This may take 1-2 minutes)"
+        );
         const fileExt = formData.profileImage.name.split(".").pop();
-        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const fileName = `${generateSecureId()}-${Date.now()}.${fileExt}`;
         const filePath = `profile-images/${fileName}`;
         let processedBlob = null;
 
         try {
+          setCreationProgress(
+            "Removing background from your image... (This step takes the longest - please be patient)"
+          );
           processedBlob = await removeBackground(formData.profileImage, {
             debug: true,
             device: "cpu",
@@ -204,12 +233,19 @@ function CreatePortfolio() {
               type: "foreground",
             },
           });
+          setCreationProgress(
+            "Background removal completed! Uploading your image..."
+          );
         } catch (e) {
           console.error("Background removal failed:", e);
+          setCreationProgress(
+            "Background removal failed, uploading original image..."
+          );
         }
 
         try {
-          setCreationProgress("Uploading your profile image...");
+          setCurrentStep(5);
+          setCreationProgress("Uploading your profile image to our servers...");
           const uploadBlob = processedBlob || formData.profileImage;
           const contentType = processedBlob
             ? "image/webp"
@@ -237,13 +273,20 @@ function CreatePortfolio() {
           }
 
           profileImagePath = urlData.publicUrl;
+          setCreationProgress("Profile image uploaded successfully!");
         } catch (uploadError) {
           console.error("Error during upload process:", uploadError);
           return;
         }
+      } else {
+        setCurrentStep(5);
+        setCreationProgress(
+          "No profile image provided, continuing with portfolio creation..."
+        );
       }
 
-      setCreationProgress("Finalizing your portfolio...");
+      setCurrentStep(hasProfileImage ? 6 : 5);
+      setCreationProgress("Setting up your user account...");
 
       // First get the user's Supabase ID from the users table using the API route
       console.log("Fetching user data for Clerk ID:", user.id);
@@ -268,6 +311,9 @@ function CreatePortfolio() {
         console.error("No user data found for Clerk ID:", user.id);
         throw new Error("No user data found");
       }
+
+      setCurrentStep(hasProfileImage ? 7 : 6);
+      setCreationProgress("Creating your portfolio in our database...");
 
       const fullData = {
         user_id: userData.id, // Use Supabase user ID instead of Clerk ID
@@ -304,13 +350,17 @@ function CreatePortfolio() {
         throw new Error(error.error || "Failed to create portfolio");
       }
 
+      const createdPortfolio = await portfolioResponse.json();
+      console.log("Portfolio created successfully:", createdPortfolio);
+
       setFormData((prev) => ({
         ...prev,
         ...aiFields,
         profileImage: profileImagePath,
       }));
 
-      setCreationProgress("Syncing your portfolio data...");
+      setCurrentStep(hasProfileImage ? 8 : 7);
+      setCreationProgress("Finalizing your portfolio setup...");
 
       // Wait for a moment to ensure data is synced
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -327,13 +377,18 @@ function CreatePortfolio() {
         console.error("Error syncing portfolio data");
       }
 
-      setCreationProgress("Redirecting to your dashboard...");
+      setCreationProgress(
+        "Portfolio created successfully! Redirecting to your dashboard..."
+      );
+
+      // Navigate to dashboard
       router.push("/dashboard");
     } catch (err) {
       console.error("Unexpected error:", err.message || err);
       toast.error(err.message || "Failed to create portfolio");
     } finally {
       setIsCreating(false);
+      setCurrentStep(0);
     }
   };
 
@@ -352,7 +407,47 @@ function CreatePortfolio() {
               <h2 className="text-xl font-semibold mb-2">
                 Creating Your Portfolio
               </h2>
-              <p className="text-muted-foreground">{creationProgress}</p>
+              <p className="text-muted-foreground mb-4">{creationProgress}</p>
+
+              {/* Progress indicator */}
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                <div
+                  className="bg-gradient-to-r from-primary-500 to-secondary-500 h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${(currentStep / totalSteps) * 100}%`,
+                  }}
+                ></div>
+              </div>
+
+              {/* Show additional info for background removal */}
+              {currentStep === 4 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Background Removal Process:</strong>
+                  </p>
+                  <ul className="text-xs text-blue-700 mt-2 space-y-1 text-left">
+                    <li>• Analyzing your image structure</li>
+                    <li>• Identifying foreground and background</li>
+                    <li>• Processing with AI model</li>
+                    <li>• Generating clean background removal</li>
+                  </ul>
+                  <p className="text-xs text-blue-600 mt-2">
+                    This process uses advanced AI and may take 1-2 minutes
+                    depending on image complexity.
+                  </p>
+                </div>
+              )}
+
+              {/* Show general tips */}
+              {currentStep !== 4 && currentStep > 0 && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-4">
+                  <p className="text-sm text-gray-700">
+                    <strong>What's happening:</strong> We're setting up your
+                    professional portfolio with all your details, projects, and
+                    customizations.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
