@@ -80,7 +80,7 @@ const BasicInfo = ({
   };
 
   return (
-    <section className="w-full  max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg">
+    <section className="w-full max-w-[90%] md:max-w-[80%] sm:max-w-lg lg:max-w-xl bg-white/80 rounded-xl px-6 py-8 shadow-lg">
       <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
         Basic Information
       </h2>
@@ -219,9 +219,9 @@ const BasicInfo = ({
 
           {/* Image guidance message - conditionally rendered */}
           {showImageGuidance && (
-            <div className="mt-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 w-full animate-in slide-in-from-top-2 duration-300">
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0 mt-0.5">
+            <div className="mt-3 p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 w-full animate-in slide-in-from-top-2 duration-300">
+              <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-3">
+                <div className="flex-shrink-0 flex justify-center sm:justify-start">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
                     <svg
                       className="w-4 h-4 text-white"
@@ -236,23 +236,25 @@ const BasicInfo = ({
                     </svg>
                   </div>
                 </div>
-                <div className="text-sm text-blue-900 flex-1">
-                  <p className="font-semibold mb-3 text-blue-800 flex items-center">
+                <div className="text-sm text-blue-900 flex-1 text-center sm:text-left">
+                  <p className="font-semibold mb-2 sm:mb-3 text-blue-800 flex items-center justify-center sm:justify-start">
                     <span className="mr-2">💡</span>
-                    Image Tip for Best Results
+                    <span className="text-xs sm:text-sm">
+                      Image Tip for Best Results
+                    </span>
                   </p>
-                  <p className="mb-4 text-blue-700 leading-relaxed">
+                  <p className="mb-3 sm:mb-4 text-blue-700 leading-relaxed text-xs sm:text-sm">
                     For the best display on your portfolio, we recommend using a{" "}
                     <strong>square image</strong> (1:1 ratio).
                   </p>
 
                   {/* Visual examples */}
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-4 p-3 bg-white/60 rounded-lg border border-green-200 shadow-sm">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                  <div className="space-y-2 sm:space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-2 sm:p-3 bg-white/60 rounded-lg border border-green-200 shadow-sm">
+                      <div className="flex items-center justify-center sm:justify-start space-x-2 sm:space-x-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-sm">
                           <svg
-                            className="w-5 h-5 text-white"
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -263,25 +265,25 @@ const BasicInfo = ({
                             />
                           </svg>
                         </div>
-                        <span className="text-sm font-semibold text-green-700">
+                        <span className="text-xs sm:text-sm font-semibold text-green-700">
                           Recommended
                         </span>
                       </div>
-                      <div className="flex space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
-                        <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                      <div className="flex justify-center sm:justify-start space-x-1 sm:space-x-2">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full">
+                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full text-center sm:text-left">
                         Square (1:1)
                       </span>
                     </div>
 
-                    <div className="flex items-center space-x-4 p-3 bg-white/60 rounded-lg border border-red-200 shadow-sm">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center shadow-sm">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-2 sm:p-3 bg-white/60 rounded-lg border border-red-200 shadow-sm">
+                      <div className="flex items-center justify-center sm:justify-start space-x-2 sm:space-x-3">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center shadow-sm">
                           <svg
-                            className="w-5 h-5 text-white"
+                            className="w-4 h-4 sm:w-5 sm:h-5 text-white"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >
@@ -292,24 +294,24 @@ const BasicInfo = ({
                             />
                           </svg>
                         </div>
-                        <span className="text-sm font-semibold text-red-700">
+                        <span className="text-xs sm:text-sm font-semibold text-red-700">
                           Avoid
                         </span>
                       </div>
-                      <div className="flex space-x-2">
-                        <div className="w-10 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
-                        <div className="w-8 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                      <div className="flex justify-center sm:justify-start space-x-1 sm:space-x-2">
+                        <div className="w-8 h-6 sm:w-10 sm:h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-6 h-8 sm:w-8 sm:h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full">
+                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full text-center sm:text-left">
                         Rectangle
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-4 p-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg border border-blue-300">
-                    <p className="text-xs text-blue-800 font-medium flex items-center">
+                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg border border-blue-300">
+                    <p className="text-xs text-blue-800 font-medium flex flex-col sm:flex-row sm:items-center text-center sm:text-left">
                       <svg
-                        className="w-4 h-4 mr-2 text-blue-600"
+                        className="w-4 h-4 mx-auto sm:mr-2 sm:ml-0 mb-1 sm:mb-0 text-blue-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -319,8 +321,10 @@ const BasicInfo = ({
                           clipRule="evenodd"
                         />
                       </svg>
-                      Square images ensure your profile picture looks great
-                      across all devices and themes!
+                      <span className="text-xs">
+                        Square images ensure your profile picture looks great
+                        across all devices and themes!
+                      </span>
                     </p>
                   </div>
                 </div>
