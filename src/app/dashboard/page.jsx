@@ -112,19 +112,11 @@ export default function Dashboard() {
 
   usePortfolioRedirect();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-  if (!user) {
-    if (typeof window !== "undefined") {
+  useEffect(() => {
+    if (!loading && !user) {
       router.push("/sign-in");
     }
-    return null;
-  }
+  }, [loading, user, router]);
 
   // Helper to map saved component names to actual component objects
   function getComponentByName(name, componentsArray) {
@@ -133,8 +125,9 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    if (!user) return;
     const loadUserComponents = async () => {
+      if (loading || !user) return;
+
       try {
         // Get user's Supabase ID
         const response = await fetch("/api/sync-user", {
@@ -207,8 +200,17 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
+
     loadUserComponents();
-  }, [user]);
+  }, [user, loading]);
+
+  // if (isLoading) {
+  //   return (
+  //     <div className="min-h-screen flex justify-center items-center">
+  //       <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+  //     </div>
+  //   );
+  // }
 
   // For Theme change
 
@@ -430,6 +432,14 @@ export default function Dashboard() {
             Retry Connection
           </button>
         </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
