@@ -41,42 +41,25 @@ export const AuthProvider = ({ children }) => {
   }, [clerkUser]);
 
   const syncUser = async (user) => {
-    if (!isUserLoaded) return;
+    if (!user) return;
 
     try {
-      if (user) {
-        console.log("Syncing user data for:", user.id);
-        const syncedUser = await syncUserData(user);
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
 
-        if (!syncedUser) {
-          console.error("Failed to sync user data");
-          return;
-        }
-
-        console.log("User data synced successfully:", syncedUser);
-        setUserData(syncedUser);
-
-        // Redirect to dashboard after successful sign in
-        if (
-          window.location.pathname === "/sign-in" ||
-          window.location.pathname === "/sign-up"
-        ) {
-          router.push("/dashboard");
-        }
-      } else {
-        setUserData(null);
+      if (!response.ok) {
+        throw new Error("Failed to sync user data");
       }
+
+      const syncedUser = await response.json();
+      return syncedUser;
     } catch (error) {
-      console.error("Error in syncUser:", error);
-      // Check if it's a network error
-      if (
-        error.message?.includes("Failed to fetch") ||
-        error.message?.includes("Network error")
-      ) {
-        setIsOffline(true);
-      }
-    } finally {
-      setLoading(false);
+      throw new Error("Failed to sync user data");
     }
   };
 

@@ -39,7 +39,6 @@ Only return valid JSON. Do not include markdown or extra explanation.
     );
 
     const data = await res.json();
-    console.log("Full Gemini API Response:", JSON.stringify(data, null, 2)); // More detailed logging
 
     // Safety check
     if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
@@ -47,7 +46,6 @@ Only return valid JSON. Do not include markdown or extra explanation.
     }
 
     const responseText = data.candidates[0].content.parts[0].text;
-    console.log("Raw AI response:", responseText);
 
     const jsonMatch = responseText.match(/{[\s\S]*}/);
     if (!jsonMatch) {

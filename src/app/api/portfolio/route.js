@@ -94,6 +94,7 @@ export async function POST(request) {
       "about_me",
       "profileImage",
       "projects",
+      "skills",
     ];
 
     const filteredData = {};
@@ -137,8 +138,6 @@ export async function POST(request) {
     }
 
     // Use upsert with the validated user_id
-    console.log("Attempting to upsert portfolio data:", filteredData);
-
     const { data, error } = await supabaseAdmin
       .from("portfolios")
       .upsert(filteredData, {
@@ -147,13 +146,6 @@ export async function POST(request) {
 
     if (error) {
       console.error("Error updating portfolio:", error);
-      console.error("Data being inserted:", filteredData);
-      console.error("Error details:", {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
       return createErrorResponse("Error updating portfolio", 500);
     }
 

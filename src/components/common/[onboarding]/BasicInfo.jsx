@@ -20,6 +20,7 @@ const BasicInfo = ({
   setProceed,
 }) => {
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [showImageGuidance, setShowImageGuidance] = useState(false);
 
   const handleInputChange = (eOrName, valueOptional) => {
     const name = typeof eOrName === "string" ? eOrName : eOrName.target.name;
@@ -191,6 +192,141 @@ const BasicInfo = ({
               ? formData.profileImage.name
               : "Upload Profile Image"}
           </label>
+
+          {/* Toggle button for image guidance */}
+          <button
+            type="button"
+            onClick={() => setShowImageGuidance(!showImageGuidance)}
+            className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium flex items-center space-x-1 transition-colors duration-200"
+          >
+            <svg
+              className={`w-4 h-4 transition-transform duration-200 ${
+                showImageGuidance ? "rotate-180" : ""
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+            <span>{showImageGuidance ? "Hide" : "Show"} image tips</span>
+          </button>
+
+          {/* Image guidance message - conditionally rendered */}
+          {showImageGuidance && (
+            <div className="mt-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 w-full animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0 mt-0.5">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-sm">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <div className="text-sm text-blue-900 flex-1">
+                  <p className="font-semibold mb-3 text-blue-800 flex items-center">
+                    <span className="mr-2">💡</span>
+                    Image Tip for Best Results
+                  </p>
+                  <p className="mb-4 text-blue-700 leading-relaxed">
+                    For the best display on your portfolio, we recommend using a{" "}
+                    <strong>square image</strong> (1:1 ratio).
+                  </p>
+
+                  {/* Visual examples */}
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-4 p-3 bg-white/60 rounded-lg border border-green-200 shadow-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                          <svg
+                            className="w-5 h-5 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-semibold text-green-700">
+                          Recommended
+                        </span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full">
+                        Square (1:1)
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-4 p-3 bg-white/60 rounded-lg border border-red-200 shadow-sm">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-red-400 to-pink-500 rounded-full flex items-center justify-center shadow-sm">
+                          <svg
+                            className="w-5 h-5 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <span className="text-sm font-semibold text-red-700">
+                          Avoid
+                        </span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <div className="w-10 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                        <div className="w-8 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-lg border-2 border-white shadow-sm transform hover:scale-110 transition-transform duration-200"></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 bg-white/80 px-2 py-1 rounded-full">
+                        Rectangle
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-lg border border-blue-300">
+                    <p className="text-xs text-blue-800 font-medium flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-2 text-blue-600"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      Square images ensure your profile picture looks great
+                      across all devices and themes!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

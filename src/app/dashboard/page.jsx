@@ -265,82 +265,55 @@ export default function Dashboard() {
     setThemeOverlay((prev) => !prev);
   };
 
-  const handleThemeChange = async (key) => {
-    if (previewThemes[key]) {
-      setThemeKey(key);
+  const handleThemeChange = async (newTheme) => {
+    if (!user) return;
 
-      try {
-        // First get the user's Supabase ID from the API route
-        const response = await fetch("/api/sync-user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
+    try {
+      // Get user's Supabase ID
+      const response = await fetch("/api/sync-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
 
-        if (!response.ok) {
-          const error = await response.json();
-          console.error("Error syncing user:", error);
-          return;
-        }
-
-        const userData = await response.json();
-
-        if (!userData) {
-          console.error("No user data found");
-          return;
-        }
-
-        // Create components object
-        const components = {
-          home: selectedComponent.home.name,
-          about: selectedComponent.about.name,
-          footer: selectedComponent.footer.name,
-          navbar: selectedComponent.navbar.name,
-          contact: selectedComponent.contact.name,
-          projects: selectedComponent.projects.name,
-        };
-
-        // Update theme
-        console.log("Updating theme with data:", {
-          id: userData.id,
-          theme: key,
-          components: components,
-        });
-
-        const { data, error } = await supabase
-          .from("users")
-          .update({
-            theme: key,
-            components: components,
-          })
-          .eq("id", userData.id)
-          .select();
-
-        if (error) {
-          console.error("Failed to update theme:", error);
-          // Try to get the current user data to debug
-          const { data: currentUser, error: fetchError } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", userData.id)
-            .single();
-
-          if (fetchError) {
-            console.error("Error fetching current user:", fetchError);
-          } else {
-            console.log("Current user data:", currentUser);
-          }
-        } else {
-          console.log("Theme updated successfully:", data);
-        }
-      } catch (err) {
-        console.error("Error updating theme:", err);
+      if (!response.ok) {
+        const error = await response.json();
+        toast.error("Failed to sync user data");
+        return;
       }
-    }
 
-    setThemeOverlay(false);
+      const userData = await response.json();
+
+      if (!userData || !userData.id) {
+        toast.error("No user data found");
+        return;
+      }
+
+      // Update user theme
+      const { data, error } = await supabase
+        .from("users")
+        .update({ theme: newTheme })
+        .eq("clerk_id", user.id)
+        .select()
+        .single();
+
+      if (error) {
+        toast.error("Failed to update theme");
+        return;
+      }
+
+      // Update local state
+      setSelectedComponent((prev) => ({
+        ...prev,
+        theme: newTheme,
+      }));
+
+      toast.success("Theme updated successfully!");
+    } catch (err) {
+      toast.error("Failed to update theme");
+    }
   };
 
   // For changing into mobile component
@@ -561,29 +534,21 @@ export default function Dashboard() {
     );
   }
 
-  const handleSave = async (section, formData) => {
+  const saveSection = async (section) => {
+    if (!user) {
+      toast.error("No user or user ID available");
+      return;
+    }
+
     try {
-      console.log("Saving section:", section);
-      console.log("Form data:", formData);
-      console.log("Current user:", user);
-
-      if (!user || !user.id) {
-        console.error("No user or user ID available");
-        toast.error("Please sign in to save changes");
+      // Get field names for this section
+      const fieldNames = sectionToField[section];
+      if (!fieldNames) {
+        toast.error("Invalid section");
         return;
       }
 
-      // Get the field names for this section
-      const fieldNames = Array.isArray(sectionToField[section])
-        ? sectionToField[section]
-        : [sectionToField[section]];
-
-      if (!fieldNames || fieldNames.length === 0) {
-        console.error("No field mapping found for section:", section);
-        return;
-      }
-
-      // Get the user's Supabase ID
+      // Get user's Supabase ID
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("id")
@@ -591,14 +556,12 @@ export default function Dashboard() {
         .single();
 
       if (userError) {
-        console.error("Error fetching user data:", userError);
-        toast.error("Error fetching user data. Please try again.");
+        toast.error("Error fetching user data");
         return;
       }
 
       if (!userData) {
-        console.error("No user data found for clerk_id:", user.id);
-        toast.error("User data not found. Please try signing out and back in.");
+        toast.error("No user data found");
         return;
       }
 
@@ -612,8 +575,7 @@ export default function Dashboard() {
         .eq("clerk_id", user.id);
 
       if (userUpdateError) {
-        console.error("Error updating user:", userUpdateError);
-        toast.error("Error updating user settings. Please try again.");
+        toast.error("Error updating user settings");
         return;
       }
 
@@ -629,8 +591,6 @@ export default function Dashboard() {
         }
       });
 
-      console.log("Sending portfolio data:", portfolioData);
-
       // Update portfolio using API route
       const response = await fetch("/api/portfolio", {
         method: "POST",
@@ -642,35 +602,21 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Portfolio update failed:", errorData);
+        toast.error(errorData.error || "Failed to update portfolio");
         throw new Error(errorData.error || "Failed to update portfolio");
       }
 
       const result = await response.json();
-      console.log("Portfolio update response:", result);
 
-      // Update local state with all fields
-      setPortfolioData((prev) => ({
+      // Update local state
+      setFormData((prev) => ({
         ...prev,
-        ...fieldNames.reduce(
-          (acc, fieldName) => ({
-            ...acc,
-            [fieldName]: formData[fieldName],
-          }),
-          {}
-        ),
+        ...portfolioData,
       }));
 
-      // Close the editor
-      setEditingSection(null);
-
-      // Refresh portfolio data
-      await refetchPortfolio();
-
-      toast.success("Portfolio updated successfully!");
+      toast.success("Section saved successfully!");
     } catch (error) {
-      console.error("Error saving portfolio:", error);
-      toast.error(error.message || "Failed to update portfolio");
+      toast.error("Error saving portfolio");
     }
   };
 
@@ -811,7 +757,7 @@ export default function Dashboard() {
             section={editingSection}
             data={portfolio}
             onClose={() => setEditingSection(null)}
-            onSave={handleSave}
+            onSave={saveSection}
             style={{ "z-index": "99" }}
           />
         )}

@@ -15,7 +15,6 @@ const supabaseAdmin = createClient(
 export async function GET(request, { params }) {
   try {
     const { url_name } = params;
-    console.log("Fetching portfolio for URL name:", url_name);
 
     // First, get the user data to get the user_id
     const { data: userData, error: userError } = await supabaseAdmin
@@ -24,23 +23,9 @@ export async function GET(request, { params }) {
       .eq("url_name", url_name)
       .maybeSingle();
 
-    console.log("User data fetch attempt:", {
-      url_name,
-      userData,
-      userError,
-      errorDetails: userError
-        ? {
-            code: userError.code,
-            message: userError.message,
-            details: userError.details,
-            hint: userError.hint,
-          }
-        : null,
-    });
-
     if (userError) {
       return NextResponse.json(
-        { error: "Error fetching user data", details: userError },
+        { error: "Error fetching user data" },
         { status: 500 }
       );
     }
@@ -59,22 +44,9 @@ export async function GET(request, { params }) {
       .eq("user_id", userData.id)
       .maybeSingle();
 
-    console.log("Portfolio data fetch result:", {
-      portfolioData,
-      portfolioError,
-      errorDetails: portfolioError
-        ? {
-            code: portfolioError.code,
-            message: portfolioError.message,
-            details: portfolioError.details,
-            hint: portfolioError.hint,
-          }
-        : null,
-    });
-
     if (portfolioError) {
       return NextResponse.json(
-        { error: "Error fetching portfolio data", details: portfolioError },
+        { error: "Error fetching portfolio data" },
         { status: 500 }
       );
     }
@@ -93,22 +65,9 @@ export async function GET(request, { params }) {
       .eq("id", userData.id)
       .maybeSingle();
 
-    console.log("User components fetch result:", {
-      userComponents,
-      componentsError,
-      errorDetails: componentsError
-        ? {
-            code: componentsError.code,
-            message: componentsError.message,
-            details: componentsError.details,
-            hint: componentsError.hint,
-          }
-        : null,
-    });
-
     if (componentsError) {
       return NextResponse.json(
-        { error: "Error fetching user components", details: componentsError },
+        { error: "Error fetching user components" },
         { status: 500 }
       );
     }
@@ -141,7 +100,7 @@ export async function GET(request, { params }) {
   } catch (error) {
     console.error("Unexpected error in portfolio API:", error);
     return NextResponse.json(
-      { error: "Internal server error", details: error.message },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

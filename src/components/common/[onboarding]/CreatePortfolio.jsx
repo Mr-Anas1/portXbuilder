@@ -158,13 +158,9 @@ function CreatePortfolio() {
     }
   };
 
-  {
-    console.log(formData);
-  }
-
   const handleCreatePortfolio = async () => {
     if (!user) {
-      console.error("No user logged in");
+      toast.error("No user logged in");
       return;
     }
 
@@ -185,7 +181,7 @@ function CreatePortfolio() {
         !formData.age ||
         !formData.experience
       ) {
-        console.error("Missing required fields");
+        toast.error("Missing required fields");
         return;
       }
 
@@ -199,7 +195,7 @@ function CreatePortfolio() {
       });
 
       if (!aiFields) {
-        console.error("Failed to generate AI fields");
+        toast.error("Failed to generate AI content");
         return;
       }
 
@@ -237,7 +233,6 @@ function CreatePortfolio() {
             "Background removal completed! Uploading your image..."
           );
         } catch (e) {
-          console.error("Background removal failed:", e);
           setCreationProgress(
             "Background removal failed, uploading original image..."
           );
@@ -259,7 +254,7 @@ function CreatePortfolio() {
             });
 
           if (uploadError) {
-            console.error("Error uploading image:", uploadError.message);
+            toast.error("Error uploading image");
             return;
           }
 
@@ -268,14 +263,14 @@ function CreatePortfolio() {
             .getPublicUrl(filePath);
 
           if (!urlData?.publicUrl) {
-            console.error("Failed to get public URL for uploaded image");
+            toast.error("Failed to get image URL");
             return;
           }
 
           profileImagePath = urlData.publicUrl;
           setCreationProgress("Profile image uploaded successfully!");
         } catch (uploadError) {
-          console.error("Error during upload process:", uploadError);
+          toast.error("Error uploading image");
           return;
         }
       } else {
@@ -289,7 +284,6 @@ function CreatePortfolio() {
       setCreationProgress("Setting up your user account...");
 
       // First get the user's Supabase ID from the users table using the API route
-      console.log("Fetching user data for Clerk ID:", user.id);
       const response = await fetch("/api/sync-user", {
         method: "POST",
         headers: {
@@ -300,15 +294,14 @@ function CreatePortfolio() {
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Error syncing user:", error);
+        toast.error("Failed to sync user data");
         throw new Error("Failed to sync user data");
       }
 
       const userData = await response.json();
-      console.log("Found user data:", userData);
 
       if (!userData || !userData.id) {
-        console.error("No user data found for Clerk ID:", user.id);
+        toast.error("No user data found");
         throw new Error("No user data found");
       }
 
@@ -346,12 +339,11 @@ function CreatePortfolio() {
 
       if (!portfolioResponse.ok) {
         const error = await portfolioResponse.json();
-        console.error("Error creating portfolio:", error);
+        toast.error(error.error || "Failed to create portfolio");
         throw new Error(error.error || "Failed to create portfolio");
       }
 
       const createdPortfolio = await portfolioResponse.json();
-      console.log("Portfolio created successfully:", createdPortfolio);
 
       setFormData((prev) => ({
         ...prev,
@@ -374,7 +366,7 @@ function CreatePortfolio() {
       });
 
       if (!syncResponse.ok) {
-        console.error("Error syncing portfolio data");
+        // Silent fail for sync
       }
 
       setCreationProgress(
@@ -384,7 +376,6 @@ function CreatePortfolio() {
       // Navigate to dashboard
       router.push("/dashboard");
     } catch (err) {
-      console.error("Unexpected error:", err.message || err);
       toast.error(err.message || "Failed to create portfolio");
     } finally {
       setIsCreating(false);

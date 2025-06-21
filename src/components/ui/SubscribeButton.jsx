@@ -13,27 +13,23 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
   const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
+    if (!user) {
+      toast.error("Please sign in to subscribe");
+      return;
+    }
+
     try {
       setLoading(true);
-      setError(null);
 
-      if (!user) {
-        setError("Please sign in to subscribe");
-        return;
-      }
-
-      console.log("Creating subscription for user:", user.id);
-
-      // First, ensure user exists in Supabase
-      const { data: supabaseUser, error: userError } = await supabase
+      // Find user in Supabase
+      const { data: userData, error: userError } = await supabase
         .from("users")
-        .select("*")
+        .select("id, razorpay_customer_id")
         .eq("clerk_id", user.id)
         .single();
 
       if (userError) {
-        console.error("Error finding user in Supabase:", userError);
-        setError("Error finding user account");
+        toast.error("Error finding user");
         return;
       }
 
@@ -44,146 +40,70 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: user.fullName || user.username || "User",
-          email: user.emailAddresses[0].emailAddress,
-          userId: user.id,
-          billingPeriod,
+          userId: userData.id,
+          billingPeriod: billingPeriod,
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Failed to create subscription");
-      }
-
-      const { subscriptionId, customerId } = await response.json();
-      console.log("Subscription created:", subscriptionId);
-
-      // Store subscription info in Supabase
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({
-          subscription_id: subscriptionId,
-          subscription_status: "pending",
-        })
-        .eq("clerk_id", user.id);
-
-      if (updateError) {
-        console.error(
-          "Error updating user with subscription info:",
-          updateError
-        );
-        setError("Error updating subscription information");
+        toast.error(error.error || "Failed to create subscription");
         return;
       }
 
+      const { subscriptionId, orderId } = await response.json();
+
+      // Initialize Razorpay
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        subscription_id: subscriptionId,
-        name: "PortX Builder",
-        description: "Pro Plan Subscription",
+        amount: billingPeriod === "monthly" ? 199 : 1499, // Amount in paise
+        currency: "INR",
+        name: "PortXBuilder",
+        description: `Pro Plan - ${
+          billingPeriod === "monthly" ? "Monthly" : "Yearly"
+        }`,
+        order_id: orderId,
         handler: async function (response) {
           try {
-            console.log("Payment successful:", response);
+            // Verify payment
             const verifyResponse = await fetch("/api/verify-payment", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_subscription_id: response.razorpay_subscription_id,
-                razorpay_signature: response.razorpay_signature,
+                paymentId: response.razorpay_payment_id,
+                orderId: response.razorpay_order_id,
+                signature: response.razorpay_signature,
               }),
             });
 
-            const result = await verifyResponse.json();
-
             if (!verifyResponse.ok) {
-              console.error("Payment verification failed:", result);
-              throw new Error(result.error || "Payment verification failed");
+              const result = await verifyResponse.json();
+              toast.error(result.error || "Payment verification failed");
+              return;
             }
 
-            console.log("Payment verified:", result);
-            toast.success(
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold">Subscription Successful!</p>
-                <p className="text-sm text-gray-600">
-                  Welcome to the Pro plan. Enjoy all premium features!
-                </p>
-              </div>,
-              {
-                duration: 5000,
-                style: {
-                  background: "#fff",
-                  color: "#333",
-                  boxShadow:
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                  borderRadius: "0.5rem",
-                  padding: "1rem",
-                },
-              }
-            );
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            const result = await verifyResponse.json();
+            toast.success("Payment successful! Welcome to Pro!");
+            window.location.reload();
           } catch (error) {
-            console.error("Payment verification error:", error);
-            toast.error(
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold">Payment Verification Failed</p>
-                <p className="text-sm text-gray-600">
-                  {error.message}. Please contact support.
-                </p>
-              </div>,
-              {
-                duration: 5000,
-                style: {
-                  background: "#fff",
-                  color: "#333",
-                  boxShadow:
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                  borderRadius: "0.5rem",
-                  padding: "1rem",
-                },
-              }
-            );
+            toast.error("Payment verification failed");
           }
         },
         prefill: {
-          name: user.fullName || user.username || "User",
-          email: user.emailAddresses[0].emailAddress,
-          contact: user.phoneNumbers[0]?.phoneNumber || "",
+          name: user.fullName || "",
+          email: user.primaryEmailAddress?.emailAddress || "",
         },
         theme: {
           color: "#6366f1",
         },
       };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error("Subscription error:", error);
-      setError(error.message || "Failed to create subscription");
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Subscription Error</p>
-          <p className="text-sm text-gray-600">
-            {error.message || "Failed to create subscription"}
-          </p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
+      toast.error("Subscription error");
     } finally {
       setLoading(false);
     }

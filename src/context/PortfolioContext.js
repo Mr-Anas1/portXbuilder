@@ -40,7 +40,6 @@ export const PortfolioProvider = ({ children }) => {
         }
 
         if (!userData) {
-          console.log("No user found with url_name:", url_name);
           setPortfolio(null);
           setLoading(false);
           return;
@@ -54,7 +53,6 @@ export const PortfolioProvider = ({ children }) => {
           .single();
 
         if (portfolioError) {
-          console.error("Error fetching portfolio:", portfolioError);
           setPortfolio(null);
           setLoading(false);
           return;
@@ -89,7 +87,6 @@ export const PortfolioProvider = ({ children }) => {
         .single();
 
       if (userError) {
-        console.error("Error fetching user:", userError);
         setError("Failed to fetch user data");
         setLoading(false);
         return;
@@ -106,7 +103,6 @@ export const PortfolioProvider = ({ children }) => {
         .single();
 
       if (portfolioError) {
-        console.error("Error fetching portfolio:", portfolioError);
         setPortfolio(null);
         setLoading(false);
         return;
@@ -119,7 +115,6 @@ export const PortfolioProvider = ({ children }) => {
         theme: userData?.theme || "default",
       });
     } catch (error) {
-      console.error("Error in fetchPortfolio:", error);
       setError("Failed to fetch portfolio");
     } finally {
       setLoading(false);
@@ -129,11 +124,6 @@ export const PortfolioProvider = ({ children }) => {
   useEffect(() => {
     // Add a small delay to ensure Supabase is initialized
     const timeout = setTimeout(() => {
-      console.log("PortfolioContext useEffect triggered with:", {
-        user: user?.id,
-        url_name,
-        loading,
-      });
       fetchPortfolio();
     }, 100);
 
