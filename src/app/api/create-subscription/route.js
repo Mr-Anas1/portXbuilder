@@ -1,94 +1,78 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
-import razorpay from "@/lib/razorpay";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
 
 export async function POST(request) {
   try {
-    // Add debugging logs
-    console.log("API called from:", request.headers.get("user-agent"));
-    console.log("Request origin:", request.headers.get("origin"));
-    console.log("All headers:", Object.fromEntries(request.headers.entries()));
-
-    // TEMPORARILY DISABLED AUTH FOR TESTING
-    // TODO: Re-enable authentication once Clerk is properly configured
-    /*
-    // Check authentication
-    let userId, user;
-    try {
-      const authResult = await auth();
-      userId = authResult.userId;
-      user = authResult.user;
-      console.log("Auth result:", { userId, hasUser: !!user });
-    } catch (authError) {
-      console.error("Auth error:", authError);
-      return NextResponse.json(
-        { error: "Authentication failed: " + authError.message },
-        { status: 401 }
-      );
-    }
-    
-    if (!userId || !user) {
-      console.error("Authentication failed - no user or userId");
-      return NextResponse.json(
-        { error: "Unauthorized - Authentication required" },
-        { status: 401 }
-      );
-    }
-    
-    console.log("User authenticated:", userId);
-    console.log("User email:", user.emailAddresses?.[0]?.emailAddress);
-    */
-
-    // Check environment variables first
-    console.log("Environment check:");
-    console.log("RAZORPAY_KEY_ID exists:", !!process.env.RAZORPAY_KEY_ID);
-    console.log(
-      "RAZORPAY_KEY_SECRET exists:",
-      !!process.env.RAZORPAY_KEY_SECRET
-    );
-    console.log(
-      "RAZORPAY_MONTHLY_PLAN_ID exists:",
-      !!process.env.RAZORPAY_MONTHLY_PLAN_ID
-    );
-    console.log(
-      "RAZORPAY_YEARLY_PLAN_ID exists:",
-      !!process.env.RAZORPAY_YEARLY_PLAN_ID
-    );
+    // Dynamically import Razorpay to ensure it's only loaded server-side
+    const Razorpay = (await import("razorpay")).default;
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      console.error("Missing Razorpay credentials");
-      return NextResponse.json(
-        {
-          error:
-            "Payment service configuration error - Missing Razorpay credentials",
-        },
-        { status: 500 }
-      );
+      throw new Error("Missing Razorpay credentials");
     }
 
-    const body = await request.json();
-    console.log("Request body:", body);
-
-    // TEMPORARILY DISABLED EMAIL VERIFICATION
-    /*
-    // Verify the email matches the authenticated user
-    const userEmail = user.emailAddresses?.[0]?.emailAddress;
-    if (body.email !== userEmail) {
-      console.error("Email mismatch:", body.email, "vs", userEmail);
-      return NextResponse.json(
-        { error: "Unauthorized - You can only create subscriptions for your own email" },
-        { status: 403 }
-      );
-    }
-    */
-
-    const customer = await razorpay.customers.create({
-      name: body.name,
-      email: body.email,
-      contact: body.contact, // optional
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
 
-    console.log("Customer created:", customer.id);
+    const body = await request.json();
+
+    if (!body.name || !body.email) {
+      return NextResponse.json(
+        { error: "Name and email are required" },
+        { status: 400 }
+      );
+    }
+
+    // Get user from Supabase
+    const { data: user, error: userError } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("email", body.email)
+      .single();
+
+    if (userError) {
+      console.error("Error finding user:", userError);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Create or get Razorpay customer
+    let customer;
+    if (user.razorpay_customer_id) {
+      customer = await razorpay.customers.fetch(user.razorpay_customer_id);
+    } else {
+      customer = await razorpay.customers.create({
+        name: body.name,
+        email: body.email,
+        contact: body.contact,
+      });
+
+      // Store Razorpay customer ID in user's record
+      const { error: updateError } = await supabaseAdmin
+        .from("users")
+        .update({ razorpay_customer_id: customer.id })
+        .eq("id", user.id);
+
+      if (updateError) {
+        console.error("Error updating user with customer ID:", updateError);
+      }
+    }
+
+    // Debug logs for environment variables and plan selection
+    console.log("Monthly Plan ID:", process.env.RAZORPAY_MONTHLY_PLAN_ID);
+    console.log("Yearly Plan ID:", process.env.RAZORPAY_YEARLY_PLAN_ID);
+    console.log("Billing period from request:", body.billingPeriod);
 
     const planId =
       body.billingPeriod === "yearly"
@@ -98,11 +82,7 @@ export async function POST(request) {
     console.log("Selected Plan ID:", planId);
 
     if (!planId) {
-      console.error("Missing Razorpay plan ID");
-      return NextResponse.json(
-        { error: "Missing Razorpay plan ID" },
-        { status: 500 }
-      );
+      throw new Error("Missing Razorpay plan ID");
     }
 
     const subscription = await razorpay.subscriptions.create({
@@ -112,14 +92,12 @@ export async function POST(request) {
       customer_id: customer.id,
     });
 
-    console.log("Subscription created:", subscription.id);
     return NextResponse.json({ subscriptionId: subscription.id });
   } catch (error) {
-    console.error("Subscription error details:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    });
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Subscription error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to create subscription" },
+      { status: 500 }
+    );
   }
 }
