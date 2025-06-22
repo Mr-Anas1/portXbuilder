@@ -21,26 +21,16 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
     try {
       setLoading(true);
 
-      // Find user in Supabase
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("id, razorpay_customer_id")
-        .eq("clerk_id", user.id)
-        .single();
-
-      if (userError) {
-        toast.error("Error finding user");
-        return;
-      }
-
-      // Create subscription
+      // Create subscription with the correct data format
       const response = await fetch("/api/create-subscription", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: userData.id,
+          name: user.fullName || user.firstName + " " + user.lastName || "User",
+          email: user.primaryEmailAddress?.emailAddress || "",
+          contact: user.phoneNumbers?.[0]?.phoneNumber || "",
           billingPeriod: billingPeriod,
         }),
       });
@@ -51,18 +41,16 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
         return;
       }
 
-      const { subscriptionId, orderId } = await response.json();
+      const { subscriptionId } = await response.json();
 
       // Initialize Razorpay
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: billingPeriod === "monthly" ? 199 : 1499, // Amount in paise
-        currency: "INR",
+        subscription_id: subscriptionId,
         name: "PortXBuilder",
         description: `Pro Plan - ${
           billingPeriod === "monthly" ? "Monthly" : "Yearly"
         }`,
-        order_id: orderId,
         handler: async function (response) {
           try {
             // Verify payment
@@ -72,9 +60,9 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                paymentId: response.razorpay_payment_id,
-                orderId: response.razorpay_order_id,
-                signature: response.razorpay_signature,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature: response.razorpay_signature,
               }),
             });
 
@@ -103,6 +91,7 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
+      console.error("Subscription error:", error);
       toast.error("Subscription error");
     } finally {
       setLoading(false);

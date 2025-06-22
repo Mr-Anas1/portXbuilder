@@ -717,7 +717,7 @@ export default function Dashboard() {
       )}
 
       {showUrlModal && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999]">
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-[99999] px-2">
           <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
             <button
               onClick={() => setShowUrlModal(false)}
