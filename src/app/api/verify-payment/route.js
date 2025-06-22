@@ -69,110 +69,92 @@ const paymentSchema = {
 
 export async function POST(request) {
   try {
-    // Get request body
     const body = await request.json();
-    if (!body) {
-      return NextResponse.json(
-        { error: "No payment data provided" },
-        { status: 400 }
-      );
-    }
+    console.log("Verifying payment - Request body:", body);
 
-    // Input validation
-    let validatedData;
-    try {
-      validatedData = validateInput(body, paymentSchema);
-    } catch (validationError) {
-      return NextResponse.json(
-        { error: validationError.message },
-        { status: 400 }
-      );
-    }
+    const {
+      razorpay_payment_id,
+      razorpay_subscription_id,
+      razorpay_signature,
+    } = body;
 
     // Verify the payment signature
     const secret = process.env.RAZORPAY_KEY_SECRET;
-    if (!secret) {
-      console.error("Missing Razorpay secret key");
-      return NextResponse.json(
-        { error: "Payment service configuration error" },
-        { status: 500 }
-      );
-    }
-
     const generated_signature = crypto
       .createHmac("sha256", secret)
-      .update(
-        validatedData.razorpay_payment_id +
-          "|" +
-          validatedData.razorpay_subscription_id
-      )
+      .update(razorpay_payment_id + "|" + razorpay_subscription_id)
       .digest("hex");
 
-    if (generated_signature !== validatedData.razorpay_signature) {
-      console.error("Invalid payment signature");
-      return NextResponse.json(
-        { error: "Invalid payment signature" },
-        { status: 400 }
-      );
+    console.log("Generated signature:", generated_signature);
+    console.log("Received signature:", razorpay_signature);
+
+    if (generated_signature !== razorpay_signature) {
+      console.error("Invalid signature");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    // Get subscription details from Razorpay to find the customer email
-    const Razorpay = (await import("razorpay")).default;
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
-
-    let customerEmail;
-    try {
-      const subscription = await razorpay.subscriptions.fetch(
-        validatedData.razorpay_subscription_id
-      );
-      const customer = await razorpay.customers.fetch(subscription.customer_id);
-      customerEmail = customer.email;
-      console.log("Found customer email:", customerEmail);
-    } catch (error) {
-      console.error("Error fetching subscription/customer:", error);
-      return NextResponse.json(
-        { error: "Invalid subscription" },
-        { status: 400 }
-      );
-    }
-
-    // Find user by email
-    const { data: user, error: userError } = await supabaseAdmin
+    // First try to find user by subscription ID
+    console.log(
+      "Looking for user with subscription ID:",
+      razorpay_subscription_id
+    );
+    const { data: userBySub, error: userBySubError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("email", customerEmail)
+      .eq("subscription_id", razorpay_subscription_id)
       .single();
 
-    if (userError || !user) {
-      console.error("Error finding user by email:", userError);
+    if (userBySubError) {
+      console.log(
+        "User not found by subscription ID, trying to find by payment ID"
+      );
+
+      // If not found by subscription ID, try to find by payment ID
+      const { data: userByPayment, error: userByPaymentError } =
+        await supabaseAdmin
+          .from("users")
+          .select("*")
+          .eq("subscription_id", razorpay_subscription_id)
+          .single();
+
+      if (userByPaymentError) {
+        console.error("Error finding user by payment ID:", userByPaymentError);
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      console.log("Found user by payment ID:", userByPayment);
+      var user = userByPayment;
+    } else {
+      console.log("Found user by subscription ID:", userBySub);
+      var user = userBySub;
+    }
+
+    if (!user) {
+      console.error("No user found");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log("Found user:", user.email);
-
     // Update user's plan to pro
+    console.log("Updating user plan for user:", user.clerk_id);
     const { data: updatedUser, error: updateError } = await supabaseAdmin
       .from("users")
       .update({
         plan: "pro",
         subscription_status: "active",
-        subscription_id: validatedData.razorpay_subscription_id,
+        subscription_id: razorpay_subscription_id,
         subscription_start_date: new Date().toISOString(),
         subscription_end_date: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
         ).toISOString(), // 30 days from now
       })
-      .eq("id", user.id)
+      .eq("clerk_id", user.clerk_id)
       .select()
       .single();
 
     if (updateError) {
       console.error("Error updating user plan:", updateError);
       return NextResponse.json(
-        { error: "Failed to update user plan" },
+        { error: "Failed to update user plan: " + updateError.message },
         { status: 500 }
       );
     }
@@ -180,11 +162,12 @@ export async function POST(request) {
     if (!updatedUser) {
       console.error("No user was updated");
       return NextResponse.json(
-        { error: "Failed to update user plan" },
+        { error: "Failed to update user plan: No user was updated" },
         { status: 500 }
       );
     }
 
+    console.log("Successfully updated user:", updatedUser);
     return NextResponse.json({ success: true, user: updatedUser });
   } catch (error) {
     console.error("Payment verification error:", error);
