@@ -20,28 +20,61 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
 
     try {
       setLoading(true);
+      console.log("Starting subscription process...");
 
       // Create subscription with the correct data format
+      const requestBody = {
+        name: user.fullName || user.firstName + " " + user.lastName || "User",
+        email: user.primaryEmailAddress?.emailAddress || "",
+        contact: user.phoneNumbers?.[0]?.phoneNumber || "",
+        billingPeriod: billingPeriod,
+      };
+
+      console.log("Sending request with body:", requestBody);
+
       const response = await fetch("/api/create-subscription", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: user.fullName || user.firstName + " " + user.lastName || "User",
-          email: user.primaryEmailAddress?.emailAddress || "",
-          contact: user.phoneNumbers?.[0]?.phoneNumber || "",
-          billingPeriod: billingPeriod,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log("Response status:", response.status);
+      console.log(
+        "Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
       if (!response.ok) {
-        const error = await response.json();
-        toast.error(error.error || "Failed to create subscription");
+        const errorText = await response.text();
+        console.error("Error response text:", errorText);
+
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { error: errorText || "Unknown error" };
+        }
+
+        toast.error(errorData.error || "Failed to create subscription");
         return;
       }
 
-      const { subscriptionId } = await response.json();
+      const responseText = await response.text();
+      console.log("Success response text:", responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Failed to parse response JSON:", e);
+        toast.error("Invalid response from server");
+        return;
+      }
+
+      const { subscriptionId } = responseData;
+      console.log("Subscription ID received:", subscriptionId);
 
       // Initialize Razorpay
       const options = {
@@ -92,7 +125,7 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       rzp.open();
     } catch (error) {
       console.error("Subscription error:", error);
-      toast.error("Subscription error");
+      toast.error("Subscription error: " + error.message);
     } finally {
       setLoading(false);
     }
