@@ -18,7 +18,7 @@ function customMiddleware(request) {
     return NextResponse.next();
   }
 
-  return clerkMiddleware(request); // ✅ Correct usage
+  return clerkMiddleware()(request); // ✅ Correct usage
 }
 
 export default customMiddleware;
