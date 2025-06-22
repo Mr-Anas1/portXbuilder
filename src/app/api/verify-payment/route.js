@@ -13,60 +13,6 @@ const supabaseAdmin = createClient(
   }
 );
 
-// Input validation function
-function validateInput(data, schema) {
-  const errors = [];
-  const sanitized = {};
-
-  for (const [field, rules] of Object.entries(schema)) {
-    const value = data[field];
-
-    // Required field check
-    if (rules.required) {
-      if (value === undefined || value === null || value === "") {
-        errors.push(`${field} is required`);
-        continue;
-      }
-      // For strings, also check if they're empty after trimming
-      if (typeof value === "string" && value.trim() === "") {
-        errors.push(`${field} is required`);
-        continue;
-      }
-    }
-
-    // Length check (only for strings)
-    if (
-      value &&
-      typeof value === "string" &&
-      rules.maxLength &&
-      value.length > rules.maxLength
-    ) {
-      errors.push(`${field} must be less than ${rules.maxLength} characters`);
-      continue;
-    }
-
-    // Sanitize string inputs
-    if (value && typeof value === "string") {
-      sanitized[field] = value.trim().replace(/[<>]/g, "");
-    } else {
-      sanitized[field] = value;
-    }
-  }
-
-  if (errors.length > 0) {
-    throw new Error(`Validation failed: ${errors.join(", ")}`);
-  }
-
-  return sanitized;
-}
-
-// Input validation schema
-const paymentSchema = {
-  razorpay_payment_id: { required: true, maxLength: 100 },
-  razorpay_subscription_id: { required: true, maxLength: 100 },
-  razorpay_signature: { required: true, maxLength: 200 },
-};
-
 export async function POST(request) {
   try {
     const body = await request.json();
