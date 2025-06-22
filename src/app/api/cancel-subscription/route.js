@@ -1,53 +1,21 @@
 import { NextResponse } from "next/server";
 import razorpay from "@/lib/razorpay";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import {
-  authenticateRequest,
-  validateInput,
-  checkRateLimit,
-  createErrorResponse,
-  createSuccessResponse,
-} from "@/lib/auth-middleware";
-
-// Input validation schema
-const cancelSubscriptionSchema = {
-  userId: { required: true, maxLength: 100 },
-};
 
 export async function POST(request) {
   try {
-    // Rate limiting
-    const clientIP = request.headers.get("x-forwarded-for") || "unknown";
-    if (!checkRateLimit(clientIP)) {
-      return createErrorResponse("Rate limit exceeded", 429);
-    }
-
-    // Authentication
-    const authResult = await authenticateRequest(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-    const { user, userId } = authResult;
-
     // Get request body
     const body = await request.json();
     if (!body) {
-      return createErrorResponse("No data provided");
+      return NextResponse.json({ error: "No data provided" }, { status: 400 });
     }
 
-    // Input validation
-    let validatedData;
-    try {
-      validatedData = validateInput(body, cancelSubscriptionSchema);
-    } catch (validationError) {
-      return createErrorResponse(validationError.message);
-    }
+    const { userId } = body;
 
-    // Authorization: Ensure user can only cancel their own subscription
-    if (validatedData.userId !== userId) {
-      return createErrorResponse(
-        "Unauthorized - You can only cancel your own subscription",
-        403
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
       );
     }
 
@@ -55,15 +23,18 @@ export async function POST(request) {
     const { data: userData, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("clerk_id", validatedData.userId)
+      .eq("clerk_id", userId)
       .single();
 
     if (userError || !userData) {
-      return createErrorResponse("User not found", 404);
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     if (!userData.subscription_id) {
-      return createErrorResponse("No active subscription found", 400);
+      return NextResponse.json(
+        { error: "No active subscription found" },
+        { status: 400 }
+      );
     }
 
     // Cancel the subscription in Razorpay
@@ -90,23 +61,26 @@ export async function POST(request) {
         subscription_cancelled_at: new Date().toISOString(),
         // Don't change the plan to free yet - it will be changed when the subscription actually ends
       })
-      .eq("clerk_id", validatedData.userId);
+      .eq("clerk_id", userId);
 
     if (updateError) {
       console.error("Error updating user subscription status:", updateError);
-      return createErrorResponse("Failed to update subscription status", 500);
+      return NextResponse.json(
+        { error: "Failed to update subscription status" },
+        { status: 500 }
+      );
     }
 
-    return createSuccessResponse({
+    return NextResponse.json({
       success: true,
       message:
         "Subscription will be cancelled at the end of the current billing period. You'll continue to have access to Pro features until then.",
     });
   } catch (error) {
     console.error("Error cancelling subscription:", error);
-    return createErrorResponse(
-      error.message || "Failed to cancel subscription",
-      500
+    return NextResponse.json(
+      { error: error.message || "Failed to cancel subscription" },
+      { status: 500 }
     );
   }
 }
