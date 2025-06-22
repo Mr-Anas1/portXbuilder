@@ -1,24 +1,28 @@
+import { NextResponse } from "next/server";
 import razorpay from "@/lib/razorpay";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end();
-
+export async function POST(request) {
   try {
+    const body = await request.json();
+
     const customer = await razorpay.customers.create({
-      name: req.body.name,
-      email: req.body.email,
-      contact: req.body.contact, // optional
+      name: body.name,
+      email: body.email,
+      contact: body.contact, // optional
     });
 
     const planId =
-      req.body.billingPeriod === "yearly"
+      body.billingPeriod === "yearly"
         ? process.env.RAZORPAY_YEARLY_PLAN_ID
         : process.env.RAZORPAY_MONTHLY_PLAN_ID;
 
     console.log("Selected Plan ID:", planId);
 
     if (!planId) {
-      throw new Error("Missing Razorpay plan ID");
+      return NextResponse.json(
+        { error: "Missing Razorpay plan ID" },
+        { status: 500 }
+      );
     }
 
     const subscription = await razorpay.subscriptions.create({
@@ -28,9 +32,9 @@ export default async function handler(req, res) {
       customer_id: customer.id,
     });
 
-    res.status(200).json({ subscriptionId: subscription.id });
+    return NextResponse.json({ subscriptionId: subscription.id });
   } catch (error) {
     console.error("Subscription error:", error);
-    res.status(500).json({ error: error.message });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
