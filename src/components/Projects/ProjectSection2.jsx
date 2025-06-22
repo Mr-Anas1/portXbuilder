@@ -92,7 +92,9 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
                   />
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <h4 className={`text-xl font-bold mb-2 ${theme.subtext}`}>
+                    {project.project_title}
+                  </h4>
                   <p className={`text-sm ${theme.text} mt-2`}>
                     {project.project_description}
                   </p>
@@ -115,7 +117,9 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
                   />
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <h3 className={`text-xl font-semibold ${theme.subtext}`}>
+                    {project.project_title}
+                  </h3>
                   <p className={`text-sm ${theme.text} mt-2`}>
                     {project.project_description}
                   </p>

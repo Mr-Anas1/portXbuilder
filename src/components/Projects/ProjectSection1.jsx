@@ -83,7 +83,7 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
               </div>
 
               <div className="p-5 text-left">
-                <h4 className="text-xl font-bold mb-2">
+                <h4 className={`text-xl font-bold mb-2 ${theme.subtext}`}>
                   {project.project_title}
                 </h4>
                 <p className={`text-sm ${theme.subtext} mb-4`}>

@@ -289,26 +289,45 @@ export default function Dashboard() {
 
   // For randomly change component
 
-  const getRandomComponent = (components) => {
-    const randomIndex = Math.floor(Math.random() * components.length);
-    return components[randomIndex];
+  const getRandomComponent = (components, currentComponent = null) => {
+    // If there's only one component, return it
+    if (components.length === 1) {
+      return components[0];
+    }
+
+    // Filter out the current component if provided
+    const availableComponents = currentComponent
+      ? components.filter((comp) => comp.name !== currentComponent.name)
+      : components;
+
+    // If no components available after filtering, return the original current component
+    if (availableComponents.length === 0) {
+      return currentComponent;
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableComponents.length);
+    return availableComponents[randomIndex];
   };
 
   const handleComponentChange = () => {
     const newComponents = {
-      navbar: getRandomComponent(navbarComponents),
-      home: getRandomComponent(heroComponents),
-      about: getRandomComponent(aboutComponents),
-      projects: getRandomComponent(projectsComponents),
-      contact: getRandomComponent(contactComponents),
-      footer: getRandomComponent(footerComponents),
+      navbar: getRandomComponent(navbarComponents, selectedComponent.navbar),
+      home: getRandomComponent(heroComponents, selectedComponent.home),
+      about: getRandomComponent(aboutComponents, selectedComponent.about),
+      projects: getRandomComponent(
+        projectsComponents,
+        selectedComponent.projects
+      ),
+      contact: getRandomComponent(contactComponents, selectedComponent.contact),
+      footer: getRandomComponent(footerComponents, selectedComponent.footer),
     };
 
     setSelectedComponent(newComponents);
   };
 
   const changeSingleComponent = (key, componentsArray) => {
-    const newComponent = getRandomComponent(componentsArray);
+    const currentComponent = selectedComponent[key];
+    const newComponent = getRandomComponent(componentsArray, currentComponent);
 
     setSelectedComponent((prev) => ({
       ...prev,
