@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import razorpay from "@/lib/razorpay";
 
 export async function POST(request) {
@@ -7,15 +8,58 @@ export async function POST(request) {
     console.log("API called from:", request.headers.get("user-agent"));
     console.log("Request origin:", request.headers.get("origin"));
 
-    const body = await request.json();
-    console.log("Request body:", body);
+    // Check authentication
+    const { userId, user } = await auth();
+    if (!userId || !user) {
+      console.error("Authentication failed");
+      return NextResponse.json(
+        { error: "Unauthorized - Authentication required" },
+        { status: 401 }
+      );
+    }
 
-    // Check environment variables
+    console.log("User authenticated:", userId);
+
+    // Check environment variables first
+    console.log("Environment check:");
+    console.log("RAZORPAY_KEY_ID exists:", !!process.env.RAZORPAY_KEY_ID);
+    console.log(
+      "RAZORPAY_KEY_SECRET exists:",
+      !!process.env.RAZORPAY_KEY_SECRET
+    );
+    console.log(
+      "RAZORPAY_MONTHLY_PLAN_ID exists:",
+      !!process.env.RAZORPAY_MONTHLY_PLAN_ID
+    );
+    console.log(
+      "RAZORPAY_YEARLY_PLAN_ID exists:",
+      !!process.env.RAZORPAY_YEARLY_PLAN_ID
+    );
+
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
       console.error("Missing Razorpay credentials");
       return NextResponse.json(
-        { error: "Payment service configuration error" },
+        {
+          error:
+            "Payment service configuration error - Missing Razorpay credentials",
+        },
         { status: 500 }
+      );
+    }
+
+    const body = await request.json();
+    console.log("Request body:", body);
+
+    // Verify the email matches the authenticated user
+    const userEmail = user.emailAddresses?.[0]?.emailAddress;
+    if (body.email !== userEmail) {
+      console.error("Email mismatch:", body.email, "vs", userEmail);
+      return NextResponse.json(
+        {
+          error:
+            "Unauthorized - You can only create subscriptions for your own email",
+        },
+        { status: 403 }
       );
     }
 
