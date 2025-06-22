@@ -6,6 +6,7 @@ export const config = {
   matcher: [
     "/((?!.*\\..*|_next).*)", // Don't run middleware on static files
     "/", // Run middleware on index page
-    "/(api|trpc)(.*)", // Run middleware on API routes
+    "/(api|trpc)(?!.*verify-payment)(?!.*webhooks)(.*)", // Run middleware on API routes except verify-payment and webhooks
+    "/(dashboard|create|pricing|sign-in|sign-up)(.*)", // Run middleware on protected pages
   ],
 };

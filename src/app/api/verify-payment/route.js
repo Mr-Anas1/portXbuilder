@@ -116,37 +116,42 @@ export async function POST(request) {
       );
     }
 
-    // First try to find user by subscription ID
-    const { data: userBySub, error: userBySubError } = await supabaseAdmin
+    // Get subscription details from Razorpay to find the customer email
+    const Razorpay = (await import("razorpay")).default;
+    const razorpay = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
+    });
+
+    let customerEmail;
+    try {
+      const subscription = await razorpay.subscriptions.fetch(
+        validatedData.razorpay_subscription_id
+      );
+      const customer = await razorpay.customers.fetch(subscription.customer_id);
+      customerEmail = customer.email;
+      console.log("Found customer email:", customerEmail);
+    } catch (error) {
+      console.error("Error fetching subscription/customer:", error);
+      return NextResponse.json(
+        { error: "Invalid subscription" },
+        { status: 400 }
+      );
+    }
+
+    // Find user by email
+    const { data: user, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("subscription_id", validatedData.razorpay_subscription_id)
+      .eq("email", customerEmail)
       .single();
 
-    let user;
-    if (userBySubError) {
-      // If not found by subscription ID, try to find by payment ID
-      const { data: userByPayment, error: userByPaymentError } =
-        await supabaseAdmin
-          .from("users")
-          .select("*")
-          .eq("subscription_id", validatedData.razorpay_subscription_id)
-          .single();
-
-      if (userByPaymentError) {
-        console.error("Error finding user by payment ID:", userByPaymentError);
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-
-      user = userByPayment;
-    } else {
-      user = userBySub;
-    }
-
-    if (!user) {
-      console.error("No user found");
+    if (userError || !user) {
+      console.error("Error finding user by email:", userError);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+
+    console.log("Found user:", user.email);
 
     // Update user's plan to pro
     const { data: updatedUser, error: updateError } = await supabaseAdmin
@@ -160,7 +165,7 @@ export async function POST(request) {
           Date.now() + 30 * 24 * 60 * 60 * 1000
         ).toISOString(), // 30 days from now
       })
-      .eq("clerk_id", user.clerk_id)
+      .eq("id", user.id)
       .select()
       .single();
 
