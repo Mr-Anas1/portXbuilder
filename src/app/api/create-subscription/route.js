@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { withAuth } from "@clerk/nextjs/api";
 import { createClient } from "@supabase/supabase-js";
 import {
-  authenticateRequest,
   validateInput,
   checkRateLimit,
   createErrorResponse,
@@ -27,20 +27,22 @@ const subscriptionSchema = {
   billingPeriod: { required: true, pattern: /^(monthly|yearly)$/ },
 };
 
-export async function POST(request) {
+export const POST = withAuth(async (request) => {
   try {
+    // Debug log for Clerk auth
+    console.log("Clerk Auth:", request.auth);
+
     // Rate limiting
     const clientIP = request.headers.get("x-forwarded-for") || "unknown";
     if (!checkRateLimit(clientIP)) {
       return createErrorResponse("Rate limit exceeded", 429);
     }
 
-    // Authentication
-    const authResult = await authenticateRequest(request);
-    if (authResult instanceof NextResponse) {
-      return authResult;
+    // Clerk authentication
+    const { userId } = request.auth;
+    if (!userId) {
+      return createErrorResponse("Unauthorized - Authentication required", 401);
     }
-    const { user, userId } = authResult;
 
     // Get request body
     const body = await request.json();
@@ -56,8 +58,20 @@ export async function POST(request) {
       return createErrorResponse(validationError.message);
     }
 
+    // Fetch user info from Clerk (for email check)
+    const clerkRes = await fetch(`https://api.clerk.dev/v1/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!clerkRes.ok) {
+      return createErrorResponse("Failed to fetch user from Clerk", 401);
+    }
+    const clerkUser = await clerkRes.json();
+    const userEmail = clerkUser.email_addresses?.[0]?.email_address;
+
     // Authorization: Ensure user can only create subscription for their own email
-    const userEmail = user.emailAddresses?.[0]?.emailAddress;
     if (validatedData.email !== userEmail) {
       return createErrorResponse(
         "Unauthorized - You can only create subscriptions for your own email",
@@ -152,7 +166,7 @@ export async function POST(request) {
       500
     );
   }
-}
+});
 
 // Handle OPTIONS requests for CORS
 export async function OPTIONS(request) {
