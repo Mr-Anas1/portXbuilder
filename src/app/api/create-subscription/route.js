@@ -92,6 +92,22 @@ export async function POST(request) {
       customer_id: customer.id,
     });
 
+    // Store subscription ID in user's record
+    const { error: subscriptionUpdateError } = await supabaseAdmin
+      .from("users")
+      .update({
+        subscription_id: subscription.id,
+        subscription_status: "pending",
+      })
+      .eq("id", user.id);
+
+    if (subscriptionUpdateError) {
+      console.error(
+        "Error updating user with subscription ID:",
+        subscriptionUpdateError
+      );
+    }
+
     return NextResponse.json({ subscriptionId: subscription.id });
   } catch (error) {
     console.error("Subscription error:", error);

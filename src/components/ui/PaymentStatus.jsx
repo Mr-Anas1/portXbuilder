@@ -24,6 +24,7 @@ const PaymentStatus = ({ subscriptionInfo }) => {
           name: user.fullName || user.username,
           email: user.emailAddresses[0].emailAddress,
           contact: user.phoneNumbers[0]?.phoneNumber || "",
+          billingPeriod: "monthly", // Default to monthly for retry payments
         }),
       });
 
@@ -31,21 +32,6 @@ const PaymentStatus = ({ subscriptionInfo }) => {
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to create subscription");
-      }
-
-      // Store subscription info in Supabase
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({
-          subscription_id: data.subscriptionId,
-          subscription_status: "pending",
-          payment_failure_count: 0,
-          grace_period_end: null,
-        })
-        .eq("clerk_id", user.id);
-
-      if (updateError) {
-        throw new Error("Error updating subscription information");
       }
 
       // Open Razorpay checkout
