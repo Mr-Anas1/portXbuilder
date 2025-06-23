@@ -2,7 +2,7 @@
 
 "use client";
 
-import { Inter } from "next/font/google";
+import { Inter, Montserrat, Lato } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
@@ -15,6 +15,18 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["400", "700"],
+});
+
+const lato = Lato({
+  subsets: ["latin"],
+  variable: "--font-lato",
+  weight: ["400", "700"],
+});
+
 // export const metadata = {
 //   title: "Your App",
 //   description: "Awesome stuff",
@@ -22,7 +34,9 @@ const inter = Inter({
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body
+        className={`${lato.variable} ${montserrat.variable} font-sans antialiased`}
+      >
         <ClerkProvider>
           <AuthProvider>
             <PortfolioProvider>

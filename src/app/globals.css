@@ -30,3 +30,16 @@ html {
 .cl-pricingTableCardFooterButton {
     @apply py-3
 }
+
+body {
+    font-family: var(--font-lato), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-montserrat), sans-serif;
+}

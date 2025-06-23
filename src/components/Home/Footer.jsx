@@ -27,10 +27,10 @@ const Footer = () => {
             Pricing
           </Link>
           <Link
-            href={"#template"}
+            href={"/contact-support"}
             className="cursor-pointer  hover:text-secondary-500 transition-colors"
           >
-            Templates
+            Contact
           </Link>
           <Link
             href={"/privacy-policy"}
