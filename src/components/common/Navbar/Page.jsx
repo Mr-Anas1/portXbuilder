@@ -76,10 +76,10 @@ const Navbar = ({ isDashboard }) => {
                 Pricing
               </Link>
               <Link
-                href={"/#template"}
+                href={"/#demo"}
                 className="cursor-pointer hover:text-secondary-500 transition-colors"
               >
-                Templates
+                Demo
               </Link>
             </div>
           </SignedOut>
@@ -202,11 +202,11 @@ const Navbar = ({ isDashboard }) => {
                 Pricing
               </Link>
               <Link
-                href="#templates"
+                href="#demo"
                 onClick={() => setIsOpen(false)}
                 className="cursor-pointer"
               >
-                Templates
+                Demo
               </Link>
             </div>
           </SignedOut>

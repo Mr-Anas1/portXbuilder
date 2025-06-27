@@ -2,7 +2,10 @@ import React from "react";
 
 const Preview = () => {
   return (
-    <section className="flex flex-col justify-center items-center px-4 sm:px-8 py-8 bg-background">
+    <section
+      className="flex flex-col justify-center items-center px-4 sm:px-8 py-8 bg-background"
+      id="demo"
+    >
       {/* Outer box with slight background contrast and responsive max width */}
       <div className="rounded-xl shadow-md p-4 md:p-6 w-full max-w-full lg:max-w-6xl bg-gradient-to-br from-primary-100 to-secondary-100">
         {/* Iframe wrapper with 16:9 aspect ratio */}
