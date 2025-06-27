@@ -10,19 +10,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { CheckIcon, MinusIcon, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import SubscribeButton from "../ui/SubscribeButton";
 
 const PRICING = {
   monthly: {
-    free: { price: 0, label: "/month" },
-    pro: { price: 1.99, label: "/month" },
+    free: { priceUSD: 0, priceINR: 0, labelUSD: "/month", labelINR: "/month" },
+    pro: {
+      priceUSD: 3.49,
+      priceINR: 299,
+      labelUSD: "/month",
+      labelINR: "/month",
+    },
   },
   yearly: {
-    free: { price: 0, label: "/year" },
-    pro: { price: 14.99, label: "/year" },
+    free: { priceUSD: 0, priceINR: 0, labelUSD: "/year", labelINR: "/year" },
+    pro: {
+      priceUSD: 34.99,
+      priceINR: 2880,
+      labelUSD: "/year",
+      labelINR: "/year",
+    },
   },
 };
 
@@ -31,6 +41,21 @@ export default function PricingSectionCards() {
   const router = useRouter();
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState("yearly");
+  const [currency, setCurrency] = useState("USD");
+
+  // Use IP geolocation to detect country
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.country_code === "IN") {
+          setCurrency("INR");
+        } else {
+          setCurrency("USD");
+        }
+      })
+      .catch(() => setCurrency("USD"));
+  }, []);
 
   const handleUpgrade = async (plan) => {
     if (!user) {
@@ -69,7 +94,7 @@ export default function PricingSectionCards() {
   return (
     <section id="pricing" className="relative">
       {/* Background effects */}
-      <div className="absolute inset-0  bg-background" />
+      <div className="absolute inset-0 bg-background" />
 
       {/* Pricing */}
       <div className="flex flex-col my-16 px-5 gap-10 lg:mx-20 relative">
@@ -85,12 +110,12 @@ export default function PricingSectionCards() {
 
         {/* Billing Toggle */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex rounded-full bg-gray-100 p-1">
+          <div className="inline-flex rounded-full gap-2 bg-gray-100 p-1 shadow-sm">
             <button
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
                 billingPeriod === "monthly"
-                  ? "bg-primary-500 text-white"
-                  : "text-gray-700"
+                  ? "bg-primary-500 text-white shadow"
+                  : "text-gray-700 border border-gray-300"
               }`}
               onClick={() => setBillingPeriod("monthly")}
               type="button"
@@ -100,8 +125,8 @@ export default function PricingSectionCards() {
             <button
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
                 billingPeriod === "yearly"
-                  ? "bg-primary-500 text-white"
-                  : "text-gray-700"
+                  ? "bg-primary-500 text-white shadow"
+                  : "text-gray-700 border border-gray-300"
               }`}
               onClick={() => setBillingPeriod("yearly")}
               type="button"
@@ -112,59 +137,73 @@ export default function PricingSectionCards() {
         </div>
 
         {/* Grid */}
-        <div className="flex flex-col w-full md:flex-row justify-center items-center gap-8 lg:items-stretch mb-16 max-w-5xl mx-auto">
+        <div className="flex flex-col w-full md:flex-row justify-center items-stretch gap-8 mb-16 max-w-5xl mx-auto">
           {/* Free Card */}
-          <Card className="flex flex-col w-full max-w-md transition duration-300 hover:scale-105 hover:shadow-lg bg-white/80 backdrop-blur-sm">
+          <Card className="flex flex-col w-full max-w-md bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-gray-200 transition duration-300 hover:scale-[1.03] hover:shadow-2xl">
             <CardHeader className="text-center pb-2">
+              {/* Invisible placeholder for alignment with Pro card's Most Popular tag */}
+              <div
+                className="inline-block px-4 py-1 rounded-full mb-2"
+                style={{ visibility: "hidden" }}
+              >
+                Most Popular
+              </div>
               <span className="font-bold text-2xl text-neutral-800 lg:text-3xl">
                 Free
               </span>
             </CardHeader>
-            <CardDescription className="text-center font-bold text-4xl text-neutral-800">
-              ${PRICING[billingPeriod].free.price}
-              <span className="text-base font-normal text-gray-500">
-                {PRICING[billingPeriod].free.label}
-              </span>
+            <CardDescription className="text-center font-extrabold text-4xl text-primary-600 mb-2">
+              {currency === "INR" ? (
+                <>
+                  ₹{PRICING[billingPeriod].free.priceINR}
+                  <span className="text-base font-normal text-gray-500">
+                    {PRICING[billingPeriod].free.labelINR}
+                  </span>
+                </>
+              ) : (
+                <>
+                  ${PRICING[billingPeriod].free.priceUSD}
+                  <span className="text-base font-normal text-gray-500">
+                    {PRICING[billingPeriod].free.labelUSD}
+                  </span>
+                </>
+              )}
             </CardDescription>
+            <div className="w-2/3 mx-auto border-b border-gray-200 my-4" />
             <CardContent className="flex-1">
-              <ul className="mt-7 space-y-3 text-sm">
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Basic Templates
-                  </span>
+              <ul className="mt-4 space-y-4 text-base">
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-500" />
+                  <span>Basic Templates</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Ads + Watermark
-                  </span>
+                <li className="flex items-center gap-3">
+                  <X className="h-5 w-5 text-gray-300" />
+                  <span className="text-gray-500">Premium Templates</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    15 Credits
-                  </span>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-500" />
+                  <span>Watermark on Portfolio</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Specific Subdomain
-                  </span>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-500" />
+                  <span>Ads</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Download Source Code
-                  </span>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-500" />
+                  <span>Portfolio URL</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <X className="h-5 w-5 text-gray-300" />
+                  <span className="text-gray-500">Priority Support</span>
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="mt-4">
               <Button
-                className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md"
+                className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
                 size="lg"
                 variant={"outline"}
+                onClick={() => (window.location.href = "/sign-up")}
               >
                 Stay Free
               </Button>
@@ -172,57 +211,77 @@ export default function PricingSectionCards() {
           </Card>
 
           {/* Pro Card */}
-          <Card className="border-primary-500 border-2 flex flex-col w-full max-w-md transition duration-300 hover:scale-105 hover:shadow-lg bg-white/80 backdrop-blur-sm">
+          <Card className="border-2 border-primary-500 flex flex-col w-full max-w-md bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl transition duration-300 hover:scale-[1.04] hover:shadow-3xl relative">
             <CardHeader className="text-center pb-2">
-              <div className="inline-block px-4 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium mb-2">
-                Most Popular
+              <div className="flex flex-col items-center justify-center gap-2 mb-3">
+                <div className="min-w-[110px] px-4 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium text-center">
+                  Most Popular
+                </div>
               </div>
-              <span className="font-bold text-2xl text-neutral-800 lg:text-3xl">
+              <span className="font-bold text-2xl text-primary-700 lg:text-3xl mt-2 block">
                 Pro
               </span>
             </CardHeader>
-            <CardDescription className="text-center font-bold text-4xl text-neutral-800">
-              ${PRICING[billingPeriod].pro.price}
-              <span className="text-base font-normal text-gray-500">
-                {PRICING[billingPeriod].pro.label}
-              </span>
+            <CardDescription className="text-center font-extrabold text-4xl text-primary-700 mb-2">
+              {currency === "INR" ? (
+                <>
+                  ₹{PRICING[billingPeriod].pro.priceINR}
+                  <span className="text-base font-normal text-gray-500">
+                    {PRICING[billingPeriod].pro.labelINR}
+                  </span>
+                </>
+              ) : (
+                <>
+                  ${PRICING[billingPeriod].pro.priceUSD}
+                  <span className="text-base font-normal text-gray-500">
+                    {PRICING[billingPeriod].pro.labelUSD}
+                  </span>
+                </>
+              )}
+              {billingPeriod === "yearly" && (
+                <div className="text-green-600 text-sm font-medium mt-1">
+                  Save 20% with yearly billing
+                </div>
+              )}
             </CardDescription>
+            <div className="w-2/3 mx-auto border-b border-primary-200 my-4" />
             <CardContent className="flex-1">
-              <ul className="mt-7 space-y-3 text-sm">
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Premium Templates
-                  </span>
+              <ul className="mt-4 space-y-4 text-base">
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-600" />
+                  <span>Basic Templates</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    No Ads + Watermark
-                  </span>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-600" />
+                  <span>Premium Templates</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Specific Subdomain
-                  </span>
+                <li className="flex items-center gap-3">
+                  <X className="h-5 w-5 text-gray-300" />
+                  <span className="text-gray-500">Watermark on Portfolio</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <CheckIcon className="flex-shrink-0 h-5 w-5 text-green-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Unlimited Credits
-                  </span>
+                <li className="flex items-center gap-3">
+                  <X className="h-5 w-5 text-gray-300" />
+                  <span className="text-gray-500">Ads</span>
                 </li>
-                <li className="flex items-center space-x-3">
-                  <X className="flex-shrink-0 h-5 w-5 text-red-500" />
-                  <span className="text-muted-foreground text-lg">
-                    Download Source Code
-                  </span>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-600" />
+                  <span>Portfolio URL</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <CheckIcon className="h-5 w-5 text-green-600" />
+                  <span>Priority Support</span>
                 </li>
               </ul>
             </CardContent>
-            <CardFooter>
-              <SubscribeButton billingPeriod={billingPeriod} />
+            <CardFooter className="mt-4">
+              <Button
+                className="w-full bg-primary-500 text-white hover:bg-primary-600 transition duration-300 text-md font-semibold rounded-xl py-3 shadow-md"
+                size="lg"
+                variant={"outline"}
+                onClick={() => (window.location.href = "/sign-up")}
+              >
+                Go Pro
+              </Button>
             </CardFooter>
           </Card>
         </div>

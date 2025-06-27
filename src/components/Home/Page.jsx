@@ -15,16 +15,34 @@ function Page({ hasProPlan }) {
   const router = useRouter();
 
   useEffect(() => {
-    const checkUserSession = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        router.replace("/dashboard"); // Redirect to dashboard if the user is logged in
-      } else {
-        setLoading(false); // Set loading to false after the check
+    let isMounted = true;
+
+    const checkSessionAndRedirect = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/dashboard");
+      } else if (isMounted) {
+        setLoading(false);
       }
     };
 
-    checkUserSession();
+    checkSessionAndRedirect();
+
+    // Listen for auth state changes (e.g., if user logs in while on this page)
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (session) {
+          router.push("/dashboard");
+        }
+      }
+    );
+
+    return () => {
+      isMounted = false;
+      authListener?.subscription?.unsubscribe();
+    };
   }, [router]);
 
   // Show loading spinner until the session check is complete
