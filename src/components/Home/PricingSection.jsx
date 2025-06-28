@@ -28,8 +28,8 @@ const PRICING = {
   yearly: {
     free: { priceUSD: 0, priceINR: 0, labelUSD: "/year", labelINR: "/year" },
     pro: {
-      priceUSD: 34.99,
-      priceINR: 2880,
+      priceUSD: 33.49,
+      priceINR: 2870,
       labelUSD: "/year",
       labelINR: "/year",
     },
