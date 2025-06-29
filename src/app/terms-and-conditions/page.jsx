@@ -28,11 +28,12 @@ const TermsAndConditions = () => {
                   1. Acceptance of Terms
                 </h2>
                 <p className="text-gray-600 mb-4">
-                  By accessing and using PortXBuilder ("the Service"), you agree
-                  to be bound by these Terms and Conditions. If you do not agree
-                  to these terms, please do not use our service. These terms
-                  apply to all users of the Service, including those who access
-                  the Service without creating an account.
+                  By accessing and using PortXBuilder (&ldquo;the
+                  Service&rdquo;), you agree to be bound by these Terms and
+                  Conditions. If you do not agree to these terms, please do not
+                  use our service. These terms apply to all users of the
+                  Service, including those who access the Service without
+                  creating an account.
                 </p>
               </section>
 
@@ -252,7 +253,7 @@ const TermsAndConditions = () => {
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
                   <li>Posting updated terms on this page</li>
                   <li>Sending email notifications to active users</li>
-                  <li>Updating the "Last updated" date</li>
+                  <li>Updating the &quot;Last updated&quot; date</li>
                 </ul>
                 <p className="text-gray-600 mb-4">
                   Continued use of the Service after changes constitutes

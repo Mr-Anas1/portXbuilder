@@ -1,16 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import { NextResponse } from "next/server";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
 
 export async function POST(request) {
   try {
@@ -46,11 +35,31 @@ export async function POST(request) {
       skills,
     } = body;
 
-    if (!user_id || !name || !profession || !experience) {
+    if (!user_id) {
       return NextResponse.json(
-        { error: "user_id, name, profession, and experience are required" },
+        { error: "user_id is required" },
         { status: 400 }
       );
+    }
+
+    // Check if portfolio exists for this user
+    const { data: existingPortfolio, error: checkError } = await supabaseAdmin
+      .from("portfolios")
+      .select("id")
+      .eq("user_id", user_id)
+      .single();
+
+    // For new portfolios, require name, profession, and experience
+    if (!existingPortfolio) {
+      if (!name || !profession || !experience) {
+        return NextResponse.json(
+          {
+            error:
+              "name, profession, and experience are required for new portfolios",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Convert age to number for database compatibility
@@ -97,11 +106,54 @@ export async function POST(request) {
     });
 
     // Use upsert with the validated user_id
-    const { data, error } = await supabaseAdmin
-      .from("portfolios")
-      .upsert(filteredData, {
-        onConflict: "user_id",
-      });
+    let result;
+    if (existingPortfolio) {
+      // Update existing portfolio - fetch current data first
+      // Get current portfolio data to merge with updates
+      const { data: currentData, error: fetchError } = await supabaseAdmin
+        .from("portfolios")
+        .select("*")
+        .eq("user_id", user_id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching current portfolio:", fetchError);
+        return NextResponse.json(
+          { error: "Error fetching current portfolio" },
+          { status: 500 }
+        );
+      }
+
+      // Merge current data with new data
+      const mergedData = {
+        ...currentData,
+        ...filteredData,
+      };
+
+      // Try a simple update first
+      result = await supabaseAdmin
+        .from("portfolios")
+        .update(filteredData) // Just update with new data, don't merge
+        .eq("user_id", user_id)
+        .select();
+
+      if (result.error) {
+        // If simple update fails, try with merged data
+        result = await supabaseAdmin
+          .from("portfolios")
+          .update(mergedData)
+          .eq("user_id", user_id)
+          .select();
+      }
+    } else {
+      // Insert new portfolio
+      result = await supabaseAdmin
+        .from("portfolios")
+        .insert(filteredData)
+        .select();
+    }
+
+    const { data, error } = result;
 
     if (error) {
       console.error("Error updating portfolio:", error);
@@ -110,6 +162,13 @@ export async function POST(request) {
         { status: 500 }
       );
     }
+
+    // Verify the data was actually saved by reading it back
+    const { data: verifyData, error: verifyError } = await supabaseAdmin
+      .from("portfolios")
+      .select("*")
+      .eq("user_id", user_id)
+      .single();
 
     return NextResponse.json({ success: true, data: filteredData });
   } catch (error) {

@@ -15,14 +15,14 @@ const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
     >
       {/* Left Section with Highlighted Intro */}
       <div
-        className={`w-full ${
+        className={`w-full  ${
           isMobileLayout ? "md:px-6" : "md:w-1/2"
-        } flex flex-col justify-center px-8 py-16 md:px-16 ${
+        } flex flex-1 flex-col justify-center px-8 py-16 md:px-16 ${
           theme.buttonBg
         } text-white`}
       >
         <p className="text-sm uppercase font-medium mb-2">
-          Hello, I'm {portfolio?.name || ""}!
+          Hello, I&apos;m {portfolio?.name || ""}!
         </p>
         <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
           {portfolio?.bio || ""}
@@ -33,7 +33,7 @@ const AboutUsSection1 = ({ theme, isMobileLayout, sectionRef }) => {
       <div
         className={`w-full justify-center ${
           isMobileLayout ? "md:px-6" : "md:w-1/2"
-        } flex flex-col justify-center px-8 py-16 md:px-16`}
+        } flex flex-1 flex-col justify-center px-8  md:px-16`}
       >
         <h2 className={`text-2xl font-semibold mb-4 ${theme.accentText || ""}`}>
           What I Do

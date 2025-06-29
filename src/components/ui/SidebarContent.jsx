@@ -1,4 +1,5 @@
 import React from "react";
+import { MinusCircle } from "lucide-react";
 
 const SidebarContent = ({
   sections,

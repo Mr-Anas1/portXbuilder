@@ -1,6 +1,7 @@
 "use client";
 import { ProjectData } from "@/Helpers/ProjectData";
 import { usePortfolio } from "@/context/PortfolioContext";
+import Image from "next/image";
 
 export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
@@ -35,7 +36,7 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
           Projects
         </h2>
 
-        <p className="text-xl md:text-2xl text-gray-500 text-center max-w-xl">
+        <p className="text-xl px-4 md:text-2xl text-gray-500 text-center max-w-xl">
           Still working on my projects. Stay tuned for some awesome work!
         </p>
       </section>
@@ -85,10 +86,11 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
                 }`}
               >
                 <div className="relative overflow-hidden w-full h-[400px]">
-                  <img
+                  <Image
                     src={project.project_img?.data || "/default-project.png"}
                     alt={project.project_img?.name || "Project image"}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-5">
@@ -108,12 +110,13 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
                 } w-full ${isMobileLayout ? "max-w-[90%]" : "max-w-md"}`}
               >
                 <div className="relative overflow-hidden w-full h-[400px]">
-                  <img
+                  <Image
                     src={
                       project.project_img?.data || "/images/default-project.png"
                     }
                     alt={project.project_img?.name || "Project image"}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </div>
                 <div className="p-5">

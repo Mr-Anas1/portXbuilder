@@ -1,5 +1,6 @@
 "use client";
 import { usePortfolio } from "@/context/PortfolioContext";
+import Image from "next/image";
 import React from "react";
 
 export default function HomeSection5({
@@ -26,9 +27,11 @@ export default function HomeSection5({
         }`}
       >
         <div>
-          <img
+          <Image
             src={portfolio?.profileImage || "/default-avatar.png"}
             alt="Profile"
+            width={48}
+            height={48}
             className={`w-12 h-12 rounded-full object-cover ${
               isMobileLayout ? "mx-auto" : "mx-0"
             }`}
@@ -38,7 +41,7 @@ export default function HomeSection5({
               isMobileLayout ? "text-3xl" : "text-5xl"
             } font-semibold leading-snug mt-2`}
           >
-            Hello! I'm <br /> {portfolio?.name}
+            Hello! I&apos;m <br /> {portfolio?.name}
           </h1>
         </div>
       </div>

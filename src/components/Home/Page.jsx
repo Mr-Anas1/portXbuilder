@@ -6,47 +6,35 @@ import Features from "./Features";
 import PricingSectionCards from "./PricingSection";
 import CtaSection from "./CtaSection";
 import Footer from "./Footer";
-import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Preview from "./Preview";
+import { useAuthContext } from "@/context/AuthContext";
 
 function Page({ hasProPlan }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { user, loading: authLoading } = useAuthContext();
 
   useEffect(() => {
-    let isMounted = true;
+    // If auth is still loading, wait
+    if (authLoading) {
+      return;
+    }
 
-    const checkSessionAndRedirect = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (session) {
-        router.push("/dashboard");
-      } else if (isMounted) {
-        setLoading(false);
-      }
-    };
+    // If user is logged in, redirect to dashboard
+    if (user) {
+      router.push("/dashboard");
+      return;
+    }
 
-    checkSessionAndRedirect();
+    // If no user and auth is not loading, show the home page
+    if (!authLoading && !user) {
+      setLoading(false);
+    }
+  }, [user, authLoading, router]);
 
-    // Listen for auth state changes (e.g., if user logs in while on this page)
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session) {
-          router.push("/dashboard");
-        }
-      }
-    );
-
-    return () => {
-      isMounted = false;
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [router]);
-
-  // Show loading spinner until the session check is complete
-  if (loading) {
+  // Show loading spinner until the auth check is complete
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-background relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-16 w-64 h-64 bg-gradient-to-r from-primary-400/20 to-secondary-400/20 rounded-full blur-3xl" />
@@ -67,9 +55,7 @@ function Page({ hasProPlan }) {
 
       <Navbar hasProPlan={hasProPlan} />
       <Hero />
-
       <Preview />
-
       <Features />
       <PricingSectionCards />
       <CtaSection />

@@ -45,8 +45,11 @@ export default function RootLayout({ children }) {
             </PortfolioProvider>
           </AuthProvider>
         </ClerkProvider>
-        {/* PayPal Script */}
-        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        {/* Razorpay Script */}
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

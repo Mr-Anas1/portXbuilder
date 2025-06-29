@@ -28,7 +28,7 @@ export default function HeroSection4({
     }, 150);
 
     return () => clearInterval(typingInterval);
-  }, []);
+  }, [name]);
 
   return (
     <section
@@ -57,7 +57,7 @@ export default function HeroSection4({
                 : "text-4xl md:text-6xl leading-tight"
             } font-bold ${theme.text}`}
           >
-            Hi, I'm <br />
+            Hi, I&apos;m <br />
             <span className={`${theme.accentText} relative inline-block`}>
               {text}
               <span

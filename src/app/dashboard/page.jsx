@@ -78,10 +78,10 @@ export default function Dashboard() {
 
   // Add section to field mapping
   const sectionToField = {
-    navbar: "name",
+    navbar: ["name"],
     home: ["home_title", "home_subtitle", "profileImage"],
-    about: "about_me",
-    projects: "projects",
+    about: ["about_me"],
+    projects: ["projects"],
     contact: [
       "email",
       "phone",
@@ -91,7 +91,7 @@ export default function Dashboard() {
       "instagram",
       "facebook",
     ],
-    footer: "name",
+    footer: ["name"],
   };
 
   const [sections, setSections] = useState([
@@ -108,7 +108,8 @@ export default function Dashboard() {
     },
   ]);
 
-  const { portfolio, refetchPortfolio, portfolioLoading } = usePortfolio();
+  const { portfolio, refetchPortfolio, portfolioLoading, updatePortfolioData } =
+    usePortfolio();
 
   usePortfolioRedirect();
 
@@ -129,7 +130,7 @@ export default function Dashboard() {
       if (loading || !user) return;
 
       try {
-        // Get user's Supabase ID
+        // First get the user's Supabase ID
         const response = await fetch("/api/sync-user", {
           method: "POST",
           headers: {
@@ -139,14 +140,37 @@ export default function Dashboard() {
         });
 
         if (!response.ok) {
-          toast.error("Error syncing user data");
+          // Don't show error toast for first-time users who will be redirected
+          console.error("Error syncing user data");
           return;
         }
 
         const userData = await response.json();
 
         if (!userData) {
-          toast.error("No user data found");
+          // Don't show error toast for first-time users who will be redirected
+          console.error("No user data found");
+          return;
+        }
+
+        // Check if user has a portfolio before trying to load components
+        const { data: portfolioData, error: portfolioError } = await supabase
+          .from("portfolios")
+          .select("id")
+          .eq("user_id", userData.id)
+          .single();
+
+        // If no portfolio exists, don't try to load components
+        // The usePortfolioRedirect hook will handle the redirect
+        if (portfolioError && portfolioError.code === "PGRST116") {
+          // No portfolio found, user will be redirected to /create
+          setIsLoading(false);
+          return;
+        }
+
+        if (portfolioError) {
+          console.error("Error checking portfolio:", portfolioError);
+          setIsLoading(false);
           return;
         }
 
@@ -196,7 +220,8 @@ export default function Dashboard() {
         // Set loading to false once everything is loaded
         setIsLoading(false);
       } catch (error) {
-        toast.error("Error loading user components");
+        // Don't show error toast for first-time users who will be redirected
+        console.error("Error loading user components:", error);
         setIsLoading(false);
       }
     };
@@ -440,7 +465,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center p-4">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-4">You're Offline</h2>
+          <h2 className="text-2xl font-semibold mb-4">You&apos;re Offline</h2>
           <p className="text-gray-600 mb-6">
             Please check your internet connection and try again.
           </p>
@@ -493,22 +518,43 @@ export default function Dashboard() {
   const theme = previewThemes[themeKey] || previewThemes.default;
 
   // Add loading state for portfolio data
-  if (portfolioLoading || !portfolio) {
+  if (portfolioLoading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">
-            {portfolioLoading
-              ? "Loading your portfolio..."
-              : "Setting up your portfolio..."}
-          </p>
+          <p className="text-gray-600 mb-4">Loading your portfolio...</p>
+          <button
+            onClick={() => refetchPortfolio()}
+            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors text-sm"
+          >
+            Refresh Portfolio
+          </button>
         </div>
       </div>
     );
   }
 
-  const saveSection = async (section) => {
+  // If portfolio is not available and we're not loading, there might be an issue
+  // Let the usePortfolioRedirect hook handle the redirect if needed
+  if (!portfolio) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 mb-4">Setting up your portfolio...</p>
+          <button
+            onClick={() => refetchPortfolio()}
+            className="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition-colors text-sm"
+          >
+            Refresh Portfolio
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const saveSection = async (section, data) => {
     if (!user) {
       toast.error("No user or user ID available");
       return;
@@ -553,15 +599,15 @@ export default function Dashboard() {
         return;
       }
 
-      // Prepare portfolio data with all fields for the section
+      // Prepare portfolio data with all fields for this section
       const portfolioData = {
         user_id: userData.id,
       };
 
       // Add all fields for this section to the portfolio data
       fieldNames.forEach((fieldName) => {
-        if (formData[fieldName] !== undefined) {
-          portfolioData[fieldName] = formData[fieldName];
+        if (data[fieldName] !== undefined) {
+          portfolioData[fieldName] = data[fieldName];
         }
       });
 
@@ -576,6 +622,7 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("API Error:", errorData);
         toast.error(errorData.error || "Failed to update portfolio");
         throw new Error(errorData.error || "Failed to update portfolio");
       }
@@ -587,6 +634,12 @@ export default function Dashboard() {
         ...prev,
         ...portfolioData,
       }));
+
+      // Update portfolio context to reflect changes immediately
+      updatePortfolioData(portfolioData);
+
+      // Close the edit box
+      setEditingSection(null);
 
       toast.success("Section saved successfully!");
     } catch (error) {

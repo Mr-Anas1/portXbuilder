@@ -13,6 +13,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { generateFields } from "@/lib/generateFields";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
+import { usePortfolio } from "@/context/PortfolioContext";
 import { useEffect } from "react";
 import { removeBackground } from "@imgly/background-removal";
 import { toast } from "react-hot-toast";
@@ -28,6 +29,7 @@ const generateSecureId = () => {
 
 function CreatePortfolio() {
   const { user, loading } = useAuthContext();
+  const { refetchPortfolio } = usePortfolio();
   const router = useRouter();
   const [page, setPage] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -125,7 +127,7 @@ function CreatePortfolio() {
     };
 
     checkPortfolio();
-  }, [user, loading, supabase]);
+  }, [user, loading]);
 
   const FormTitles = [
     "Welcome",
@@ -357,21 +359,77 @@ function CreatePortfolio() {
       // Wait for a moment to ensure data is synced
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Force a refetch of the portfolio data
-      const syncResponse = await fetch("/api/portfolio", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Verify that the portfolio was created successfully
+      let portfolioVerified = false;
+      let retryCount = 0;
+      const maxRetries = 5;
 
-      if (!syncResponse.ok) {
-        // Silent fail for sync
+      while (!portfolioVerified && retryCount < maxRetries) {
+        try {
+          // Get user's Supabase ID
+          const userResponse = await fetch("/api/sync-user", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+          });
+
+          if (!userResponse.ok) {
+            throw new Error("Failed to sync user");
+          }
+
+          const userData = await userResponse.json();
+
+          // Check if portfolio exists
+          const { data: portfolioCheck, error: portfolioCheckError } =
+            await supabase
+              .from("portfolios")
+              .select("id")
+              .eq("user_id", userData.id)
+              .single();
+
+          if (portfolioCheckError) {
+            if (portfolioCheckError.code === "PGRST116") {
+              // Portfolio not found, retry after delay
+              retryCount++;
+              setCreationProgress(
+                `Verifying portfolio creation... (attempt ${retryCount}/${maxRetries})`
+              );
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              continue;
+            } else {
+              throw new Error("Error checking portfolio");
+            }
+          }
+
+          // Portfolio found, verification successful
+          portfolioVerified = true;
+          setCreationProgress("Portfolio verified successfully!");
+        } catch (error) {
+          retryCount++;
+          if (retryCount >= maxRetries) {
+            throw new Error("Failed to verify portfolio creation");
+          }
+          setCreationProgress(
+            `Verifying portfolio creation... (attempt ${retryCount}/${maxRetries})`
+          );
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+      }
+
+      if (!portfolioVerified) {
+        throw new Error(
+          "Portfolio verification failed after multiple attempts"
+        );
       }
 
       setCreationProgress(
         "Portfolio created successfully! Redirecting to your dashboard..."
       );
+
+      // Add a small delay before redirect to ensure everything is ready
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Navigate to dashboard
       router.push("/dashboard");
@@ -433,9 +491,9 @@ function CreatePortfolio() {
               {currentStep !== 4 && currentStep > 0 && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-4">
                   <p className="text-sm text-gray-700">
-                    <strong>What's happening:</strong> We're setting up your
-                    professional portfolio with all your details, projects, and
-                    customizations.
+                    <strong>What&apos;s happening:</strong> We&apos;re setting
+                    up your professional portfolio with all your details,
+                    projects, and customizations.
                   </p>
                 </div>
               )}

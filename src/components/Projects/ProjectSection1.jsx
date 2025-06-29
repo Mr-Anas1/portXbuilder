@@ -1,6 +1,7 @@
 "use client";
 import { usePortfolio } from "@/context/PortfolioContext";
 import { ProjectData } from "../../Helpers/ProjectData";
+import Image from "next/image";
 
 export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
   const { portfolio, loading } = usePortfolio();
@@ -36,7 +37,7 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
           Recent projects
         </h2>
 
-        <p className="text-xl md:text-2xl text-gray-500 text-center max-w-xl">
+        <p className="text-xl px-4 md:text-2xl text-gray-500 text-center max-w-xl">
           Still working on my projects. Stay tuned for some awesome work!
         </p>
       </section>
@@ -73,12 +74,13 @@ export default function ProjectSection1({ theme, isMobileLayout, sectionRef }) {
               }`}
             >
               <div className="relative overflow-hidden w-full h-[300px]">
-                <img
+                <Image
                   src={
                     project.project_img?.data || "/images/default-project.png"
                   }
                   alt={project.project_img?.name || "Project image"}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
 
