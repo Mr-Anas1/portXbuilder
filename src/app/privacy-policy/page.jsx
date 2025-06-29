@@ -211,7 +211,7 @@ const PrivacyPolicy = () => {
 
               <section className="mb-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                  9. Children's Privacy
+                  9. Children&apos;s Privacy
                 </h2>
                 <p className="text-gray-600 mb-4">
                   PortXBuilder is not intended for children under 13. We do not
@@ -232,7 +232,7 @@ const PrivacyPolicy = () => {
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
                   <li>Posting the new policy on this page</li>
                   <li>Sending email notifications for significant changes</li>
-                  <li>Updating the "Last updated" date</li>
+                  <li>Updating the &quot;Last updated&quot; date</li>
                 </ul>
               </section>
 

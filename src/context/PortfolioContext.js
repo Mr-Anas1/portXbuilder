@@ -18,7 +18,7 @@ export const PortfolioProvider = ({ children }) => {
   const [isPro, setIsPro] = useState(false);
   const supabase = createClientComponentClient();
 
-  const fetchPortfolio = async () => {
+  const fetchPortfolio = async (retryCount = 0) => {
     try {
       setLoading(true);
       setError(null);
@@ -103,6 +103,20 @@ export const PortfolioProvider = ({ children }) => {
         .single();
 
       if (portfolioError) {
+        // If portfolio not found and we haven't retried too many times, retry with exponential backoff
+        if (portfolioError.code === "PGRST116" && retryCount < 8) {
+          const delay = Math.min(1000 * Math.pow(2, retryCount), 8000); // Exponential backoff, max 8 seconds
+          console.log(
+            `Portfolio not found, retrying in ${delay}ms... (attempt ${
+              retryCount + 1
+            }/8)`
+          );
+          setTimeout(() => {
+            fetchPortfolio(retryCount + 1);
+          }, delay);
+          return;
+        }
+
         setPortfolio(null);
         setLoading(false);
         return;
@@ -122,13 +136,20 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Add a small delay to ensure Supabase is initialized
+    // Only fetch if we have a user (for dashboard) or url_name (for public portfolio)
+    if (!user && !url_name) {
+      setLoading(false);
+      return;
+    }
+
+    // Add a longer delay to ensure Supabase is initialized and user data is available
+    // Also give more time for any recent database transactions to be committed
     const timeout = setTimeout(() => {
       fetchPortfolio();
-    }, 100);
+    }, 500);
 
     return () => clearTimeout(timeout);
-  }, [user, url_name]);
+  }, [user?.id, url_name]); // Use user.id instead of user object to prevent unnecessary re-renders
 
   // Add a function to update portfolio data without refetching
   const updatePortfolioData = (newData) => {

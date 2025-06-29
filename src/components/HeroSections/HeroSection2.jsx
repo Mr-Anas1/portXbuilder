@@ -45,7 +45,7 @@ export default function HeroSection2({
               : "text-4xl md:text-6xl lg:text-8xl text-center md:text-left"
           } font-bold leading-tight ${theme.text}`}
         >
-          Hi, I'm{" "}
+          Hi, I&apos;m{" "}
           <span
             className={`border-r-2 animate-pulse ${theme.accentText} border-current`}
           >
@@ -76,7 +76,7 @@ export default function HeroSection2({
               handleScrollToSection("contact");
             }}
           >
-            Let's Collaborate
+            Let&apos;s Collaborate
             <span className="ml-2 transform group-hover:translate-x-1 transition-transform">
               →
             </span>

@@ -35,7 +35,7 @@ export default function ProjectSection2({ theme, isMobileLayout, sectionRef }) {
           Projects
         </h2>
 
-        <p className="text-xl md:text-2xl text-gray-500 text-center max-w-xl">
+        <p className="text-xl px-4 md:text-2xl text-gray-500 text-center max-w-xl">
           Still working on my projects. Stay tuned for some awesome work!
         </p>
       </section>

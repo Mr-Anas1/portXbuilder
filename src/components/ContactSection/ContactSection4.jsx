@@ -19,7 +19,9 @@ const ContactSection4 = ({ theme, isMobileLayout, sectionRef }) => {
       <div
         className={`${theme.accentBg} flex-1 flex flex-col justify-center items-center text-white text-center px-4`}
       >
-        <p className="uppercase tracking-wide text-sm">Don't Be A Stranger</p>
+        <p className="uppercase tracking-wide text-sm">
+          Don&apos;t Be A Stranger
+        </p>
         <h2 className="text-4xl md:text-5xl font-extrabold mt-2">
           Contact Me.
         </h2>
