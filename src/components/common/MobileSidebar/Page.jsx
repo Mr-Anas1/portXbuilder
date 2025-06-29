@@ -52,7 +52,7 @@ const MobileSidebar = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [setMobileSidebarOpen]);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999]">
       <div className="w-[50%] bg-background h-full shadow-lg p-4 relative">

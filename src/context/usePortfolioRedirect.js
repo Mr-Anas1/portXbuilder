@@ -57,5 +57,5 @@ export const usePortfolioRedirect = () => {
     };
 
     checkPortfolio();
-  }, [user, loading]);
+  }, [user, loading, router]);
 };

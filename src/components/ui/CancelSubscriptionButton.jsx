@@ -46,8 +46,8 @@ export default function CancelSubscriptionButton() {
         <div className="flex flex-col gap-1">
           <p className="font-semibold">Subscription Cancelled</p>
           <p className="text-sm text-gray-600">
-            You'll continue to have access to Pro features until the end of your
-            billing period.
+            You&apos;ll continue to have access to Pro features until the end of
+            your billing period.
           </p>
         </div>,
         {
@@ -114,10 +114,10 @@ export default function CancelSubscriptionButton() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Subscription</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel your subscription? You'll continue
-              to have access to Pro features until the end of your current
-              billing period. After that, your account will be downgraded to the
-              Free plan.
+              Are you sure you want to cancel your subscription? You&apos;ll
+              continue to have access to Pro features until the end of your
+              current billing period. After that, your account will be
+              downgraded to the Free plan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

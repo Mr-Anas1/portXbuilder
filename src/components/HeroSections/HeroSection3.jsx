@@ -75,7 +75,7 @@ export default function HeroSection3({
                   : "text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
               }`}
             >
-              Hello, I'm{" "}
+              Hello, I&apos;m{" "}
               <span className={`font-bold ${theme.accentText}`}>
                 {portfolio?.name}
               </span>

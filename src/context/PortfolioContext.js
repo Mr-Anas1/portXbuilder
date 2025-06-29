@@ -149,7 +149,7 @@ export const PortfolioProvider = ({ children }) => {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [user?.id, url_name]); // Use user.id instead of user object to prevent unnecessary re-renders
+  }, [user?.id, url_name, fetchPortfolio]); // Use user.id instead of user object to prevent unnecessary re-renders
 
   // Add a function to update portfolio data without refetching
   const updatePortfolioData = (newData) => {

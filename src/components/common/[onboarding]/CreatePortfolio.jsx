@@ -127,7 +127,7 @@ function CreatePortfolio() {
     };
 
     checkPortfolio();
-  }, [user, loading, supabase]);
+  }, [user, loading]);
 
   const FormTitles = [
     "Welcome",
@@ -491,9 +491,9 @@ function CreatePortfolio() {
               {currentStep !== 4 && currentStep > 0 && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-4">
                   <p className="text-sm text-gray-700">
-                    <strong>What's happening:</strong> We're setting up your
-                    professional portfolio with all your details, projects, and
-                    customizations.
+                    <strong>What&apos;s happening:</strong> We&apos;re setting
+                    up your professional portfolio with all your details,
+                    projects, and customizations.
                   </p>
                 </div>
               )}

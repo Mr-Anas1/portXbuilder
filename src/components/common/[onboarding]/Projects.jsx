@@ -25,7 +25,7 @@ const Projects = ({ formData, setFormData }) => {
         ],
       });
     }
-  }, [formData]);
+  }, [formData, setFormData]);
 
   const addCard = () => {
     if (cards.length >= 3) return;
