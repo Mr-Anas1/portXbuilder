@@ -33,24 +33,24 @@ const lato = Lato({
 // };
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${lato.variable} ${montserrat.variable} font-sans antialiased`}
-      >
-        <ClerkProvider>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={`${lato.variable} ${montserrat.variable} font-sans antialiased`}
+        >
           <AuthProvider>
             <PortfolioProvider>
               <Toaster position="top-right" />
               {children}
             </PortfolioProvider>
           </AuthProvider>
-        </ClerkProvider>
-        {/* Razorpay Script */}
-        <Script
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          strategy="beforeInteractive"
-        />
-      </body>
-    </html>
+          {/* Razorpay Script */}
+          <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            strategy="beforeInteractive"
+          />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

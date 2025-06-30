@@ -280,7 +280,7 @@ const PricingPage = () => {
                 <div className="space-y-2">
                   <p className="text-gray-600 mb-2">
                     {isCancelled
-                      ? "Your subscription has been cancelled but you&apos;ll continue to have access to Pro features until the end of your billing period."
+                      ? "Your subscription has been cancelled but you'll continue to have access to Pro features until the end of your billing period."
                       : "You are currently on the Pro plan. You can cancel your subscription at any time."}
                   </p>
                   {!isCancelled && <CancelSubscriptionButton />}

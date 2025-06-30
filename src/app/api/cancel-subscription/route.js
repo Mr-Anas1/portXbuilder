@@ -1,25 +1,18 @@
 import { NextResponse } from "next/server";
 import razorpay from "@/lib/razorpay";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { requireAuth } from "@/lib/requireAuth";
 
 export async function POST(request) {
   try {
+    const userId = requireAuth(request);
     // Get request body
     const body = await request.json();
     if (!body) {
       return NextResponse.json({ error: "No data provided" }, { status: 400 });
     }
 
-    const { userId } = body;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      );
-    }
-
-    // Get user's subscription details from Supabase
+    // Get user's subscription details from Supabase using userId from Clerk
     const { data: userData, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
