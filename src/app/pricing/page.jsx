@@ -585,8 +585,8 @@ const PricingPage = () => {
               </summary>
               <p className="mt-2 text-gray-600">
                 The Free plan gives you access to basic templates, a hosted
-                portfolio with a watermark, and limited features. It's perfect
-                for getting started and exploring the platform.
+                portfolio with a watermark, and limited features. It&apos;s
+                perfect for getting started and exploring the platform.
               </p>
             </details>
             {/* FAQ Item 3 */}
