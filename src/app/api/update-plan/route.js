@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "@/lib/requireAuth";
 
 // Initialize Supabase client with service role key
 const supabase = createClient(
@@ -8,16 +9,17 @@ const supabase = createClient(
 
 export async function POST(req) {
   try {
-    const { userId, plan } = await req.json();
+    const userId = requireAuth(req);
+    const { plan } = await req.json();
 
-    if (!userId || !plan) {
+    if (!plan) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400 }
       );
     }
 
-    // Get user's Supabase ID
+    // Get user's Supabase ID using userId from Clerk
     const { data: userData, error: userError } = await supabase
       .from("users")
       .select("id")

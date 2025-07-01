@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "@/lib/requireAuth";
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -14,6 +15,7 @@ const supabaseAdmin = createClient(
 
 export async function POST(request) {
   try {
+    const userId = requireAuth(request);
     // Dynamically import Razorpay to ensure it's only loaded server-side
     const Razorpay = (await import("razorpay")).default;
 
@@ -35,11 +37,11 @@ export async function POST(request) {
       );
     }
 
-    // Get user from Supabase
+    // Get user from Supabase using userId from Clerk
     const { data: user, error: userError } = await supabaseAdmin
       .from("users")
       .select("*")
-      .eq("email", body.email)
+      .eq("clerk_id", userId)
       .single();
 
     if (userError) {
