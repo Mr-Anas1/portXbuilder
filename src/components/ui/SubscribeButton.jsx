@@ -20,7 +20,6 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
 
     try {
       setLoading(true);
-      console.log("Starting subscription process...");
 
       // Create subscription with the correct data format
       const requestBody = {
@@ -30,8 +29,6 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
         billingPeriod: billingPeriod,
       };
 
-      console.log("Sending request with body:", requestBody);
-
       const response = await fetch("/api/create-subscription", {
         method: "POST",
         headers: {
@@ -40,15 +37,8 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
         body: JSON.stringify(requestBody),
       });
 
-      console.log("Response status:", response.status);
-      console.log(
-        "Response headers:",
-        Object.fromEntries(response.headers.entries())
-      );
-
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Error response text:", errorText);
 
         let errorData;
         try {
@@ -62,19 +52,16 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       }
 
       const responseText = await response.text();
-      console.log("Success response text:", responseText);
 
       let responseData;
       try {
         responseData = JSON.parse(responseText);
       } catch (e) {
-        console.error("Failed to parse response JSON:", e);
         toast.error("Invalid response from server");
         return;
       }
 
       const { subscriptionId } = responseData;
-      console.log("Subscription ID received:", subscriptionId);
 
       // Initialize Razorpay
       const options = {
@@ -124,7 +111,6 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
-      console.error("Subscription error:", error);
       toast.error("Subscription error: " + error.message);
     } finally {
       setLoading(false);

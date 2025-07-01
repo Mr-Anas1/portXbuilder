@@ -34,7 +34,6 @@ export async function POST(req) {
       "svix-signature": svix_signature,
     });
   } catch (err) {
-    console.error("Error verifying webhook:", err);
     return new Response("Error occured", {
       status: 400,
     });
@@ -42,14 +41,12 @@ export async function POST(req) {
 
   // Handle the webhook
   const eventType = evt.type;
-  console.log("Webhook event type:", eventType);
 
   // Only handle user updates
   if (eventType === "user.updated") {
     // Get the full user data from Clerk
     const userId = evt.data.user?.id || evt.data.userId;
     if (!userId) {
-      console.error("No user ID found in webhook data");
       return new Response("No user ID found", { status: 400 });
     }
 
@@ -70,13 +67,9 @@ export async function POST(req) {
       );
 
       if (!response.ok) {
-        console.error("Error syncing user:", await response.text());
         return new Response("Error syncing user", { status: 500 });
       }
-
-      console.log("User synced successfully");
     } catch (error) {
-      console.error("Error calling sync-user:", error);
       return new Response("Error calling sync-user", { status: 500 });
     }
   }

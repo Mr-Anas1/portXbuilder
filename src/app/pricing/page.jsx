@@ -550,6 +550,103 @@ const PricingPage = () => {
             </Card>
           </div>
         </div>
+
+        {/* FAQ Section */}
+        <div className="max-w-2xl mx-auto mt-16 mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+            Frequently Asked Questions
+          </h2>
+          <div className="space-y-4">
+            {/* FAQ Item 1 */}
+            <details
+              className="group border border-gray-200 rounded-lg p-4 bg-white/80"
+              open
+            >
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                What is PortXBuilder?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                PortXBuilder is an easy-to-use platform for creating and
+                managing your professional portfolio website. No coding
+                required—just pick a template, add your content, and launch your
+                site in minutes.
+              </p>
+            </details>
+            {/* FAQ Item 2 */}
+            <details className="group border border-gray-200 rounded-lg p-4 bg-white/80">
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                What do I get with the Free plan?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                The Free plan gives you access to basic templates, a hosted
+                portfolio with a watermark, and limited features. It's perfect
+                for getting started and exploring the platform.
+              </p>
+            </details>
+            {/* FAQ Item 3 */}
+            <details className="group border border-gray-200 rounded-lg p-4 bg-white/80">
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                What are the benefits of the Pro plan?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                The Pro plan unlocks premium templates, removes watermarks and
+                ads priority support, and more advanced features to help you
+                stand out.
+              </p>
+            </details>
+            {/* FAQ Item 4 */}
+            <details className="group border border-gray-200 rounded-lg p-4 bg-white/80">
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                Can I cancel or change my subscription anytime?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Yes! You can upgrade, downgrade, or cancel your subscription at
+                any time from your dashboard. Your changes will take effect at
+                the end of your current billing period.
+              </p>
+            </details>
+            {/* FAQ Item 5 */}
+            <details className="group border border-gray-200 rounded-lg p-4 bg-white/80">
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                Is my data and portfolio secure?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Absolutely. We use industry-standard security practices to keep
+                your data and portfolio safe. You have full control over your
+                content and privacy settings.
+              </p>
+            </details>
+            {/* FAQ Item 6 */}
+            <details className="group border border-gray-200 rounded-lg p-4 bg-white/80">
+              <summary className="font-semibold text-lg text-gray-800 cursor-pointer flex items-center justify-between">
+                Do I need to know how to code?
+                <span className="ml-2 transition-transform group-open:rotate-180">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600">
+                Not at all! PortXBuilder is designed for everyone. You can build
+                and customize your portfolio with our intuitive editor—no coding
+                skills required.
+              </p>
+            </details>
+          </div>
+        </div>
       </>
     );
   };
