@@ -245,7 +245,7 @@ const PrivacyPolicy = () => {
                   practices:
                 </p>
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
-                  <li>Email: privacy@portxbuilder.com</li>
+                  <li>Email: support@portxbuilder.com</li>
                   <li>Support: support@portxbuilder.com</li>
                   <li>Response time: Within 48 hours</li>
                 </ul>

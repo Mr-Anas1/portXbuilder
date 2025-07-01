@@ -78,7 +78,7 @@ const PrivacyPolicy = () => {
               If you have any questions about this Privacy Policy, please
               contact us at:
             </p>
-            <p className="text-gray-600">support@example.com</p>
+            <p className="text-gray-600">support@portxbuilder.com</p>
           </section>
         </div>
       </div>

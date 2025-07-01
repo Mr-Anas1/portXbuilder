@@ -210,6 +210,15 @@ const Navbar = ({ isDashboard }) => {
                 Demo
               </Link>
             </div>
+
+            <Button variant="outline" asChild>
+              <Link
+                href="/sign-up"
+                className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white cursor-pointer text-md px-8 py-6 border-none rounded-xl hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
+              >
+                Get Started
+              </Link>
+            </Button>
           </SignedOut>
           <SignedIn>
             <div className="flex flex-col gap-8 justify-center items-center">

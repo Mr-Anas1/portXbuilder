@@ -22,11 +22,11 @@ const ContactSection3 = ({ theme, isMobileLayout, sectionRef }) => {
 
       {/* Email Box */}
       <a
-        href="mailto:mohamed.anas.l7a@gmail.com"
+        href={portfolio?.email ? `mailto:${portfolio.email}` : undefined}
         className={`flex items-center justify-center border px-4 py-2 rounded-md shadow-sm hover:shadow-md transition text-sm sm:text-base ${theme.subtext}`}
       >
         <FaEnvelope className="mr-2" size={20} />
-        <span>{portfolio?.email || "email"}</span>
+        <span>{portfolio?.email}</span>
       </a>
 
       {/* Social Icons */}

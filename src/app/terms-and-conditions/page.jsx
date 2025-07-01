@@ -269,7 +269,7 @@ const TermsAndConditions = () => {
                   If you have questions about these Terms and Conditions:
                 </p>
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
-                  <li>Email: legal@portxbuilder.com</li>
+                  <li>Email: support@portxbuilder.com</li>
                   <li>Support: support@portxbuilder.com</li>
                   <li>Response time: Within 48 hours</li>
                 </ul>
