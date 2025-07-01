@@ -388,20 +388,24 @@ const PricingPage = () => {
                     <span>Basic Templates</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckIcon className="h-5 w-5 text-green-500" />
-                    <span>Ads + Watermark</span>
+                    <X className="h-5 w-5 text-gray-300" />
+                    <span className="text-gray-500">Premium Templates</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <CheckIcon className="h-5 w-5 text-green-500" />
-                    <span>15 Credits</span>
+                    <span>Watermark on Portfolio</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckIcon className="h-5 w-5 text-green-500" />
+                    <span>Ads</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckIcon className="h-5 w-5 text-green-500" />
+                    <span>Portfolio URL</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <X className="h-5 w-5 text-gray-300" />
-                    <span className="text-gray-500">Specific Subdomain</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <X className="h-5 w-5 text-gray-300" />
-                    <span className="text-gray-500">Download Source Code</span>
+                    <span className="text-gray-500">Priority Support</span>
                   </li>
                 </ul>
               </CardContent>
@@ -500,23 +504,29 @@ const PricingPage = () => {
                 <ul className="mt-4 space-y-4 text-base">
                   <li className="flex items-center gap-3">
                     <CheckIcon className="h-5 w-5 text-green-600" />
+                    <span>Basic Templates</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckIcon className="h-5 w-5 text-green-600" />
                     <span>Premium Templates</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <CheckIcon className="h-5 w-5 text-green-600" />
-                    <span>No Ads + Watermark</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckIcon className="h-5 w-5 text-green-600" />
-                    <span>Specific Subdomain</span>
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <CheckIcon className="h-5 w-5 text-green-600" />
-                    <span>Unlimited Credits</span>
+                    <X className="h-5 w-5 text-gray-300" />
+                    <span className="text-gray-500">
+                      Watermark on Portfolio
+                    </span>
                   </li>
                   <li className="flex items-center gap-3">
                     <X className="h-5 w-5 text-gray-300" />
-                    <span className="text-gray-500">Download Source Code</span>
+                    <span className="text-gray-500">Ads</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckIcon className="h-5 w-5 text-green-600" />
+                    <span>Portfolio URL</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <CheckIcon className="h-5 w-5 text-green-600" />
+                    <span>Priority Support</span>
                   </li>
                 </ul>
               </CardContent>
@@ -530,8 +540,8 @@ const PricingPage = () => {
                     {isCancelled
                       ? "Cancelled"
                       : isPaymentFailed
-                      ? "Payment Failed"
-                      : "Current Plan"}
+                        ? "Payment Failed"
+                        : "Current Plan"}
                   </Button>
                 ) : (
                   <SubscribeButton billingPeriod={billingPeriod} />
