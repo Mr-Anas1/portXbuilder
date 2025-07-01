@@ -149,7 +149,7 @@ export const PortfolioProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [user, url_name]);
+  }, [user, url_name, getCacheKey, supabase]);
 
   useEffect(() => {
     if (!user && !url_name) {
@@ -157,7 +157,7 @@ export const PortfolioProvider = ({ children }) => {
       return;
     }
     fetchPortfolio();
-  }, [user?.id, url_name, fetchPortfolio]);
+  }, [user, url_name, fetchPortfolio]);
 
   // Add a function to update portfolio data without refetching
   const updatePortfolioData = async (newData) => {

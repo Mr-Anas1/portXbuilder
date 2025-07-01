@@ -10,17 +10,10 @@ export default async function handler(req, res) {
       contact: req.body.contact, // optional
     });
 
-    // Debug logs for environment variables and plan selection
-    console.log("Monthly Plan ID:", process.env.RAZORPAY_MONTHLY_PLAN_ID);
-    console.log("Yearly Plan ID:", process.env.RAZORPAY_YEARLY_PLAN_ID);
-    console.log("Billing period from request:", req.body.billingPeriod);
-
     const planId =
       req.body.billingPeriod === "yearly"
         ? process.env.RAZORPAY_YEARLY_PLAN_ID
         : process.env.RAZORPAY_MONTHLY_PLAN_ID;
-
-    console.log("Selected Plan ID:", planId);
 
     if (!planId) {
       throw new Error("Missing Razorpay plan ID");
@@ -35,7 +28,6 @@ export default async function handler(req, res) {
 
     res.status(200).json({ subscriptionId: subscription.id });
   } catch (error) {
-    console.error("Subscription error:", error);
     res.status(500).json({ error: error.message });
   }
 }

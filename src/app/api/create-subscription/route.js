@@ -45,7 +45,6 @@ export async function POST(request) {
       .single();
 
     if (userError) {
-      console.error("Error finding user:", userError);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
@@ -67,7 +66,6 @@ export async function POST(request) {
         .eq("id", user.id);
 
       if (updateError) {
-        console.error("Error updating user with customer ID:", updateError);
       }
     }
 
@@ -104,15 +102,10 @@ export async function POST(request) {
       .eq("id", user.id);
 
     if (subscriptionUpdateError) {
-      console.error(
-        "Error updating user with subscription ID:",
-        subscriptionUpdateError
-      );
     }
 
     return NextResponse.json({ subscriptionId: subscription.id });
   } catch (error) {
-    console.error("Subscription error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to create subscription" },
       { status: 500 }

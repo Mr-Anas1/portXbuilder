@@ -141,7 +141,6 @@ export default function Dashboard() {
 
         if (!response.ok) {
           // Don't show error toast for first-time users who will be redirected
-          console.error("Error syncing user data");
           return;
         }
 
@@ -149,7 +148,6 @@ export default function Dashboard() {
 
         if (!userData) {
           // Don't show error toast for first-time users who will be redirected
-          console.error("No user data found");
           return;
         }
 
@@ -169,7 +167,6 @@ export default function Dashboard() {
         }
 
         if (portfolioError) {
-          console.error("Error checking portfolio:", portfolioError);
           setIsLoading(false);
           return;
         }
@@ -221,7 +218,6 @@ export default function Dashboard() {
         setIsLoading(false);
       } catch (error) {
         // Don't show error toast for first-time users who will be redirected
-        console.error("Error loading user components:", error);
         setIsLoading(false);
       }
     };
@@ -376,14 +372,12 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const error = await response.json();
-        console.error("Error syncing user:", error);
         return;
       }
 
       const userData = await response.json();
 
       if (!userData) {
-        console.error("No user data found");
         return;
       }
 
@@ -407,7 +401,6 @@ export default function Dashboard() {
         .eq("id", userData.id);
 
       if (error) {
-        console.error("Error updating components:", error);
         toast.error("Failed to save changes");
         return;
       }
@@ -420,7 +413,6 @@ export default function Dashboard() {
         .single();
 
       if (urlError) {
-        console.error("Error checking URL name:", urlError);
         return;
       }
 
@@ -435,7 +427,6 @@ export default function Dashboard() {
         setShowUrlModal(true);
       }
     } catch (error) {
-      console.error("Error in handleLaunchClick:", error);
       toast.error("Failed to save changes");
     } finally {
       setIsLaunching(false);
@@ -622,7 +613,6 @@ export default function Dashboard() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API Error:", errorData);
         toast.error(errorData.error || "Failed to update portfolio");
         throw new Error(errorData.error || "Failed to update portfolio");
       }
@@ -665,15 +655,12 @@ export default function Dashboard() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("Error syncing user:", error);
         return;
       }
 
       const userData = await response.json();
 
       if (!userData) {
-        console.error("No user data found");
         return;
       }
 
@@ -706,7 +693,6 @@ export default function Dashboard() {
         .select();
 
       if (error) {
-        console.error("Error updating user:", error);
         // Try to get the current user data to debug
         const { data: currentUser, error: fetchError } = await supabase
           .from("users")
@@ -758,7 +744,6 @@ export default function Dashboard() {
         .maybeSingle();
 
       if (error) {
-        console.error("Error checking URL name:", error);
         return;
       }
 

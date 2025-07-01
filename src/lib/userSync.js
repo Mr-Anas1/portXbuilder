@@ -5,8 +5,6 @@ export const syncUserData = async (clerkUser) => {
   }
 
   try {
-    console.log("Starting user sync for:", clerkUser.id);
-
     const response = await fetch("/api/sync-user", {
       method: "POST",
       headers: {

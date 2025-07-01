@@ -103,7 +103,11 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
               Project Image
             </label>
             <div className="flex items-center gap-2 w-full">
-              <Image className="text-gray-500 flex-shrink-0" size={20} />
+              <Image
+                className="text-gray-500 flex-shrink-0"
+                size={20}
+                aria-hidden="true"
+              />
               <input
                 id={`projectImage-${id}`}
                 name="project_img"
