@@ -53,7 +53,7 @@ export default function HeroSection1({
             } gap-4`}
           >
             <button
-              className={`px-6 py-3 rounded-full shadow-md transition ${theme.buttonBg} ${theme.buttonText} ${theme.buttonHover}`}
+              className={`px-6 py-3 text-center md:text-left rounded-full shadow-md transition ${theme.buttonBg} ${theme.buttonText} ${theme.buttonHover}`}
               onClick={(e) => {
                 e.preventDefault();
                 handleScrollToSection("contact");

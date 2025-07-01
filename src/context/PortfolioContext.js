@@ -14,6 +14,9 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const PortfolioContext = createContext();
 
+// In-memory cache for the current session
+let portfolioCache = null;
+
 export const PortfolioProvider = ({ children }) => {
   const { user } = useAuthContext();
   const params = useParams();
@@ -24,143 +27,159 @@ export const PortfolioProvider = ({ children }) => {
   const [isPro, setIsPro] = useState(false);
   const supabase = createClientComponentClient();
 
-  const fetchPortfolio = useCallback(
-    async (retryCount = 0) => {
-      try {
-        setLoading(true);
-        setError(null);
+  // Helper to get cache key
+  const getCacheKey = () => {
+    if (url_name) return `portfolio_cache_url_${url_name}`;
+    if (user?.id) return `portfolio_cache_user_${user.id}`;
+    return null;
+  };
 
-        // If we have a url_name, we're viewing a public portfolio
-        if (url_name) {
-          // Get user data by url_name
-          const { data: userData, error: userError } = await supabase
-            .from("users")
-            .select("id, components, theme, plan")
-            .eq("url_name", url_name)
-            .single();
+  const fetchPortfolio = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const cacheKey = getCacheKey();
 
-          if (userError) {
-            console.error("Error fetching user by url_name:", userError);
-            setPortfolio(null);
-            setLoading(false);
-            return;
-          }
+      // Check in-memory cache first
+      if (portfolioCache && cacheKey && portfolioCache.key === cacheKey) {
+        setPortfolio(portfolioCache.data);
+        setIsPro(portfolioCache.data?.plan === "pro");
+        setLoading(false);
+        return;
+      }
 
-          if (!userData) {
-            setPortfolio(null);
-            setLoading(false);
-            return;
-          }
-
-          // Get portfolio data
-          const { data: portfolioData, error: portfolioError } = await supabase
-            .from("portfolios")
-            .select("*")
-            .eq("user_id", userData.id)
-            .single();
-
-          if (portfolioError) {
-            setPortfolio(null);
-            setLoading(false);
-            return;
-          }
-
-          // Set pro status
-          setIsPro(userData?.plan === "pro");
-
-          // Merge portfolio data with user data
-          setPortfolio({
-            ...portfolioData,
-            components: userData?.components || {},
-            theme: userData?.theme || "default",
-          });
+      // Check localStorage cache
+      if (cacheKey) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setPortfolio(parsed);
+          setIsPro(parsed?.plan === "pro");
+          // Also update in-memory cache
+          portfolioCache = { key: cacheKey, data: parsed };
           setLoading(false);
           return;
         }
+      }
 
-        // If we're in the dashboard (no url_name), we need authentication
-        if (!user) {
-          setPortfolio(null);
-          setIsPro(false);
-          setLoading(false);
-          return;
-        }
-
-        // Get user data from Supabase
+      // If we have a url_name, we're viewing a public portfolio
+      if (url_name) {
         const { data: userData, error: userError } = await supabase
           .from("users")
-          .select("*")
-          .eq("clerk_id", user.id)
+          .select("id, components, theme, plan")
+          .eq("url_name", url_name)
           .single();
 
-        if (userError) {
-          setError("Failed to fetch user data");
+        if (userError || !userData) {
+          setPortfolio(null);
           setLoading(false);
           return;
         }
 
-        // Set pro status
-        setIsPro(userData?.plan === "pro");
-
-        // Get portfolio data
         const { data: portfolioData, error: portfolioError } = await supabase
           .from("portfolios")
           .select("*")
           .eq("user_id", userData.id)
           .single();
 
-        if (portfolioError) {
-          // If portfolio not found and we haven't retried too many times, retry with exponential backoff
-          if (portfolioError.code === "PGRST116" && retryCount < 8) {
-            const delay = Math.min(1000 * Math.pow(2, retryCount), 8000); // Exponential backoff, max 8 seconds
-            console.log(
-              `Portfolio not found, retrying in ${delay}ms... (attempt ${
-                retryCount + 1
-              }/8)`
-            );
-            setTimeout(() => {
-              fetchPortfolio(retryCount + 1);
-            }, delay);
-            return;
-          }
-
+        if (portfolioError || !portfolioData) {
           setPortfolio(null);
           setLoading(false);
           return;
         }
 
-        // Merge portfolio data with user data
-        setPortfolio({
+        setIsPro(userData?.plan === "pro");
+        const merged = {
           ...portfolioData,
           components: userData?.components || {},
           theme: userData?.theme || "default",
-        });
-      } catch (error) {
-        setError("Failed to fetch portfolio");
-      } finally {
+          plan: userData?.plan || "free",
+        };
+        setPortfolio(merged);
+        // Update caches
+        if (cacheKey) {
+          localStorage.setItem(cacheKey, JSON.stringify(merged));
+          portfolioCache = { key: cacheKey, data: merged };
+        }
         setLoading(false);
+        return;
       }
-    },
-    [user, url_name]
-  );
+
+      // If we're in the dashboard (no url_name), we need authentication
+      if (!user) {
+        setPortfolio(null);
+        setIsPro(false);
+        setLoading(false);
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("clerk_id", user.id)
+        .single();
+
+      if (userError || !userData) {
+        setError("Failed to fetch user data");
+        setLoading(false);
+        return;
+      }
+
+      setIsPro(userData?.plan === "pro");
+      const { data: portfolioData, error: portfolioError } = await supabase
+        .from("portfolios")
+        .select("*")
+        .eq("user_id", userData.id)
+        .single();
+
+      if (portfolioError || !portfolioData) {
+        setPortfolio(null);
+        setLoading(false);
+        return;
+      }
+
+      const merged = {
+        ...portfolioData,
+        components: userData?.components || {},
+        theme: userData?.theme || "default",
+        plan: userData?.plan || "free",
+      };
+      setPortfolio(merged);
+      // Update caches
+      if (cacheKey) {
+        localStorage.setItem(cacheKey, JSON.stringify(merged));
+        portfolioCache = { key: cacheKey, data: merged };
+      }
+    } catch (error) {
+      setError("Failed to fetch portfolio");
+    } finally {
+      setLoading(false);
+    }
+  }, [user, url_name]);
 
   useEffect(() => {
     if (!user && !url_name) {
       setLoading(false);
       return;
     }
-    const timeout = setTimeout(() => {
-      fetchPortfolio();
-    }, 500);
-    return () => clearTimeout(timeout);
+    fetchPortfolio();
   }, [user?.id, url_name, fetchPortfolio]);
 
   // Add a function to update portfolio data without refetching
   const updatePortfolioData = (newData) => {
-    setPortfolio((prev) => ({
-      ...prev,
-      ...newData,
-    }));
+    setPortfolio((prev) => {
+      const updated = {
+        ...prev,
+        ...newData,
+      };
+      // Update caches
+      const cacheKey = getCacheKey();
+      if (cacheKey) {
+        localStorage.setItem(cacheKey, JSON.stringify(updated));
+        portfolioCache = { key: cacheKey, data: updated };
+      }
+      return updated;
+    });
   };
 
   return (
