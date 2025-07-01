@@ -1,57 +1,129 @@
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+// --- Simple in-memory rate limiter ---
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX = 10; // 10 requests per minute per IP
+
+function rateLimit(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip) || { count: 0, last: now };
+  if (now - entry.last > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, last: now });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  rateLimitMap.set(ip, { count: entry.count + 1, last: entry.last });
+  return false;
+}
+
+// --- Zod schema for validation ---
+const portfolioSchema = z.object({
+  user_id: z.string(),
+  name: z.string().min(1).max(60).optional(),
+  age: z.union([z.string(), z.number()]).optional(),
+  profession: z.string().max(100).optional(),
+  experience: z.string().max(100).optional(),
+  bio: z.string().max(1000).optional(),
+  email: z.string().email().optional(),
+  location: z.string().max(100).optional(),
+  phone: z.string().max(15).optional(),
+  github: z.string().url().optional(),
+  linkedin: z.string().url().optional(),
+  x: z.string().url().optional(),
+  instagram: z.string().url().optional(),
+  facebook: z.string().url().optional(),
+  home_title: z.string().max(100).optional(),
+  home_subtitle: z.string().max(150).optional(),
+  about_me: z.string().max(1000).optional(),
+  profileImage: z.string().url().optional(),
+  projects: z.any().optional(),
+  skills: z.any().optional(),
+});
+
+// --- Simple sanitizer for string fields ---
+function sanitize(str) {
+  if (typeof str !== "string") return str;
+  return str.replace(/[<>]/g, "");
+}
+
+const allowedFields = [
+  "user_id",
+  "name",
+  "age",
+  "profession",
+  "experience",
+  "bio",
+  "email",
+  "location",
+  "phone",
+  "github",
+  "linkedin",
+  "x",
+  "instagram",
+  "facebook",
+  "home_title",
+  "home_subtitle",
+  "about_me",
+  "profileImage",
+  "projects",
+  "skills",
+];
+
+const publicFields = [
+  "user_id",
+  "name",
+  "profession",
+  "experience",
+  "bio",
+  "location",
+  "github",
+  "linkedin",
+  "x",
+  "instagram",
+  "facebook",
+  "home_title",
+  "home_subtitle",
+  "about_me",
+  "profileImage",
+  "projects",
+  "skills",
+];
 
 export async function POST(request) {
+  const ip = request.headers.get("x-forwarded-for") || "local";
+  if (rateLimit(ip)) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
   try {
-    // Get request body
     const body = await request.json();
-    if (!body) {
+    const parsed = portfolioSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "No portfolio data provided" },
+        { error: "Invalid input", details: parsed.error.errors },
         { status: 400 }
       );
     }
-
-    const {
-      user_id,
-      name,
-      age,
-      profession,
-      experience,
-      bio,
-      email,
-      location,
-      phone,
-      github,
-      linkedin,
-      x,
-      instagram,
-      facebook,
-      home_title,
-      home_subtitle,
-      about_me,
-      profileImage,
-      projects,
-      skills,
-    } = body;
-
-    if (!user_id) {
-      return NextResponse.json(
-        { error: "user_id is required" },
-        { status: 400 }
-      );
+    const data = parsed.data;
+    // Sanitize string fields
+    for (const key of Object.keys(data)) {
+      if (typeof data[key] === "string") {
+        data[key] = sanitize(data[key]);
+      }
     }
-
     // Check if portfolio exists for this user
-    const { data: existingPortfolio, error: checkError } = await supabaseAdmin
+    const { data: existingPortfolio } = await supabaseAdmin
       .from("portfolios")
       .select("id")
-      .eq("user_id", user_id)
+      .eq("user_id", data.user_id)
       .single();
-
     // For new portfolios, require name, profession, and experience
     if (!existingPortfolio) {
-      if (!name || !profession || !experience) {
+      if (!data.name || !data.profession || !data.experience) {
         return NextResponse.json(
           {
             error:
@@ -61,118 +133,36 @@ export async function POST(request) {
         );
       }
     }
-
-    // Convert age to number for database compatibility
-    let ageNumber = null;
-    if (age) {
-      ageNumber = parseInt(age, 10);
-      if (isNaN(ageNumber)) {
-        return NextResponse.json(
-          { error: "Invalid age format" },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Filter out fields that might not exist in the database schema
-    const allowedFields = [
-      "user_id",
-      "name",
-      "age",
-      "profession",
-      "experience",
-      "bio",
-      "email",
-      "location",
-      "phone",
-      "github",
-      "linkedin",
-      "x",
-      "instagram",
-      "facebook",
-      "home_title",
-      "home_subtitle",
-      "about_me",
-      "profileImage",
-      "projects",
-      "skills",
-    ];
-
+    // Prepare filtered data
     const filteredData = {};
     allowedFields.forEach((field) => {
-      if (body[field] !== undefined) {
-        filteredData[field] = field === "age" ? ageNumber : body[field];
+      if (data[field] !== undefined) {
+        filteredData[field] = data[field];
       }
     });
-
-    // Use upsert with the validated user_id
+    // Upsert
     let result;
     if (existingPortfolio) {
-      // Update existing portfolio - fetch current data first
-      // Get current portfolio data to merge with updates
-      const { data: currentData, error: fetchError } = await supabaseAdmin
-        .from("portfolios")
-        .select("*")
-        .eq("user_id", user_id)
-        .single();
-
-      if (fetchError) {
-        console.error("Error fetching current portfolio:", fetchError);
-        return NextResponse.json(
-          { error: "Error fetching current portfolio" },
-          { status: 500 }
-        );
-      }
-
-      // Merge current data with new data
-      const mergedData = {
-        ...currentData,
-        ...filteredData,
-      };
-
-      // Try a simple update first
       result = await supabaseAdmin
         .from("portfolios")
-        .update(filteredData) // Just update with new data, don't merge
-        .eq("user_id", user_id)
-        .select();
-
-      if (result.error) {
-        // If simple update fails, try with merged data
-        result = await supabaseAdmin
-          .from("portfolios")
-          .update(mergedData)
-          .eq("user_id", user_id)
-          .select();
-      }
+        .update(filteredData)
+        .eq("user_id", data.user_id)
+        .select(publicFields.join(","));
     } else {
-      // Insert new portfolio
       result = await supabaseAdmin
         .from("portfolios")
         .insert(filteredData)
-        .select();
+        .select(publicFields.join(","));
     }
-
-    const { data, error } = result;
-
+    const { data: updated, error } = result;
     if (error) {
-      console.error("Error updating portfolio:", error);
       return NextResponse.json(
         { error: "Error updating portfolio" },
         { status: 500 }
       );
     }
-
-    // Verify the data was actually saved by reading it back
-    const { data: verifyData, error: verifyError } = await supabaseAdmin
-      .from("portfolios")
-      .select("*")
-      .eq("user_id", user_id)
-      .single();
-
-    return NextResponse.json({ success: true, data: filteredData });
+    return NextResponse.json({ success: true, data: updated?.[0] });
   } catch (error) {
-    console.error("Error in portfolio API:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -181,46 +171,42 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
+  const ip = request.headers.get("x-forwarded-for") || "local";
+  if (rateLimit(ip)) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
-
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
         { status: 400 }
       );
     }
-
     // Get user's Supabase ID
     const { data: userData, error: userError } = await supabaseAdmin
       .from("users")
       .select("id")
       .eq("clerk_id", userId)
       .single();
-
     if (userError || !userData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    // Get portfolio data
+    // Get portfolio
     const { data: portfolioData, error: portfolioError } = await supabaseAdmin
       .from("portfolios")
-      .select("*")
+      .select(publicFields.join(","))
       .eq("user_id", userData.id)
       .single();
-
-    if (portfolioError) {
-      console.error("Error fetching portfolio:", portfolioError);
+    if (portfolioError || !portfolioData) {
       return NextResponse.json(
-        { error: "Error fetching portfolio" },
-        { status: 500 }
+        { error: "Portfolio not found" },
+        { status: 404 }
       );
     }
-
-    return NextResponse.json({ portfolio: portfolioData });
+    return NextResponse.json({ data: portfolioData });
   } catch (error) {
-    console.error("Error in portfolio GET API:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

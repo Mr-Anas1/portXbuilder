@@ -40,30 +40,9 @@ export const PortfolioProvider = ({ children }) => {
       setError(null);
       const cacheKey = getCacheKey();
 
-      // Check in-memory cache first
-      if (portfolioCache && cacheKey && portfolioCache.key === cacheKey) {
-        setPortfolio(portfolioCache.data);
-        setIsPro(portfolioCache.data?.plan === "pro");
-        setLoading(false);
-        return;
-      }
-
-      // Check localStorage cache
-      if (cacheKey) {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          setPortfolio(parsed);
-          setIsPro(parsed?.plan === "pro");
-          // Also update in-memory cache
-          portfolioCache = { key: cacheKey, data: parsed };
-          setLoading(false);
-          return;
-        }
-      }
-
       // If we have a url_name, we're viewing a public portfolio
       if (url_name) {
+        // Always fetch fresh data for public portfolio page
         const { data: userData, error: userError } = await supabase
           .from("users")
           .select("id, components, theme, plan")
@@ -96,13 +75,28 @@ export const PortfolioProvider = ({ children }) => {
           plan: userData?.plan || "free",
         };
         setPortfolio(merged);
-        // Update caches
-        if (cacheKey) {
-          localStorage.setItem(cacheKey, JSON.stringify(merged));
-          portfolioCache = { key: cacheKey, data: merged };
-        }
         setLoading(false);
         return;
+      }
+
+      // Dashboard (authenticated user) view: use cache
+      if (portfolioCache && cacheKey && portfolioCache.key === cacheKey) {
+        setPortfolio(portfolioCache.data);
+        setIsPro(portfolioCache.data?.plan === "pro");
+        setLoading(false);
+        return;
+      }
+
+      if (cacheKey) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          setPortfolio(parsed);
+          setIsPro(parsed?.plan === "pro");
+          portfolioCache = { key: cacheKey, data: parsed };
+          setLoading(false);
+          return;
+        }
       }
 
       // If we're in the dashboard (no url_name), we need authentication
@@ -166,7 +160,8 @@ export const PortfolioProvider = ({ children }) => {
   }, [user?.id, url_name, fetchPortfolio]);
 
   // Add a function to update portfolio data without refetching
-  const updatePortfolioData = (newData) => {
+  const updatePortfolioData = async (newData) => {
+    // Synchronously update state and cache
     setPortfolio((prev) => {
       const updated = {
         ...prev,
@@ -180,6 +175,25 @@ export const PortfolioProvider = ({ children }) => {
       }
       return updated;
     });
+    // Invalidate public cache for /portfolio/[url_name]
+    let urlName = null;
+    if (user?.url_name) {
+      urlName = user.url_name;
+    } else if (user?.id) {
+      const { data: userData } = await supabase
+        .from("users")
+        .select("url_name")
+        .eq("clerk_id", user.id)
+        .single();
+      urlName = userData?.url_name;
+    }
+    if (urlName) {
+      const publicCacheKey = `portfolio_cache_url_${urlName}`;
+      localStorage.removeItem(publicCacheKey);
+      if (portfolioCache && portfolioCache.key === publicCacheKey) {
+        portfolioCache = null;
+      }
+    }
   };
 
   return (

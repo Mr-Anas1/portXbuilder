@@ -737,8 +737,8 @@ export default function Dashboard() {
     const value = e.target.value;
     setEnteredName(value);
 
-    // Validate URL name (only lowercase letters, numbers, and hyphens)
-    const isValidName = /^[a-z0-9-]+$/.test(value);
+    // Validate URL name: starts with a letter, only lowercase letters, numbers, hyphens, 3-20 chars
+    const isValidName = /^[a-z][a-z0-9-]{2,19}$/.test(value);
     setIsValid(isValidName);
 
     if (isValidName) {
@@ -799,16 +799,32 @@ export default function Dashboard() {
             </button>
 
             <h2 className="text-xl font-bold mb-4">Choose your URL name</h2>
+            {/* Info box */}
+            <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex flex-col gap-1">
+              <span className="font-semibold">Important:</span>
+              <span>
+                <strong>You can only set your URL name once.</strong> This will
+                be your unique public portfolio link.
+              </span>
+              <span>
+                Share your portfolio using:{" "}
+                <span className="font-mono bg-blue-100 px-1 rounded">
+                  www.portxbuilder.com/portfolio/&lt;your-url-name&gt;
+                </span>
+              </span>
+            </div>
             <div className="relative">
               <input
-                className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 outline-none ${
+                className={`w-full px-4 py-2 rounded-lg border transition-all duration-100 outline-none shadow-sm focus:ring-2 focus:ring-primary-200 focus:border-primary-400 bg-gray-50 text-gray-800 placeholder-gray-400 ${
                   !isValid || isNameTaken
                     ? "border-red-500 focus:ring-2 focus:ring-red-400"
                     : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 }`}
-                placeholder="e.g. john"
+                placeholder="e.g. johnsmith"
                 value={enteredName}
                 onChange={handleUrlNameChange}
+                maxLength={20}
+                autoFocus
               />
               {isChecking && (
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -820,7 +836,8 @@ export default function Dashboard() {
             <div className="mt-2 space-y-2">
               {!isValid && (
                 <p className="text-red-500 text-sm">
-                  Only lowercase letters, numbers, and hyphens (-) are allowed.
+                  URL must start with a lowercase letter, be 3-20 characters,
+                  and only contain lowercase letters, numbers, and hyphens (-).
                 </p>
               )}
               {isNameTaken && (
