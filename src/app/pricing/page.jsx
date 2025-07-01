@@ -348,7 +348,7 @@ const PricingPage = () => {
               </button>
             </div>
           </div>
-          <div className="flex flex-col w-full md:flex-row justify-center items-stretch gap-8 mb-16 max-w-5xl mx-auto">
+          <div className="flex flex-col items-center w-full md:flex-row justify-center md:items-stretch gap-8 mb-16 max-w-5xl mx-auto">
             {/* Free Card */}
             <Card className="flex flex-col w-full max-w-md bg-white/90 backdrop-blur-lg rounded-3xl shadow-lg border border-gray-200 transition duration-300 hover:scale-[1.03] hover:shadow-2xl">
               <CardHeader className="text-center pb-2">
