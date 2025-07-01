@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const CtaSection = () => {
   return (
-    <section className="py-32 bg-primary-600 relative overflow-hidden">
+    <section className="py-32 bg-primary-600 px-4 relative overflow-hidden">
       <div className="flex flex-col gap-10 items-center">
         <h1 className="text-3xl text-center font-bold lg:text-5xl text-white">
           Ready to Showcase Your Work?

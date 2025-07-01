@@ -36,7 +36,7 @@ const ContactSection5 = ({ theme, isMobileLayout, sectionRef }) => {
             className={`text-center ${isMobileLayout ? "" : "md:text-left"}`}
           >
             <p className="text-lg text-center font-semibold">
-              {portfolio?.email}
+              {portfolio?.email || "support@portxbuilder.com"}
             </p>
           </div>
 

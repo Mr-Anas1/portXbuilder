@@ -19,9 +19,9 @@ const ContactSection1 = ({ theme, isMobileLayout, sectionRef }) => {
     {
       icon: <FaEnvelope className={`text-2xl ${theme.accentText}`} />,
       title: "Email",
-      content: portfolio?.email || "Not provided",
+      content: portfolio?.email,
       isLink: true,
-      href: "mailto:portXbuilder@gmail.com",
+      href: portfolio?.email ? `mailto:${portfolio.email}` : undefined,
     },
   ];
 
