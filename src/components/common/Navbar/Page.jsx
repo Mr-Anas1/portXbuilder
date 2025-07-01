@@ -12,15 +12,15 @@ import {
   SignedOut,
   PricingTable,
 } from "@clerk/nextjs";
-import { useProStatusClient } from "@/context/useProStatusClient";
 import { useAuthContext } from "@/context/AuthContext";
 
 const Navbar = ({ isDashboard }) => {
-  const { loading: authLoading } = useAuthContext();
-  const { hasProPlan, loading: proLoading } = useProStatusClient();
+  const { userData, loading: authLoading } = useAuthContext();
   const { signOut } = useClerk();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+
+  const isPro = userData?.plan === "pro";
 
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
@@ -89,7 +89,7 @@ const Navbar = ({ isDashboard }) => {
           <div className="hidden md:block">
             <SignedIn>
               <div className="flex justify-center items-center gap-4">
-                {proLoading || authLoading ? null : hasProPlan ? (
+                {authLoading ? null : isPro ? (
                   <button
                     className="group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 font-medium  transition hover:scale-110"
                     onClick={() => router.push("/pricing")}
@@ -158,7 +158,7 @@ const Navbar = ({ isDashboard }) => {
             </SignedOut>
             <SignedIn>
               <div className="flex justify-center items-center gap-4">
-                {proLoading || authLoading ? null : hasProPlan ? (
+                {authLoading ? null : isPro ? (
                   <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-md text-sm font-semibold">
                     PRO
                   </div>
@@ -170,7 +170,6 @@ const Navbar = ({ isDashboard }) => {
                     GO PRO
                   </Link>
                 )}
-
                 <UserButton
                   afterSignOutUrl="/"
                   appearance={{
@@ -215,7 +214,7 @@ const Navbar = ({ isDashboard }) => {
           <SignedIn>
             <div className="flex flex-col gap-8 justify-center items-center">
               <div className="text-center">
-                {proLoading || authLoading ? null : hasProPlan ? (
+                {authLoading ? null : isPro ? (
                   <div className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
                     PRO
                   </div>
