@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuthContext } from "@/context/AuthContext";
@@ -25,14 +26,14 @@ export const PortfolioProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPro, setIsPro] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = useMemo(() => createClientComponentClient(), []);
 
   // Helper to get cache key
-  const getCacheKey = () => {
+  const getCacheKey = useCallback(() => {
     if (url_name) return `portfolio_cache_url_${url_name}`;
     if (user?.id) return `portfolio_cache_user_${user.id}`;
     return null;
-  };
+  }, [url_name, user?.id]);
 
   const fetchPortfolio = useCallback(async () => {
     try {
