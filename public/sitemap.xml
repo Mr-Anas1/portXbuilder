@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.portxbuilder.com/</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.portxbuilder.com/pricing</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.portxbuilder.com/create</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.portxbuilder.com/contact-support</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.portxbuilder.com/privacy-policy</loc>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://www.portxbuilder.com/terms-and-conditions</loc>
+    <priority>0.5</priority>
+  </url>
+  <!-- Example dynamic portfolio URL: -->
+  <url>
+    <loc>https://www.portxbuilder.com/portfolio/example-user</loc>
+    <priority>0.6</priority>
+  </url>
+</urlset> 
