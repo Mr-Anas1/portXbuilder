@@ -172,20 +172,13 @@ function CreatePortfolio() {
     for (const field of socialFields) {
       const value = formData[field]?.trim();
       if (!value) {
-        validatedSocials[field] = null;
+        // Do not add the field at all
+        continue;
       } else {
-        // Check if value is a valid URL
-        let urlValue = value;
-        // If user entered just a username, not a URL, try to construct a URL (optional, or just require full URL)
-        // For now, require full URL
         try {
-          // Only accept if starts with http:// or https://
-          if (!/^https?:\/\//i.test(urlValue)) {
-            throw new Error();
-          }
-          // Try to construct a URL object
-          new URL(urlValue);
-          validatedSocials[field] = urlValue;
+          if (!/^https?:\/\//i.test(value)) throw new Error();
+          new URL(value);
+          validatedSocials[field] = value;
         } catch {
           toast.error(
             `Please enter a valid URL for ${field.charAt(0).toUpperCase() + field.slice(1)}`
@@ -350,14 +343,10 @@ function CreatePortfolio() {
         email: formData.email,
         location: formData.location,
         phone: formData.phone,
-        github: validatedSocials.github,
-        linkedin: validatedSocials.linkedin,
-        x: validatedSocials.x,
-        instagram: validatedSocials.instagram,
-        facebook: validatedSocials.facebook,
         projects: formData.projects,
         profileImage: profileImagePath,
         ...aiFields,
+        ...validatedSocials, // Only include validated social fields
       };
 
       // Create portfolio using the API route
