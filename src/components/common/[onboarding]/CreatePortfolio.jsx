@@ -166,6 +166,36 @@ function CreatePortfolio() {
       return;
     }
 
+    // --- Social links validation ---
+    const socialFields = ["github", "linkedin", "x", "instagram", "facebook"];
+    const validatedSocials = {};
+    for (const field of socialFields) {
+      const value = formData[field]?.trim();
+      if (!value) {
+        validatedSocials[field] = null;
+      } else {
+        // Check if value is a valid URL
+        let urlValue = value;
+        // If user entered just a username, not a URL, try to construct a URL (optional, or just require full URL)
+        // For now, require full URL
+        try {
+          // Only accept if starts with http:// or https://
+          if (!/^https?:\/\//i.test(urlValue)) {
+            throw new Error();
+          }
+          // Try to construct a URL object
+          new URL(urlValue);
+          validatedSocials[field] = urlValue;
+        } catch {
+          toast.error(
+            `Please enter a valid URL for ${field.charAt(0).toUpperCase() + field.slice(1)}`
+          );
+          return;
+        }
+      }
+    }
+    // --- End social links validation ---
+
     try {
       setIsCreating(true);
       setCurrentStep(1);
@@ -320,11 +350,11 @@ function CreatePortfolio() {
         email: formData.email,
         location: formData.location,
         phone: formData.phone,
-        github: formData.github,
-        linkedin: formData.linkedin,
-        x: formData.x,
-        instagram: formData.instagram,
-        facebook: formData.facebook,
+        github: validatedSocials.github,
+        linkedin: validatedSocials.linkedin,
+        x: validatedSocials.x,
+        instagram: validatedSocials.instagram,
+        facebook: validatedSocials.facebook,
         projects: formData.projects,
         profileImage: profileImagePath,
         ...aiFields,
