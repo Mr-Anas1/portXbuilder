@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import previewThemes from "@/components/ui/previewThemes";
 import { Loader2 } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
+import Script from "next/script";
 
 import { navbarComponents } from "@/components/Navbars/index";
 import { heroComponents } from "@/components/HeroSections/index";
@@ -51,6 +52,8 @@ const Page = () => {
   const { portfolio, loading } = usePortfolio();
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [userTheme, setUserTheme] = useState("default");
+  const [showAd, setShowAd] = useState(true);
+  const [adWidth, setAdWidth] = useState("90vw");
 
   const sectionRefs = {
     navbar: useRef(null),
@@ -91,6 +94,19 @@ const Page = () => {
       setUserTheme(validTheme);
     }
   }, [portfolio?.theme]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 600) {
+        setAdWidth("70vw");
+      } else {
+        setAdWidth("90vw");
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (loading) {
     return (
@@ -167,6 +183,122 @@ const Page = () => {
       <section ref={sectionRefs.footer}>
         {renderComponent(portfolio.components?.footer, "footer")}
       </section>
+
+      {/* Google AdSense for free users */}
+      {portfolio.plan && portfolio.plan !== "pro" && showAd && (
+        <>
+          <Script
+            id="adsense-script"
+            strategy="afterInteractive"
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5542805617135767"
+            crossOrigin="anonymous"
+            async
+          />
+          <div
+            style={{
+              position: "fixed",
+              bottom: 60,
+              right: 16,
+              zIndex: 60,
+              background: "#fff",
+              borderRadius: 8,
+              boxShadow: "0 2px 8px rgba(60,60,60,0.13)",
+              padding: "10px 14px 10px 10px",
+              minWidth: 160,
+              width: adWidth,
+              maxWidth: 300,
+              display: "flex",
+              alignItems: "center",
+              border: "1px solid #e5e7eb",
+              fontFamily: "inherit",
+            }}
+          >
+            <button
+              onClick={() => setShowAd(false)}
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 8,
+                background: "transparent",
+                border: "none",
+                fontSize: 18,
+                color: "#bbb",
+                cursor: "pointer",
+                lineHeight: 1,
+                fontWeight: 700,
+                padding: 0,
+              }}
+              aria-label="Close ad"
+            >
+              ×
+            </button>
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 280,
+                height: 100,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <ins
+                className="adsbygoogle"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  maxWidth: 280,
+                  height: 100,
+                  borderRadius: 4,
+                  overflow: "hidden",
+                }}
+                data-ad-client="ca-pub-5542805617135767"
+                data-ad-slot="1234567890"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              ></ins>
+            </div>
+          </div>
+          <Script id="adsbygoogle-init" strategy="afterInteractive">
+            {`
+              if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+                window.adsbygoogle.push({});
+              }
+            `}
+          </Script>
+        </>
+      )}
+
+      {/* Watermark for free users */}
+      {portfolio.plan && portfolio.plan !== "pro" && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            zIndex: 50,
+            background: "rgba(255,255,255,0.85)",
+            borderRadius: 8,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            display: "flex",
+            alignItems: "center",
+            padding: "6px 14px 6px 8px",
+            fontSize: 14,
+            color: "#333",
+            fontWeight: 500,
+            gap: 8,
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="PortXBuilder Logo"
+            style={{ height: 20, width: 20, marginRight: 0 }}
+          />
+          <span>
+            Made with <b>PortXBuilder</b>
+          </span>
+        </div>
+      )}
     </div>
   );
 };
