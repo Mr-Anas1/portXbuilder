@@ -1,113 +1,58 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-import { requireAuth } from "@/lib/requireAuth";
+import DodoPayments from "dodopayments";
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+console.log("DODO_PAYMENTS_API_KEY:", process.env.DODO_PAYMENTS_API_KEY);
+
+const client = new DodoPayments({
+  bearerToken: process.env.DODO_PAYMENTS_API_KEY,
+});
 
 export async function POST(request) {
   try {
-    const userId = requireAuth(request);
-    // Dynamically import Razorpay to ensure it's only loaded server-side
-    const Razorpay = (await import("razorpay")).default;
-
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      throw new Error("Missing Razorpay credentials");
-    }
-
-    const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID,
-      key_secret: process.env.RAZORPAY_KEY_SECRET,
-    });
-
     const body = await request.json();
+    const { billing, customer, product_id, quantity = 1, return_url } = body;
 
-    if (!body.name || !body.email) {
+    // Validate required fields
+    if (!billing || !customer || !product_id) {
       return NextResponse.json(
-        { error: "Name and email are required" },
+        { error: "Missing required fields: billing, customer, or product_id" },
         { status: 400 }
       );
     }
 
-    // Get user from Supabase using userId from Clerk
-    const { data: user, error: userError } = await supabaseAdmin
-      .from("users")
-      .select("*")
-      .eq("clerk_id", userId)
-      .single();
-
-    if (userError) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    // If customer_id is not present, use CreateNewCustomer schema
+    let dodoCustomer = customer;
+    if (!customer.customer_id) {
+      dodoCustomer = {
+        name: customer.name,
+        email: customer.email,
+        phone_number: customer.phone_number || undefined,
+      };
     }
 
-    // Create or get Razorpay customer
-    let customer;
-    if (user.razorpay_customer_id) {
-      customer = await razorpay.customers.fetch(user.razorpay_customer_id);
-    } else {
-      customer = await razorpay.customers.create({
-        name: body.name,
-        email: body.email,
-        contact: body.contact,
-      });
-
-      // Store Razorpay customer ID in user's record
-      const { error: updateError } = await supabaseAdmin
-        .from("users")
-        .update({ razorpay_customer_id: customer.id })
-        .eq("id", user.id);
-
-      if (updateError) {
-      }
-    }
-
-    // Debug logs for environment variables and plan selection
-    console.log("Monthly Plan ID:", process.env.RAZORPAY_MONTHLY_PLAN_ID);
-    console.log("Yearly Plan ID:", process.env.RAZORPAY_YEARLY_PLAN_ID);
-    console.log("Billing period from request:", body.billingPeriod);
-
-    const planId =
-      body.billingPeriod === "yearly"
-        ? process.env.RAZORPAY_YEARLY_PLAN_ID
-        : process.env.RAZORPAY_MONTHLY_PLAN_ID;
-
-    console.log("Selected Plan ID:", planId);
-
-    if (!planId) {
-      throw new Error("Missing Razorpay plan ID");
-    }
-
-    const subscription = await razorpay.subscriptions.create({
-      plan_id: planId,
-      customer_notify: 1,
-      total_count: 12, // how many billing cycles
-      customer_id: customer.id,
+    // Create the subscription using the SDK
+    const subscription = await client.subscriptions.create({
+      billing,
+      customer: dodoCustomer,
+      product_id,
+      quantity,
+      payment_link: true,
+      return_url: return_url || process.env.NEXT_PUBLIC_RETURN_URL,
     });
 
-    // Store subscription ID in user's record
-    const { error: subscriptionUpdateError } = await supabaseAdmin
-      .from("users")
-      .update({
-        subscription_id: subscription.id,
-        subscription_status: "pending",
-      })
-      .eq("id", user.id);
-
-    if (subscriptionUpdateError) {
-    }
-
-    return NextResponse.json({ subscriptionId: subscription.id });
-  } catch (error) {
+    // Return the payment link and subscription ID
+    return NextResponse.json({
+      paymentLink: subscription.payment_link,
+      subscriptionId: subscription.subscription_id,
+      ...subscription,
+    });
+  } catch (err) {
+    console.error("Dodo Payments error:", err, JSON.stringify(err));
     return NextResponse.json(
-      { error: error.message || "Failed to create subscription" },
+      {
+        error:
+          err?.message || JSON.stringify(err) || "An unknown error occurred",
+      },
       { status: 500 }
     );
   }

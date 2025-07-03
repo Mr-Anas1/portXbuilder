@@ -1,33 +1,8 @@
-import razorpay from "@/lib/razorpay";
-
+// Dodo Payments integration will go here
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
-
-  try {
-    const customer = await razorpay.customers.create({
-      name: req.body.name,
-      email: req.body.email,
-      contact: req.body.contact, // optional
-    });
-
-    const planId =
-      req.body.billingPeriod === "yearly"
-        ? process.env.RAZORPAY_YEARLY_PLAN_ID
-        : process.env.RAZORPAY_MONTHLY_PLAN_ID;
-
-    if (!planId) {
-      throw new Error("Missing Razorpay plan ID");
-    }
-
-    const subscription = await razorpay.subscriptions.create({
-      plan_id: planId,
-      customer_notify: 1,
-      total_count: 12, // how many billing cycles
-      customer_id: customer.id,
-    });
-
-    res.status(200).json({ subscriptionId: subscription.id });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  // TODO: Implement Dodo Payments subscription creation
+  res
+    .status(501)
+    .json({ error: "Dodo Payments integration not implemented yet" });
 }

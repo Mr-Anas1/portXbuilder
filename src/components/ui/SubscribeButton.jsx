@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../lib/supabase";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 
@@ -10,7 +9,6 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
   const { user } = useUser();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -21,95 +19,43 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
     try {
       setLoading(true);
 
-      // Create subscription with the correct data format
-      const requestBody = {
-        name: user.fullName || user.firstName + " " + user.lastName || "User",
-        email: user.primaryEmailAddress?.emailAddress || "",
-        contact: user.phoneNumbers?.[0]?.phoneNumber || "",
-        billingPeriod: billingPeriod,
+      // Prepare billing and customer info (replace with real data as needed)
+      const billing = {
+        city: "YourCity",
+        country: "IN",
+        state: "YourState",
+        street: "YourStreet",
+        zipcode: 123456,
       };
+      const customer = {
+        email: user.primaryEmailAddress?.emailAddress || "",
+        name: user.fullName || user.firstName + " " + user.lastName || "User",
+        phone_number: user.phoneNumbers?.[0]?.phoneNumber || "",
+      };
+      const product_id =
+        billingPeriod === "monthly"
+          ? "pdt_JEwkqh6Ji8GK9iHUjCpzs"
+          : "pdt_5JbylGSK2FKHuXwOOJ3eX";
 
+      console.log("Sending to backend:", { billing, customer, product_id });
       const response = await fetch("/api/create-subscription", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          billing,
+          customer,
+          product_id,
+        }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorText = await response.text();
-
-        let errorData;
-        try {
-          errorData = JSON.parse(errorText);
-        } catch (e) {
-          errorData = { error: errorText || "Unknown error" };
-        }
-
-        toast.error(errorData.error || "Failed to create subscription");
-        return;
+        throw new Error(data.error || "Failed to create subscription");
       }
 
-      const responseText = await response.text();
-
-      let responseData;
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (e) {
-        toast.error("Invalid response from server");
-        return;
-      }
-
-      const { subscriptionId } = responseData;
-
-      // Initialize Razorpay
-      const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        subscription_id: subscriptionId,
-        name: "PortXBuilder",
-        description: `Pro Plan - ${
-          billingPeriod === "monthly" ? "Monthly" : "Yearly"
-        }`,
-        handler: async function (response) {
-          try {
-            // Verify payment
-            const verifyResponse = await fetch("/api/verify-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_subscription_id: response.razorpay_subscription_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-
-            if (!verifyResponse.ok) {
-              const result = await verifyResponse.json();
-              toast.error(result.error || "Payment verification failed");
-              return;
-            }
-
-            const result = await verifyResponse.json();
-            toast.success("Payment successful! Welcome to Pro!");
-            window.location.reload();
-          } catch (error) {
-            toast.error("Payment verification failed");
-          }
-        },
-        prefill: {
-          name: user.fullName || "",
-          email: user.primaryEmailAddress?.emailAddress || "",
-        },
-        theme: {
-          color: "#6366f1",
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      // Redirect to Dodo Payments payment link
+      window.location.href = data.paymentLink;
     } catch (error) {
       toast.error("Subscription error: " + error.message);
     } finally {
@@ -131,7 +77,6 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       ) : (
         "Subscribe Now"
       )}
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </button>
   );
 }
