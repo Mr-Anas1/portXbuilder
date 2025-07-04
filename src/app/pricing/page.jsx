@@ -156,6 +156,29 @@ const PricingPage = () => {
     }
   };
 
+  // Add handler for Dodo customer portal
+  const handleManageSubscription = async () => {
+    if (!user) {
+      toast.error("Please sign in to manage your subscription");
+      return;
+    }
+    try {
+      const res = await fetch("/api/create-customer-portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerk_id: user.id }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Failed to open portal");
+      }
+    } catch (error) {
+      toast.error("Failed to open portal");
+    }
+  };
+
   useEffect(() => {
     const fetchSubscriptionInfo = async () => {
       if (!isUserLoaded) return; // Wait for user to be loaded
@@ -684,6 +707,19 @@ const PricingPage = () => {
             </p>
           </div>
           {renderPlans()}
+
+          {/* Manage Subscription Button */}
+          {user && subscriptionInfo?.plan === "pro" && (
+            <div className="flex flex-col gap-2 mt-4">
+              <Button
+                onClick={handleManageSubscription}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Manage Subscription
+              </Button>
+              <CancelSubscriptionButton />
+            </div>
+          )}
         </div>
       </main>
       <Footer className="relative z-10" />

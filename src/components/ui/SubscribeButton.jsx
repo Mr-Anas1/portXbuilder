@@ -16,49 +16,24 @@ export default function SubscribeButton({ billingPeriod = "yearly" }) {
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-
-      // Prepare billing and customer info (replace with real data as needed)
-      const billing = {
-        city: "YourCity",
-        country: "IN",
-        state: "YourState",
-        street: "YourStreet",
-        zipcode: 123456,
-      };
-      const customer = {
-        email: user.primaryEmailAddress?.emailAddress || "",
-        name: user.fullName || user.firstName + " " + user.lastName || "User",
-        phone_number: user.phoneNumbers?.[0]?.phoneNumber || "",
-      };
       const product_id =
         billingPeriod === "monthly"
           ? "pdt_JEwkqh6Ji8GK9iHUjCpzs"
           : "pdt_5JbylGSK2FKHuXwOOJ3eX";
-
-      console.log("Sending to backend:", { billing, customer, product_id });
-      const response = await fetch("/api/create-subscription", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          billing,
-          customer,
-          product_id,
-        }),
-      });
-
+      // Pass clerk_id as a query param
+      const url = `/api/subscription?productId=${product_id}&clerk_id=${user.id}`;
+      const response = await fetch(url, { method: "GET" });
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.payment_link) {
         throw new Error(data.error || "Failed to create subscription");
       }
 
-      // Redirect to Dodo Payments payment link
-      window.location.href = data.paymentLink;
+      window.location.href = data.payment_link;
     } catch (error) {
-      toast.error("Subscription error: " + error.message);
-    } finally {
+      toast.error("Subscription error: " + (error.message || error));
       setLoading(false);
     }
   };
