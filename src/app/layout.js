@@ -41,6 +41,7 @@ export default function RootLayout({ children }) {
             PortXBuilder – Portfolio Creator & Generator | Build Your Portfolio
             Website
           </title>
+          <meta name="google-adsense-account" content="ca-pub-5542805617135767">
           <meta
             name="description"
             content="Create your professional portfolio website in minutes with PortXBuilder. The easiest portfolio creator and generator for developers, designers, and creators. No code needed!"
