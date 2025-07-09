@@ -73,89 +73,6 @@ const PricingPage = () => {
       .catch(() => setCurrency("USD"));
   }, []);
 
-  const handleDowngrade = async () => {
-    if (!user) {
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Authentication Required</p>
-          <p className="text-sm text-gray-600">
-            Please sign in to manage your subscription.
-          </p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/cancel-subscription", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to downgrade subscription");
-      }
-
-      toast.success(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Subscription Downgraded</p>
-          <p className="text-sm text-gray-600">{data.message}</p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
-      window.location.reload(); // Refresh the page to update the UI
-    } catch (error) {
-      console.error("Error downgrading subscription:", error);
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Downgrade Failed</p>
-          <p className="text-sm text-gray-600">
-            Failed to downgrade subscription. Please try again.
-          </p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
-    }
-  };
-
   // Add handler for Dodo customer portal
   const handleManageSubscription = async () => {
     if (!user) {
@@ -220,119 +137,6 @@ const PricingPage = () => {
       </div>
     );
   }
-
-  const renderSubscriptionStatus = () => {
-    if (!user) {
-      return (
-        <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Subscription Management
-          </h2>
-          <p className="text-gray-600">
-            Please sign in to manage your subscription.
-          </p>
-        </div>
-      );
-    }
-
-    if (loading) {
-      return (
-        <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading...</h2>
-        </div>
-      );
-    }
-
-    const isPro = subscriptionInfo?.plan === "pro";
-    const isCancelled = subscriptionInfo?.subscription_status === "cancelled";
-    const endDate = subscriptionInfo?.subscription_end_date
-      ? new Date(subscriptionInfo.subscription_end_date)
-      : null;
-    const cancelledAt = subscriptionInfo?.subscription_cancelled_at
-      ? new Date(subscriptionInfo.subscription_cancelled_at)
-      : null;
-
-    return (
-      <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Your Subscription Status
-        </h2>
-
-        <PaymentStatus subscriptionInfo={subscriptionInfo} />
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="text-gray-600">Current Plan</p>
-              <p className="text-xl font-semibold text-gray-800">
-                {isPro ? "Pro Plan" : "Free Plan"}
-              </p>
-              {isCancelled && (
-                <p className="text-sm text-amber-600 mt-1">
-                  Cancelled - Active until {endDate?.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            <div className="px-3 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium">
-              {subscriptionInfo?.subscription_status ||
-                "No active subscription"}
-            </div>
-          </div>
-
-          {endDate && (
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">Subscription Period</p>
-              <p className="text-lg font-semibold text-gray-800">
-                {isCancelled ? "Access until" : "Next billing date"}:{" "}
-                {endDate.toLocaleDateString()}
-              </p>
-              {isCancelled && cancelledAt && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Cancelled on {cancelledAt.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Available Actions
-            </h3>
-            <div className="space-y-4">
-              {isPro ? (
-                <div className="space-y-2">
-                  <p className="text-gray-600 mb-2">
-                    {isCancelled
-                      ? "Your subscription has been cancelled but you'll continue to have access to Pro features until the end of your billing period."
-                      : "You are currently on the Pro plan. You can cancel your subscription at any time."}
-                  </p>
-                  {!isCancelled && <CancelSubscriptionButton />}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-gray-600 mb-4">
-                    Upgrade to Pro to unlock all premium features and remove
-                    limitations.
-                  </p>
-                  <Button
-                    className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors"
-                    onClick={() => {
-                      const el = document.getElementById("pricing");
-                      if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    See Plans
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const renderPlans = () => {
     const isPro = subscriptionInfo?.plan === "pro";
@@ -433,58 +237,14 @@ const PricingPage = () => {
                 </ul>
               </CardContent>
               <CardFooter className="mt-4">
-                {isPro && !isCancelled && !isPaymentFailed && !isEnded ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
-                        size="lg"
-                        variant={"outline"}
-                      >
-                        Downgrade to Free
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Downgrade to Free Plan
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to downgrade to the Free plan?
-                          You&apos;ll continue to have access to Pro features
-                          until the end of your current billing period. After
-                          that, your account will be downgraded to the Free plan
-                          with the following limitations:
-                          <ul className="list-disc pl-6 mt-2 space-y-1">
-                            <li>Basic templates only</li>
-                            <li>Ads and watermarks on your portfolio</li>
-                            <li>Limited to 15 credits</li>
-                            <li>No specific subdomain</li>
-                            <li>No source code download</li>
-                          </ul>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Keep Pro Plan</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDowngrade}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          Yes, Downgrade to Free
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                ) : (
-                  <Button
-                    className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
-                    size="lg"
-                    variant={"outline"}
-                    disabled
-                  >
-                    {isPro ? "Current Plan" : "Free Plan"}
-                  </Button>
-                )}
+                <Button
+                  className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
+                  size="lg"
+                  variant={"outline"}
+                  disabled
+                >
+                  {isPro ? "Free Plan" : "Current Plan"}
+                </Button>
               </CardFooter>
             </Card>
 
@@ -683,20 +443,6 @@ const PricingPage = () => {
       <Navbar className="relative z-10" />
       <main className="flex-1 relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {/* Title */}
-          <div className="max-w-2xl mx-auto text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Subscription Management
-            </h1>
-            <p className="text-lg text-gray-600">
-              Manage your subscription and choose the plan that best fits your
-              needs
-            </p>
-          </div>
-
-          {/* Subscription Status */}
-          {renderSubscriptionStatus()}
-
           {/* Plans */}
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
@@ -707,19 +453,6 @@ const PricingPage = () => {
             </p>
           </div>
           {renderPlans()}
-
-          {/* Manage Subscription Button */}
-          {user && subscriptionInfo?.plan === "pro" && (
-            <div className="flex flex-col gap-2 mt-4">
-              <Button
-                onClick={handleManageSubscription}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Manage Subscription
-              </Button>
-              <CancelSubscriptionButton />
-            </div>
-          )}
         </div>
       </main>
       <Footer className="relative z-10" />

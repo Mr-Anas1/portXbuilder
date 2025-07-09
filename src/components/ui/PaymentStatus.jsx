@@ -44,7 +44,7 @@ const PaymentStatus = ({ subscriptionInfo }) => {
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create subscription");
+        throw new Error(data.error || "Failed to create payment link");
       }
       // Redirect to Dodo Payments payment link
       window.location.href = data.paymentLink;
