@@ -4,7 +4,9 @@ import { dodopayments } from "@/lib/dodopayments";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { sendSubscriptionEmail } from "@/lib/sendSubscriptionEmail";
 
-const webhook = new Webhook(process.env.DODO_PAYMENTS_WEBHOOK_KEY);
+const webhook = process.env.DODO_PAYMENTS_WEBHOOK_KEY
+  ? new Webhook(process.env.DODO_PAYMENTS_WEBHOOK_KEY)
+  : null;
 
 // Test endpoint to verify webhook is accessible
 export async function GET() {
@@ -44,8 +46,12 @@ export async function POST(request) {
     };
 
     try {
-      await webhook.verify(rawBody, webhookHeaders);
-      console.log("Webhook verification successful");
+      if (webhook) {
+        await webhook.verify(rawBody, webhookHeaders);
+        console.log("Webhook verification successful");
+      } else {
+        console.log("Webhook key not available, skipping verification");
+      }
     } catch (verificationError) {
       console.error("Webhook verification failed:", verificationError);
       // Still process the webhook for debugging
