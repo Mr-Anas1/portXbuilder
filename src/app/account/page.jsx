@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/context/AuthContext";
 import { useProStatusClient } from "@/context/useProStatusClient";
 import Navbar from "@/components/common/Navbar/Page";
 import CustomerPortalButton from "@/components/ui/CustomerPortalButton";
+import BillingForm from "@/components/ui/BillingForm";
+import { supabase } from "@/lib/supabase";
 
 import {
   CreditCard,
@@ -28,6 +30,9 @@ export default function AccountPage() {
   const router = useRouter();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingBilling, setEditingBilling] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingInfo, setBillingInfo] = useState(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -35,36 +40,70 @@ export default function AccountPage() {
     }
   }, [loading, user, router]);
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     if (!user) return;
 
+    setIsLoading(true);
     try {
-      setIsLoading(true);
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("clerk_id", user.id)
+        .single();
 
-      // Fetch user data
-      const userResponse = await fetch("/api/sync-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        setUserData(userData);
+      if (error) {
+        console.error("Error fetching user data:", error);
+        return;
       }
+
+      setUserData(data);
+      setHasProPlan(data?.plan === "pro");
     } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error("Failed to load account information");
+      console.error("Error:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchUserData();
-  }, [user]);
+  }, [user, fetchUserData]);
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("users")
+        .select(
+          "billing_city, billing_country, billing_state, billing_street, billing_zipcode"
+        )
+        .eq("clerk_id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setBillingInfo({
+              city: data.billing_city || "",
+              country: data.billing_country || "",
+              state: data.billing_state || "",
+              street: data.billing_street || "",
+              zipcode: data.billing_zipcode || "",
+            });
+          }
+        });
+    }
+  }, [user, isLoading]);
+
+  const handleBillingSave = async (form) => {
+    setBillingLoading(true);
+    await fetch("/api/update-billing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, clerk_id: user.id }),
+    });
+    setBillingLoading(false);
+    setEditingBilling(false);
+    setBillingInfo(form);
+    toast.success("Billing details updated!");
+  };
 
   if (loading || isLoading) {
     return (
@@ -216,8 +255,8 @@ export default function AccountPage() {
                             Subscription Cancelled
                           </p>
                           <p className="text-sm text-amber-700 mb-2">
-                            Your subscription has been cancelled. You'll have
-                            Pro access until{" "}
+                            Your subscription has been cancelled. You&apos;ll
+                            have Pro access until{" "}
                             <span className="font-medium">
                               {new Date(
                                 userData.grace_period_end
@@ -226,8 +265,8 @@ export default function AccountPage() {
                             .
                           </p>
                           <p className="text-xs text-amber-600">
-                            After this date, you'll be downgraded to the Free
-                            plan and lose access to Pro features.
+                            After this date, you&apos;ll be downgraded to the
+                            Free plan and lose access to Pro features.
                           </p>
                         </div>
                       </div>
@@ -293,6 +332,75 @@ export default function AccountPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Billing Details */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-primary-500" /> Billing
+                Details
+              </h2>
+              {editingBilling ? (
+                <BillingForm
+                  initialValues={billingInfo || {}}
+                  onSubmit={handleBillingSave}
+                  loading={billingLoading}
+                  submitLabel="Update"
+                />
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-gray-700 text-sm mb-4">
+                  <div>
+                    <span className="font-semibold text-gray-900">City:</span>{" "}
+                    {billingInfo?.city || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">
+                      Country:
+                    </span>{" "}
+                    {billingInfo?.country || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">State:</span>{" "}
+                    {billingInfo?.state || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">Street:</span>{" "}
+                    {billingInfo?.street || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-900">
+                      Zipcode:
+                    </span>{" "}
+                    {billingInfo?.zipcode || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </div>
+                </div>
+              )}
+              {editingBilling ? (
+                <button
+                  className="mt-2 text-sm text-gray-500 underline"
+                  onClick={() => setEditingBilling(false)}
+                  disabled={billingLoading}
+                >
+                  Cancel
+                </button>
+              ) : (
+                <button
+                  className="mt-2 bg-primary-600 hover:bg-primary-700 text-white px-5 py-2 rounded-lg font-semibold shadow transition-colors"
+                  onClick={() => setEditingBilling(true)}
+                >
+                  Edit Billing Details
+                </button>
+              )}
             </div>
           </div>
 
@@ -360,8 +468,8 @@ export default function AccountPage() {
                 Need Help?
               </h3>
               <p className="text-gray-600 text-sm mb-4">
-                Have questions about your account or subscription? We're here to
-                help.
+                Have questions about your account or subscription? We&apos;re
+                here to help.
               </p>
               <button
                 onClick={() => router.push("/contact-support")}

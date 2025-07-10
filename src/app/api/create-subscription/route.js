@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import DodoPayments from "dodopayments";
 
-console.log("DODO_PAYMENTS_API_KEY:", process.env.DODO_PAYMENTS_API_KEY);
-
 const client = new DodoPayments({
-  bearerToken: process.env.DODO_PAYMENTS_API_KEY,
+  bearerToken:
+    process.env.NODE_ENV === "development"
+      ? process.env.DODO_API_KEY_TEST
+      : process.env.DODO_API_KEY_LIVE,
+  environment:
+    process.env.NODE_ENV === "development" ? "test_mode" : "live_mode",
 });
 
 export async function POST(request) {

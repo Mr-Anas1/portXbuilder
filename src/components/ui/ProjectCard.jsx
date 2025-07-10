@@ -107,6 +107,7 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
                 className="text-gray-500 flex-shrink-0"
                 size={20}
                 aria-hidden="true"
+                alt=""
               />
               <input
                 id={`projectImage-${id}`}

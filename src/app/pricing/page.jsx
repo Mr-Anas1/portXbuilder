@@ -30,6 +30,7 @@ import {
 import FullPageLoader from "@/components/ui/FullPageLoader";
 import { toast } from "react-hot-toast";
 import PaymentStatus from "@/components/ui/PaymentStatus";
+import BillingForm from "@/components/ui/BillingForm";
 
 const PRICING = {
   monthly: {
@@ -58,6 +59,9 @@ const PricingPage = () => {
   const [loading, setLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState("yearly");
   const [currency, setCurrency] = useState("USD");
+  const [showBilling, setShowBilling] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingInfo, setBillingInfo] = useState(null);
 
   // Use IP geolocation to detect country
   useEffect(() => {
@@ -129,6 +133,45 @@ const PricingPage = () => {
 
     fetchSubscriptionInfo();
   }, [user, isUserLoaded]);
+
+  // Fetch billing info from user profile if available
+  useEffect(() => {
+    if (user) {
+      // Fetch from Supabase or your user context
+      supabase
+        .from("users")
+        .select(
+          "billing_city, billing_country, billing_state, billing_street, billing_zipcode"
+        )
+        .eq("clerk_id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setBillingInfo({
+              city: data.billing_city || "",
+              country: data.billing_country || "",
+              state: data.billing_state || "",
+              street: data.billing_street || "",
+              zipcode: data.billing_zipcode || "",
+            });
+          }
+        });
+    }
+  }, [user]);
+
+  const handleBillingSubmit = async (form) => {
+    setBillingLoading(true);
+    // Update billing info in DB
+    await fetch("/api/update-billing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, clerk_id: user.id }),
+    });
+    setBillingLoading(false);
+    setShowBilling(false);
+    // Now trigger the SubscribeButton logic (can refactor into a function)
+    document.getElementById("real-subscribe-btn").click();
+  };
 
   if (!isUserLoaded || loading) {
     return (
@@ -327,7 +370,46 @@ const PricingPage = () => {
                         : "Current Plan"}
                   </Button>
                 ) : (
-                  <SubscribeButton billingPeriod={billingPeriod} />
+                  <>
+                    <AlertDialog
+                      open={showBilling}
+                      onOpenChange={setShowBilling}
+                    >
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
+                          onClick={() => setShowBilling(true)}
+                        >
+                          Subscribe Now
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Billing Information
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <BillingForm
+                          initialValues={billingInfo || {}}
+                          onSubmit={handleBillingSubmit}
+                          loading={billingLoading}
+                        />
+                        <AlertDialogFooter>
+                          <AlertDialogCancel
+                            onClick={() => setShowBilling(false)}
+                          >
+                            Cancel
+                          </AlertDialogCancel>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    {/* Hidden real subscribe button, triggered after billing info is saved */}
+                    <SubscribeButton
+                      id="real-subscribe-btn"
+                      billingPeriod={billingPeriod}
+                      style={{ display: "none" }}
+                    />
+                  </>
                 )}
               </CardFooter>
             </Card>

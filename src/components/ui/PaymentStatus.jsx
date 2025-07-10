@@ -29,8 +29,8 @@ const PaymentStatus = ({ subscriptionInfo }) => {
       const planType = subscriptionInfo?.plan_type || "monthly";
       const product_id =
         planType === "yearly"
-          ? "pdt_5JbylGSK2FKHuXwOOJ3eX"
-          : "pdt_JEwkqh6Ji8GK9iHUjCpzs";
+          ? process.env.NEXT_PUBLIC_DODO_PAYMENTS_YEARLY_PLAN_ID
+          : process.env.NEXT_PUBLIC_DODO_PAYMENTS_MONTHLY_PLAN_ID;
 
       const response = await fetch("/api/create-subscription", {
         method: "POST",

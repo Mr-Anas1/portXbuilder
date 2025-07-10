@@ -5,6 +5,7 @@ import previewThemes from "@/components/ui/previewThemes";
 import { Loader2 } from "lucide-react";
 import { usePortfolio } from "@/context/PortfolioContext";
 import Script from "next/script";
+import Image from "next/image";
 
 import { navbarComponents } from "@/components/Navbars/index";
 import { heroComponents } from "@/components/HeroSections/index";
@@ -289,10 +290,12 @@ const Page = () => {
             gap: 8,
           }}
         >
-          <img
+          <Image
             src="/logo.png"
             alt="PortXBuilder Logo"
-            style={{ height: 20, width: 20, marginRight: 0 }}
+            width={20}
+            height={20}
+            style={{ marginRight: 0 }}
           />
           <span>
             Made with <b>PortXBuilder</b>
