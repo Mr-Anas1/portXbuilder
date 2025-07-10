@@ -3,10 +3,10 @@ import Footer from "@/components/Home/Footer";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/common/Navbar/Page";
 import { useUser } from "@clerk/nextjs";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import SubscribeButton from "@/components/ui/SubscribeButton";
-import CancelSubscriptionButton from "@/components/ui/CancelSubscriptionButton";
+
 import {
   Card,
   CardContent,

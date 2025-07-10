@@ -92,7 +92,7 @@ const PrivacyPolicy = () => {
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
                   <li>
                     <strong>Service Providers:</strong> Clerk (authentication),
-                    Razorpay (payments), Supabase (database)
+                    Dodo Payments (payments), Supabase (database)
                   </li>
                   <li>
                     <strong>Legal Authorities:</strong> When required by law or
@@ -121,7 +121,7 @@ const PrivacyPolicy = () => {
                   <li>Secure authentication through Clerk</li>
                   <li>Regular security audits and updates</li>
                   <li>Access controls and monitoring</li>
-                  <li>Secure payment processing through Razorpay</li>
+                  <li>Secure payment processing through Dodo Payments</li>
                 </ul>
               </section>
 
@@ -194,7 +194,7 @@ const PrivacyPolicy = () => {
                     <strong>Clerk:</strong> User authentication and management
                   </li>
                   <li>
-                    <strong>Razorpay:</strong> Payment processing
+                    <strong>Dodo Payments:</strong> Payment processing
                   </li>
                   <li>
                     <strong>Supabase:</strong> Database and backend services

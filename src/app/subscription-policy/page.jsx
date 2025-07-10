@@ -52,7 +52,7 @@ const SubscriptionPolicy = () => {
                 </p>
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
                   <li>Automatic renewal at the end of each billing period</li>
-                  <li>Payment processing through Razorpay</li>
+                  <li>Payment processing through Dodo Payments</li>
                   <li>
                     Secure payment handling with industry-standard encryption
                   </li>

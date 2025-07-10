@@ -98,7 +98,7 @@ const TermsAndConditions = () => {
                 </p>
                 <ul className="list-disc pl-6 text-gray-600 mb-4">
                   <li>Subscriptions automatically renew unless cancelled</li>
-                  <li>Payments are processed through Razorpay</li>
+                  <li>Payments are processed through Dodo Payments</li>
                   <li>Prices may change with 30 days notice</li>
                   <li>No refunds for partial months or used periods</li>
                 </ul>

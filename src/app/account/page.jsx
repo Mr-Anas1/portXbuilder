@@ -7,7 +7,7 @@ import { useProStatusClient } from "@/context/useProStatusClient";
 import Navbar from "@/components/common/Navbar/Page";
 import CustomerPortalButton from "@/components/ui/CustomerPortalButton";
 import BillingForm from "@/components/ui/BillingForm";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 
 import {
   CreditCard,
