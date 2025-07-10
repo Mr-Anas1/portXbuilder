@@ -1,6 +1,7 @@
 import { dodopayments } from "@/lib/dodopayments";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import countryNameToCode from "@/lib/countryCodes";
 
 export async function GET(request) {
   try {
@@ -61,10 +62,12 @@ export async function GET(request) {
       .eq("clerk_id", clerkId);
 
     // 2. Create the subscription using the customer_id and real user data
+    const countryInput = user.billing_country;
+    const countryCode = countryNameToCode[countryInput] || countryInput; // fallback if already code
     const subscriptionData = {
       billing: {
         city: user.billing_city || "Default City",
-        country: user.billing_country || "US",
+        country: countryCode || "US", // Use the code here
         state: user.billing_state || "Default State",
         street: user.billing_street || "Default Street",
         zipcode: user.billing_zipcode || "12345",
