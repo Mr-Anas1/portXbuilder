@@ -28,6 +28,17 @@ export default function SubscribeButton({
 
       console.log("Plan IDs:", { monthlyPlanId, yearlyPlanId, billingPeriod });
 
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+      console.log("Base URL:", baseUrl);
+      const NODE_ENV = process.env.NODE_ENV;
+      console.log("Node Environment:", NODE_ENV);
+      const DODO_PAYMENTS_WEBHOOK_KEY = process.env.DODO_PAYMENTS_WEBHOOK_KEY;
+      console.log("DODO_PAYMENTS_WEBHOOK_KEY:", DODO_PAYMENTS_WEBHOOK_KEY);
+      const DODO_API_KEY_TEST = process.env.DODO_API_KEY_TEST;
+      console.log("DODO_API_KEY_TEST:", DODO_API_KEY_TEST);
+      const DODO_API_KEY_LIVE = process.env.DODO_API_KEY_LIVE;
+      console.log("DODO_API_KEY_LIVE:", DODO_API_KEY_LIVE);
+
       const product_id =
         billingPeriod === "monthly" ? monthlyPlanId : yearlyPlanId;
 
