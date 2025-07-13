@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import DodoPayments from "dodopayments";
 
+// Initialize DodoPayments client
+const bearerToken =
+  process.env.NODE_ENV === "development"
+    ? process.env.DODO_API_KEY_TEST
+    : process.env.DODO_API_KEY_LIVE;
+
+const environment =
+  process.env.NODE_ENV === "development" ? "test_mode" : "live_mode";
+
 const client = new DodoPayments({
-  bearerToken:
-    process.env.NODE_ENV === "development"
-      ? process.env.DODO_API_KEY_TEST
-      : process.env.DODO_API_KEY_LIVE,
-  environment:
-    process.env.NODE_ENV === "development" ? "test_mode" : "live_mode",
+  bearerToken,
+  environment,
 });
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    // Accept both the old and new payload shapes for flexibility
     const {
       billing,
       customer,
@@ -24,13 +28,13 @@ export async function POST(request) {
       cartItems,
     } = body;
 
-    // Support both direct and formData-based payloads
     let finalBilling = billing;
     let finalCustomer = customer;
     let finalProductId = product_id;
     let finalQuantity = quantity;
     let finalReturnUrl = return_url || process.env.NEXT_PUBLIC_RETURN_URL;
 
+    // Handle formData if provided
     if (formData) {
       finalBilling = {
         city: formData.city,
@@ -57,46 +61,25 @@ export async function POST(request) {
       );
     }
 
-    // Log the payload for debugging
-    console.log({
+    console.log("[Creating subscription] Env:", environment);
+    console.log("[Using bearer token?]", !!bearerToken);
+
+    // Call the DodoPayments SDK
+    const response = await client.subscriptions.create({
       billing: finalBilling,
       customer: finalCustomer,
+      payment_link: true,
       product_id: finalProductId,
       quantity: finalQuantity,
+      return_url: finalReturnUrl,
     });
 
-    // Make the direct fetch call to Dodo Payments
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_DODO_TEST_API}/subscriptions`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DODO_API_KEY}`,
-        },
-        body: JSON.stringify({
-          billing: finalBilling,
-          customer: finalCustomer,
-          payment_link: true,
-          product_id: finalProductId,
-          quantity: finalQuantity,
-          return_url: finalReturnUrl,
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      return NextResponse.json(
-        { error: "Payment link creation failed", details: errorData },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    return NextResponse.json({ paymentLink: data.payment_link, ...data });
+    return NextResponse.json({
+      paymentLink: response.payment_link,
+      ...response,
+    });
   } catch (err) {
-    console.error("Payment error:", err);
+    console.error("Subscription error:", err);
     return NextResponse.json(
       {
         error: err instanceof Error ? err.message : "An unknown error occurred",
