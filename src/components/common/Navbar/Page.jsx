@@ -13,6 +13,7 @@ import {
   PricingTable,
 } from "@clerk/nextjs";
 import { useAuthContext } from "@/context/AuthContext";
+import CustomerPortalButton from "@/components/ui/CustomerPortalButton";
 
 const Navbar = ({ isDashboard }) => {
   const { userData, loading: authLoading } = useAuthContext();
@@ -115,6 +116,12 @@ const Navbar = ({ isDashboard }) => {
                   className="cursor-pointer hover:text-secondary-500 transition-colors"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/account"
+                  className="cursor-pointer hover:text-secondary-500 transition-colors"
+                >
+                  Account
                 </Link>
                 <UserButton
                   afterSignOutUrl="/"
@@ -242,6 +249,13 @@ const Navbar = ({ isDashboard }) => {
                 onClick={() => setIsOpen(false)}
               >
                 Dashboard
+              </Link>
+              <Link
+                href="/account"
+                className="cursor-pointer"
+                onClick={() => setIsOpen(false)}
+              >
+                Account
               </Link>
               <button
                 onClick={() => {

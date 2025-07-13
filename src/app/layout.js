@@ -125,11 +125,7 @@ export default function RootLayout({ children }) {
               {children}
             </PortfolioProvider>
           </AuthProvider>
-          {/* Razorpay Script */}
-          <Script
-            src="https://checkout.razorpay.com/v1/checkout.js"
-            strategy="beforeInteractive"
-          />
+
           <Analytics />
         </body>
       </html>

@@ -3,10 +3,10 @@ import Footer from "@/components/Home/Footer";
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/common/Navbar/Page";
 import { useUser } from "@clerk/nextjs";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import SubscribeButton from "@/components/ui/SubscribeButton";
-import CancelSubscriptionButton from "@/components/ui/CancelSubscriptionButton";
+
 import {
   Card,
   CardContent,
@@ -30,6 +30,7 @@ import {
 import FullPageLoader from "@/components/ui/FullPageLoader";
 import { toast } from "react-hot-toast";
 import PaymentStatus from "@/components/ui/PaymentStatus";
+import BillingForm from "@/components/ui/BillingForm";
 
 const PRICING = {
   monthly: {
@@ -58,6 +59,10 @@ const PricingPage = () => {
   const [loading, setLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState("yearly");
   const [currency, setCurrency] = useState("USD");
+  const [showBilling, setShowBilling] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingInfo, setBillingInfo] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
   // Use IP geolocation to detect country
   useEffect(() => {
@@ -73,86 +78,26 @@ const PricingPage = () => {
       .catch(() => setCurrency("USD"));
   }, []);
 
-  const handleDowngrade = async () => {
+  // Add handler for Dodo customer portal
+  const handleManageSubscription = async () => {
     if (!user) {
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Authentication Required</p>
-          <p className="text-sm text-gray-600">
-            Please sign in to manage your subscription.
-          </p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
+      toast.error("Please sign in to manage your subscription");
       return;
     }
-
     try {
-      const response = await fetch("/api/cancel-subscription", {
+      const res = await fetch("/api/create-customer-portal", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clerk_id: user.id }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to downgrade subscription");
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error || "Failed to open portal");
       }
-
-      toast.success(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Subscription Downgraded</p>
-          <p className="text-sm text-gray-600">{data.message}</p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
-      window.location.reload(); // Refresh the page to update the UI
     } catch (error) {
-      console.error("Error downgrading subscription:", error);
-      toast.error(
-        <div className="flex flex-col gap-1">
-          <p className="font-semibold">Downgrade Failed</p>
-          <p className="text-sm text-gray-600">
-            Failed to downgrade subscription. Please try again.
-          </p>
-        </div>,
-        {
-          duration: 5000,
-          style: {
-            background: "#fff",
-            color: "#333",
-            boxShadow:
-              "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-            borderRadius: "0.5rem",
-            padding: "1rem",
-          },
-        }
-      );
+      toast.error("Failed to open portal");
     }
   };
 
@@ -190,6 +135,70 @@ const PricingPage = () => {
     fetchSubscriptionInfo();
   }, [user, isUserLoaded]);
 
+  // Fetch billing info from user profile if available
+  useEffect(() => {
+    if (user) {
+      // Fetch from Supabase or your user context
+      supabase
+        .from("users")
+        .select(
+          "billing_city, billing_country, billing_state, billing_street, billing_zipcode"
+        )
+        .eq("clerk_id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setBillingInfo({
+              city: data.billing_city || "",
+              country: data.billing_country || "",
+              state: data.billing_state || "",
+              street: data.billing_street || "",
+              zipcode: data.billing_zipcode || "",
+            });
+          }
+        });
+    }
+  }, [user]);
+
+  // Check if billing information is complete
+  const isBillingComplete = () => {
+    if (!billingInfo) return false;
+    return (
+      billingInfo.city &&
+      billingInfo.country &&
+      billingInfo.state &&
+      billingInfo.street &&
+      billingInfo.zipcode
+    );
+  };
+
+  const handleSubscribeClick = () => {
+    if (isBillingComplete()) {
+      // If billing info is complete, show loading and directly trigger subscription
+      setSubscriptionLoading(true);
+      document.getElementById("real-subscribe-btn").click();
+    } else {
+      // If billing info is incomplete, show the billing form
+      setShowBilling(true);
+    }
+  };
+
+  const handleBillingSubmit = async (form) => {
+    setBillingLoading(true);
+    // Update billing info in DB
+    await fetch("/api/update-billing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, clerk_id: user.id }),
+    });
+    setBillingLoading(false);
+    setShowBilling(false);
+    // Update local billing info
+    setBillingInfo(form);
+    // Now trigger the SubscribeButton logic
+    document.getElementById("real-subscribe-btn").click();
+  };
+
   if (!isUserLoaded || loading) {
     return (
       <div className="min-h-screen flex justify-center items-center">
@@ -197,119 +206,6 @@ const PricingPage = () => {
       </div>
     );
   }
-
-  const renderSubscriptionStatus = () => {
-    if (!user) {
-      return (
-        <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Subscription Management
-          </h2>
-          <p className="text-gray-600">
-            Please sign in to manage your subscription.
-          </p>
-        </div>
-      );
-    }
-
-    if (loading) {
-      return (
-        <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading...</h2>
-        </div>
-      );
-    }
-
-    const isPro = subscriptionInfo?.plan === "pro";
-    const isCancelled = subscriptionInfo?.subscription_status === "cancelled";
-    const endDate = subscriptionInfo?.subscription_end_date
-      ? new Date(subscriptionInfo.subscription_end_date)
-      : null;
-    const cancelledAt = subscriptionInfo?.subscription_cancelled_at
-      ? new Date(subscriptionInfo.subscription_cancelled_at)
-      : null;
-
-    return (
-      <div className="max-w-3xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Your Subscription Status
-        </h2>
-
-        <PaymentStatus subscriptionInfo={subscriptionInfo} />
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <p className="text-gray-600">Current Plan</p>
-              <p className="text-xl font-semibold text-gray-800">
-                {isPro ? "Pro Plan" : "Free Plan"}
-              </p>
-              {isCancelled && (
-                <p className="text-sm text-amber-600 mt-1">
-                  Cancelled - Active until {endDate?.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-            <div className="px-3 py-1 rounded-full bg-primary-100 text-primary-500 text-sm font-medium">
-              {subscriptionInfo?.subscription_status ||
-                "No active subscription"}
-            </div>
-          </div>
-
-          {endDate && (
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-gray-600">Subscription Period</p>
-              <p className="text-lg font-semibold text-gray-800">
-                {isCancelled ? "Access until" : "Next billing date"}:{" "}
-                {endDate.toLocaleDateString()}
-              </p>
-              {isCancelled && cancelledAt && (
-                <p className="text-sm text-gray-500 mt-1">
-                  Cancelled on {cancelledAt.toLocaleDateString()}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Available Actions
-            </h3>
-            <div className="space-y-4">
-              {isPro ? (
-                <div className="space-y-2">
-                  <p className="text-gray-600 mb-2">
-                    {isCancelled
-                      ? "Your subscription has been cancelled but you'll continue to have access to Pro features until the end of your billing period."
-                      : "You are currently on the Pro plan. You can cancel your subscription at any time."}
-                  </p>
-                  {!isCancelled && <CancelSubscriptionButton />}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <p className="text-gray-600 mb-4">
-                    Upgrade to Pro to unlock all premium features and remove
-                    limitations.
-                  </p>
-                  <Button
-                    className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors"
-                    onClick={() => {
-                      const el = document.getElementById("pricing");
-                      if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
-                      }
-                    }}
-                  >
-                    See Plans
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const renderPlans = () => {
     const isPro = subscriptionInfo?.plan === "pro";
@@ -410,58 +306,14 @@ const PricingPage = () => {
                 </ul>
               </CardContent>
               <CardFooter className="mt-4">
-                {isPro && !isCancelled && !isPaymentFailed && !isEnded ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
-                        size="lg"
-                        variant={"outline"}
-                      >
-                        Downgrade to Free
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Downgrade to Free Plan
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to downgrade to the Free plan?
-                          You&apos;ll continue to have access to Pro features
-                          until the end of your current billing period. After
-                          that, your account will be downgraded to the Free plan
-                          with the following limitations:
-                          <ul className="list-disc pl-6 mt-2 space-y-1">
-                            <li>Basic templates only</li>
-                            <li>Ads and watermarks on your portfolio</li>
-                            <li>Limited to 15 credits</li>
-                            <li>No specific subdomain</li>
-                            <li>No source code download</li>
-                          </ul>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Keep Pro Plan</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={handleDowngrade}
-                          className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                          Yes, Downgrade to Free
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                ) : (
-                  <Button
-                    className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
-                    size="lg"
-                    variant={"outline"}
-                    disabled
-                  >
-                    {isPro ? "Current Plan" : "Free Plan"}
-                  </Button>
-                )}
+                <Button
+                  className="w-full bg-primary-100 text-primary-500 hover:bg-primary-500 hover:text-white transition duration-300 text-md font-semibold rounded-xl py-3"
+                  size="lg"
+                  variant={"outline"}
+                  disabled
+                >
+                  {isPro ? "Free Plan" : "Current Plan"}
+                </Button>
               </CardFooter>
             </Card>
 
@@ -544,7 +396,68 @@ const PricingPage = () => {
                         : "Current Plan"}
                   </Button>
                 ) : (
-                  <SubscribeButton billingPeriod={billingPeriod} />
+                  <>
+                    {isBillingComplete() ? (
+                      // If billing is complete, show button without AlertDialog
+                      <Button
+                        className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
+                        onClick={handleSubscribeClick}
+                        disabled={subscriptionLoading}
+                      >
+                        {subscriptionLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Subscribe Now"
+                        )}
+                      </Button>
+                    ) : (
+                      // If billing is incomplete, show AlertDialog
+                      <AlertDialog
+                        open={showBilling}
+                        onOpenChange={setShowBilling}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
+                            onClick={() => setShowBilling(true)}
+                            disabled={subscriptionLoading}
+                          >
+                            Subscribe Now
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Billing Information
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <BillingForm
+                            initialValues={billingInfo || {}}
+                            onSubmit={handleBillingSubmit}
+                            loading={billingLoading}
+                          />
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                              onClick={() => setShowBilling(false)}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                    {/* Hidden real subscribe button, triggered after billing info is saved */}
+                    <SubscribeButton
+                      id="real-subscribe-btn"
+                      billingPeriod={billingPeriod}
+                      style={{ display: "none" }}
+                      onComplete={() => setSubscriptionLoading(false)}
+                      onError={() => setSubscriptionLoading(false)}
+                    />
+                  </>
                 )}
               </CardFooter>
             </Card>
@@ -660,20 +573,6 @@ const PricingPage = () => {
       <Navbar className="relative z-10" />
       <main className="flex-1 relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {/* Title */}
-          <div className="max-w-2xl mx-auto text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Subscription Management
-            </h1>
-            <p className="text-lg text-gray-600">
-              Manage your subscription and choose the plan that best fits your
-              needs
-            </p>
-          </div>
-
-          {/* Subscription Status */}
-          {renderSubscriptionStatus()}
-
           {/* Plans */}
           <div className="max-w-2xl mx-auto text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
