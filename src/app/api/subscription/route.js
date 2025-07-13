@@ -1,10 +1,19 @@
-import { dodopayments } from "@/lib/dodopayments";
+import { dodopayments, isDodoPaymentsConfigured } from "@/lib/dodopayments";
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import countryNameToCode from "@/lib/countryCodes";
 
 export async function GET(request) {
   try {
+    // Check if Dodo Payments is properly configured
+    if (!isDodoPaymentsConfigured()) {
+      console.error("Dodo Payments is not configured. Missing API keys.");
+      return NextResponse.json(
+        { error: "Payment service is not configured. Please contact support." },
+        { status: 500 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("productId");
     const clerkId = searchParams.get("clerk_id");
@@ -121,9 +130,18 @@ export async function GET(request) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error(error);
+    console.error("Subscription API error:", error);
+
+    // Provide more specific error messages
+    if (error.message?.includes("JSON.parse")) {
+      return NextResponse.json(
+        { error: "Invalid response from payment service" },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
-      { error: "Failed to fetch products" },
+      { error: "Failed to create subscription. Please try again." },
       { status: 500 }
     );
   }

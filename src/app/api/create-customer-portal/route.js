@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
-import { dodopayments } from "@/lib/dodopayments";
+import { dodopayments, isDodoPaymentsConfigured } from "@/lib/dodopayments";
 
 export async function POST(request) {
   console.log("create-customer-portal API called");
 
   try {
+    // Check if Dodo Payments is properly configured
+    if (!isDodoPaymentsConfigured()) {
+      console.error("Dodo Payments is not configured. Missing API keys.");
+      return NextResponse.json(
+        { error: "Payment service is not configured. Please contact support." },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     console.log("Request body:", body);
 

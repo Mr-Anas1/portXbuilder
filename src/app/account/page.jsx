@@ -57,7 +57,6 @@ export default function AccountPage() {
       }
 
       setUserData(data);
-      setHasProPlan(data?.plan === "pro");
     } catch (error) {
       console.error("Error:", error);
     } finally {

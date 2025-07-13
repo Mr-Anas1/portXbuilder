@@ -59,7 +59,21 @@ const CustomerPortalButton = ({
       window.location.href = data.url;
     } catch (error) {
       console.error("Error opening customer portal:", error);
-      toast.error(error.message || "Failed to open subscription settings");
+
+      // Provide more user-friendly error messages
+      let errorMessage = "Failed to open subscription settings";
+      if (error.message?.includes("Payment service is not configured")) {
+        errorMessage =
+          "Payment service is temporarily unavailable. Please try again later or contact support.";
+      } else if (error.message?.includes("No subscription found")) {
+        errorMessage = "No active subscription found. Please subscribe first.";
+      } else if (error.message?.includes("Customer not found")) {
+        errorMessage = "Subscription not found. Please contact support.";
+      } else {
+        errorMessage = error.message || "Failed to open subscription settings";
+      }
+
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

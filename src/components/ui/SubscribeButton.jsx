@@ -38,6 +38,7 @@ export default function SubscribeButton({
       console.log("DODO_API_KEY_TEST:", DODO_API_KEY_TEST);
       const DODO_API_KEY_LIVE = process.env.DODO_API_KEY_LIVE;
       console.log("DODO_API_KEY_LIVE:", DODO_API_KEY_LIVE);
+      console.log("DODO_API_KEY_LIVE:", !!process.env.DODO_API_KEY_LIVE);
 
       const product_id =
         billingPeriod === "monthly" ? monthlyPlanId : yearlyPlanId;
@@ -63,7 +64,19 @@ export default function SubscribeButton({
       window.location.href = data.payment_link;
     } catch (error) {
       console.error("Subscription error:", error);
-      toast.error("Subscription error: " + (error.message || error));
+
+      // Provide more user-friendly error messages
+      let errorMessage = "Subscription error: ";
+      if (error.message?.includes("Payment service is not configured")) {
+        errorMessage =
+          "Payment service is temporarily unavailable. Please try again later or contact support.";
+      } else if (error.message?.includes("Invalid response")) {
+        errorMessage = "Payment service error. Please try again.";
+      } else {
+        errorMessage += error.message || "Unknown error occurred";
+      }
+
+      toast.error(errorMessage);
       setLoading(false);
     }
   };
