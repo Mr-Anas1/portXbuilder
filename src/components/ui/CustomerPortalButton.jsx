@@ -19,16 +19,12 @@ const CustomerPortalButton = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const handleOpenPortal = async () => {
-    console.log("CustomerPortalButton clicked, user:", user);
-
     if (!user?.id) {
-      console.error("No user ID found:", user);
       toast.error("Please sign in to manage your subscription");
       return;
     }
 
     setIsLoading(true);
-    console.log("Making API call with clerk_id:", user.id);
 
     try {
       const response = await fetch("/api/create-customer-portal", {
@@ -41,10 +37,7 @@ const CustomerPortalButton = ({
         }),
       });
 
-      console.log("API response status:", response.status);
-
       const data = await response.json();
-      console.log("API response data:", data);
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to open customer portal");
@@ -54,12 +47,9 @@ const CustomerPortalButton = ({
         throw new Error("No portal URL received from API");
       }
 
-      console.log("Redirecting to portal URL:", data.url);
       // Redirect to the customer portal
       window.location.href = data.url;
     } catch (error) {
-      console.error("Error opening customer portal:", error);
-
       // Provide more user-friendly error messages
       let errorMessage = "Failed to open subscription settings";
       if (error.message?.includes("Payment service is not configured")) {

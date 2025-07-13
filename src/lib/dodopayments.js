@@ -8,9 +8,6 @@ const getApiKey = () => {
       : process.env.DODO_API_KEY_LIVE;
 
   if (!apiKey) {
-    console.warn(
-      `Dodo Payments API key not found for ${process.env.NODE_ENV} environment`
-    );
     return null;
   }
 

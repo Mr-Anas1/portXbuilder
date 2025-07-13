@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { dodopayments, isDodoPaymentsConfigured } from "@/lib/dodopayments";
 
 export async function POST(request) {
-  console.log("create-customer-portal API called");
-
   try {
     // Check if Dodo Payments is properly configured
     if (!isDodoPaymentsConfigured()) {
@@ -15,13 +13,9 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    console.log("Request body:", body);
-
     const { clerk_id } = body;
-    console.log("Extracted clerk_id:", clerk_id);
 
     if (!clerk_id) {
-      console.error("No clerk_id provided");
       return NextResponse.json(
         { error: "clerk_id is required" },
         { status: 400 }
@@ -42,14 +36,11 @@ export async function POST(request) {
     }
 
     // Fetch the user's data from Supabase
-    console.log("Fetching user from Supabase with clerk_id:", clerk_id);
     const { data: user, error } = await supabaseAdmin
       .from("users")
       .select("dodo_customer_id, plan, email, name")
       .eq("clerk_id", clerk_id)
       .single();
-
-    console.log("Supabase response - user:", user, "error:", error);
 
     if (error) {
       console.error("Supabase error:", error);
@@ -60,19 +51,14 @@ export async function POST(request) {
     }
 
     if (!user) {
-      console.error("User not found in database");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    console.log("User found:", user);
 
     // Get the appropriate API key from the SDK config
     const apiKey =
       process.env.NODE_ENV === "development"
         ? process.env.DODO_API_KEY_TEST
         : process.env.DODO_API_KEY_LIVE;
-
-    console.log("API key configured:", !!apiKey);
 
     if (!apiKey) {
       console.error("Dodo Payments API key not configured");
@@ -88,11 +74,7 @@ export async function POST(request) {
       ? "https://api.dodopayments.com"
       : "https://test.dodopayments.com";
 
-    console.log("Using base URL:", baseUrl);
-
     // Find the customer by searching through all customers and matching clerk_id in metadata
-    console.log("Searching for customer with clerk_id in metadata...");
-
     const customersUrl = `${baseUrl}/customers`;
     const customersResponse = await fetch(customersUrl, {
       method: "GET",
@@ -111,12 +93,6 @@ export async function POST(request) {
       customersData = { raw: customersText };
     }
 
-    console.log(
-      "Customers list response:",
-      customersResponse.status,
-      customersData
-    );
-
     if (!customersResponse.ok) {
       console.error("Failed to fetch customers list");
       return NextResponse.json(
@@ -127,7 +103,6 @@ export async function POST(request) {
 
     if (!customersData.items || !Array.isArray(customersData.items)) {
       console.error("No customers found or invalid response format");
-      console.log("Response structure:", customersData);
       return NextResponse.json(
         { error: "No customers found in payment system" },
         { status: 404 }
@@ -140,30 +115,16 @@ export async function POST(request) {
     );
 
     if (!matchingCustomer) {
-      console.error("No customer found with matching email");
-      console.log(
-        "Available customers:",
-        customersData.items.map((c) => ({
-          customer_id: c.customer_id,
-          email: c.email,
-          name: c.name,
-        }))
-      );
-      console.log("Looking for email:", user.email);
       return NextResponse.json(
         { error: "No subscription found. Please subscribe first." },
         { status: 404 }
       );
     }
 
-    console.log("Found customer by metadata search:", matchingCustomer);
     const actualCustomerId = matchingCustomer.customer_id;
 
     // Update the stored customer ID if it's different
     if (user.dodo_customer_id !== actualCustomerId) {
-      console.log(
-        `Updating stored customer ID from ${user.dodo_customer_id} to ${actualCustomerId}`
-      );
       await supabaseAdmin
         .from("users")
         .update({ dodo_customer_id: actualCustomerId })
@@ -171,12 +132,9 @@ export async function POST(request) {
     }
 
     const returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/account`;
-    console.log("Return URL:", returnUrl);
 
     // Try to create portal session using Dodo SDK first
     try {
-      console.log("Creating portal session with Dodo SDK...");
-
       // Check if the SDK has a customer portal method
       if (
         dodopayments.customers &&
@@ -186,24 +144,16 @@ export async function POST(request) {
         const portalSession =
           await dodopayments.customers.customerPortal.create(actualCustomerId);
 
-        console.log("Portal session created with SDK:", portalSession);
         return NextResponse.json({ url: portalSession.link });
       }
     } catch (sdkError) {
-      console.log(
-        "SDK method not available or failed, trying REST API:",
-        sdkError
-      );
+      // Fallback to REST API if SDK method doesn't exist
     }
 
     // Fallback to REST API if SDK method doesn't exist
-    console.log("Using REST API fallback...");
-
     const portalUrl = `${baseUrl}/customers/${actualCustomerId}/customer-portal/session`;
-    console.log("Portal URL:", portalUrl);
 
     // Create the portal session using REST API
-    console.log("Creating portal session with REST API...");
     const resp = await fetch(portalUrl, {
       method: "POST",
       headers: {
@@ -215,12 +165,9 @@ export async function POST(request) {
       }),
     });
 
-    console.log("Dodo API response status:", resp.status);
-
     // Handle empty response body
     let data;
     const responseText = await resp.text();
-    console.log("Dodo API response text:", responseText);
 
     try {
       data = responseText ? JSON.parse(responseText) : {};
@@ -228,8 +175,6 @@ export async function POST(request) {
       console.error("Failed to parse Dodo API response:", parseError);
       data = { error: "Invalid response from payment service" };
     }
-
-    console.log("Dodo API response data:", data);
 
     if (!resp.ok) {
       console.error("Dodo Payments portal error:", {
@@ -269,7 +214,6 @@ export async function POST(request) {
       );
     }
 
-    console.log("Portal session created successfully for user:", clerk_id);
     return NextResponse.json({ url: data.link });
   } catch (error) {
     console.error("API route error:", error);

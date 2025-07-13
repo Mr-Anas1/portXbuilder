@@ -18,10 +18,6 @@ export async function GET(request) {
     const productId = searchParams.get("productId");
     const clerkId = searchParams.get("clerk_id");
 
-    console.log("Creating subscription with:", { productId, clerkId });
-    console.log("Environment:", process.env.NODE_ENV);
-    console.log("Base URL:", process.env.NEXT_PUBLIC_BASE_URL);
-
     if (!productId || !clerkId) {
       return NextResponse.json(
         { error: "Missing productId or clerk_id" },
@@ -42,18 +38,6 @@ export async function GET(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log("User found:", {
-      email: user.email,
-      name: user.name,
-      billing: {
-        city: user.billing_city,
-        country: user.billing_country,
-        state: user.billing_state,
-        street: user.billing_street,
-        zipcode: user.billing_zipcode,
-      },
-    });
-
     // 1. Create or update the customer with real user data
     const customerResp = await dodopayments.customers.create({
       email: user.email,
@@ -61,8 +45,6 @@ export async function GET(request) {
       metadata: { clerk_id: clerkId },
     });
     const customer_id = customerResp.customer_id;
-
-    console.log("Customer created:", customer_id);
 
     // Store the Dodo customer_id in the users table (using dodo_customer_id column)
     await supabaseAdmin
@@ -97,11 +79,7 @@ export async function GET(request) {
       webhook_url: `${process.env.NEXT_PUBLIC_BASE_URL || "https://your-ngrok-url.app"}/api/webhook`,
     };
 
-    console.log("Creating subscription with data:", subscriptionData);
-
     const response = await dodopayments.subscriptions.create(subscriptionData);
-
-    console.log("Dodo Payments Response:", response);
 
     // Update user record in Supabase
     if (response && response.subscription_id) {
