@@ -62,6 +62,7 @@ const PricingPage = () => {
   const [showBilling, setShowBilling] = useState(false);
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingInfo, setBillingInfo] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
   // Use IP geolocation to detect country
   useEffect(() => {
@@ -159,6 +160,29 @@ const PricingPage = () => {
     }
   }, [user]);
 
+  // Check if billing information is complete
+  const isBillingComplete = () => {
+    if (!billingInfo) return false;
+    return (
+      billingInfo.city &&
+      billingInfo.country &&
+      billingInfo.state &&
+      billingInfo.street &&
+      billingInfo.zipcode
+    );
+  };
+
+  const handleSubscribeClick = () => {
+    if (isBillingComplete()) {
+      // If billing info is complete, show loading and directly trigger subscription
+      setSubscriptionLoading(true);
+      document.getElementById("real-subscribe-btn").click();
+    } else {
+      // If billing info is incomplete, show the billing form
+      setShowBilling(true);
+    }
+  };
+
   const handleBillingSubmit = async (form) => {
     setBillingLoading(true);
     // Update billing info in DB
@@ -169,7 +193,9 @@ const PricingPage = () => {
     });
     setBillingLoading(false);
     setShowBilling(false);
-    // Now trigger the SubscribeButton logic (can refactor into a function)
+    // Update local billing info
+    setBillingInfo(form);
+    // Now trigger the SubscribeButton logic
     document.getElementById("real-subscribe-btn").click();
   };
 
@@ -371,43 +397,65 @@ const PricingPage = () => {
                   </Button>
                 ) : (
                   <>
-                    <AlertDialog
-                      open={showBilling}
-                      onOpenChange={setShowBilling}
-                    >
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
-                          onClick={() => setShowBilling(true)}
-                        >
-                          Subscribe Now
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Billing Information
-                          </AlertDialogTitle>
-                        </AlertDialogHeader>
-                        <BillingForm
-                          initialValues={billingInfo || {}}
-                          onSubmit={handleBillingSubmit}
-                          loading={billingLoading}
-                        />
-                        <AlertDialogFooter>
-                          <AlertDialogCancel
-                            onClick={() => setShowBilling(false)}
+                    {isBillingComplete() ? (
+                      // If billing is complete, show button without AlertDialog
+                      <Button
+                        className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
+                        onClick={handleSubscribeClick}
+                        disabled={subscriptionLoading}
+                      >
+                        {subscriptionLoading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Subscribe Now"
+                        )}
+                      </Button>
+                    ) : (
+                      // If billing is incomplete, show AlertDialog
+                      <AlertDialog
+                        open={showBilling}
+                        onOpenChange={setShowBilling}
+                      >
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            className="w-full bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 transition-colors text-md font-semibold rounded-xl py-3 shadow-md"
+                            onClick={() => setShowBilling(true)}
+                            disabled={subscriptionLoading}
                           >
-                            Cancel
-                          </AlertDialogCancel>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            Subscribe Now
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Billing Information
+                            </AlertDialogTitle>
+                          </AlertDialogHeader>
+                          <BillingForm
+                            initialValues={billingInfo || {}}
+                            onSubmit={handleBillingSubmit}
+                            loading={billingLoading}
+                          />
+                          <AlertDialogFooter>
+                            <AlertDialogCancel
+                              onClick={() => setShowBilling(false)}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                     {/* Hidden real subscribe button, triggered after billing info is saved */}
                     <SubscribeButton
                       id="real-subscribe-btn"
                       billingPeriod={billingPeriod}
                       style={{ display: "none" }}
+                      onComplete={() => setSubscriptionLoading(false)}
+                      onError={() => setSubscriptionLoading(false)}
                     />
                   </>
                 )}

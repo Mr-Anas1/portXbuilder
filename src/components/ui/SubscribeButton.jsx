@@ -9,6 +9,8 @@ export default function SubscribeButton({
   billingPeriod = "yearly",
   id,
   style,
+  onComplete,
+  onError,
 }) {
   const { user } = useUser();
   const router = useRouter();
@@ -45,8 +47,14 @@ export default function SubscribeButton({
         throw new Error(data.error || "Failed to create subscription");
       }
 
+      // Call onComplete callback before redirecting
+      if (onComplete) onComplete();
+
       window.location.href = data.payment_link;
     } catch (error) {
+      // Call onError callback
+      if (onError) onError();
+
       // Provide more user-friendly error messages
       let errorMessage = "Subscription error: ";
       if (error.message?.includes("Payment service is not configured")) {
