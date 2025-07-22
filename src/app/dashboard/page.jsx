@@ -80,7 +80,7 @@ export default function Dashboard() {
   const sectionToField = {
     navbar: ["name"],
     home: ["home_title", "home_subtitle", "profileImage"],
-    about: ["about_me"],
+    about: ["about_me", "bio"],
     projects: ["projects"],
     contact: [
       "email",

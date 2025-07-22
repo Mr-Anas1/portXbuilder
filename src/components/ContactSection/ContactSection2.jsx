@@ -15,7 +15,7 @@ const ContactSection2 = ({ theme, isMobileLayout, sectionRef }) => {
     >
       <div className="flex flex-col justify-center items-center text-center h-full py-16">
         <h2 className={`text-4xl font-bold mb-4 ${theme.accentText}`}>
-          Contact Us
+          Contact Me
         </h2>
         <p className={`${theme.subtext} mb-12`}>
           Get in touch with us or follow our social profiles

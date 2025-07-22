@@ -55,6 +55,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
     // Max length per field
     const maxLengths = {
       about_me: 1000,
+      bio: 500, // Max length for bio
       phone: 15,
       email: 254,
       name: 60,
@@ -70,6 +71,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
       phone: /^[0-9+\s-]*$/, // Digits, spaces, +, and dashes
       email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Valid email
       about_me: /^(?!.*<[^>]*>)[a-zA-Z0-9\s.,'()!?\-]*$/, // No HTML, allow basic punctuation
+      bio: /^(?!.*<[^>]*>)[a-zA-Z0-9\s.,'()!?\-]*$/, // Validation for bio
       name: /^[a-zA-Z\s]*$/, // Letters and spaces
       home_title: /^[a-zA-Z0-9\s.',!?-]*$/, // Basic sentence format
       home_subtitle: /^[a-zA-Z0-9\s.',!?-]*$/,
@@ -228,6 +230,7 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
     // Check if any required fields are empty
     const requiredFields = {
       about_me: "About Me",
+      bio: "Bio", // Required field
       name: "Name",
       home_title: "Home Title",
       home_subtitle: "Home Subtitle",
@@ -336,6 +339,18 @@ const PortfolioEditor = ({ section, data, onClose, onSave }) => {
               onChange={handleChange}
               className={`rounded-lg h-36 px-4 py-2 w-full outline-none border transition-all duration-300 mb-4 ${
                 fieldErrors["about_me"]
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400"
+                  : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              }`}
+            />
+
+            <label className="block text-sm font-medium mb-1">Bio</label>
+            <textarea
+              name="bio"
+              value={formState.bio || ""}
+              onChange={handleChange}
+              className={`rounded-lg h-24 px-4 py-2 w-full outline-none border transition-all duration-300 mb-4 ${
+                fieldErrors["bio"]
                   ? "border-red-500 focus:ring-2 focus:ring-red-400"
                   : "border-gray-300 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               }`}

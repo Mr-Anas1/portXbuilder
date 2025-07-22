@@ -99,7 +99,7 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
         <div className="flex flex-col md:flex-row gap-4 ">
           {/* Project Image Upload */}
           <div className="flex-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+            <label className="text-sm text-start md:text-center font-medium text-gray-700 mb-2 block">
               Project Image
             </label>
             <div className="flex items-center gap-2 w-full">
@@ -135,7 +135,7 @@ const ProjectCard = ({ id, formData, setFormData, removeCard }) => {
 
           {/* Project Link Input */}
           <div className="flex-1">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
+            <label className="text-sm text-start md:text-center font-medium text-gray-700 mb-2 block">
               Project Link
             </label>
             <div className="flex items-center gap-2">
