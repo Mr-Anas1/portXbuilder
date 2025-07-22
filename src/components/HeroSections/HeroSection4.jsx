@@ -54,7 +54,7 @@ export default function HeroSection4({
             className={`${
               isMobileLayout
                 ? "text-3xl leading-snug"
-                : "text-4xl md:text-6xl leading-tight"
+                : "text-3xl md:text-4xl lg:text-5xl leading-tight"
             } font-bold ${theme.text}`}
           >
             Hi, I&apos;m <br />
@@ -89,8 +89,8 @@ export default function HeroSection4({
 
       {/* Right Image Section */}
       <div
-        className={`relative flex-1 mx-auto w-full max-w-[250px] h-auto aspect-square sm:max-w-[350px] md:max-w-[350px] lg:max-w-[450px] xl:max-w-[550px] ${
-          isMobileLayout ? "mt-10" : "mt-20"
+        className={`relative flex-1 mx-auto w-full  h-auto aspect-square max-w-[300px] sm:max-w-[350px] md:max-w-[350px] lg:max-w-[450px] xl:max-w-[550px] ${
+          isMobileLayout ? "mt-10" : ""
         }`}
       >
         <div

@@ -61,10 +61,7 @@ export default function BillingForm({
       htmlTagPattern.test(form.country)
     )
       errs.country = "Invalid characters in country name";
-    else if (!textPattern.test(form.country))
-      errs.country =
-        "Only letters, numbers, spaces, and hyphens allowed in country name";
-    // State
+
     if (!form.state || form.state.trim().length < 2)
       errs.state = "State must be at least 2 characters";
     else if (form.state.length > 40)
