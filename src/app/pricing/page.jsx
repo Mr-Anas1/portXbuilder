@@ -31,6 +31,7 @@ import FullPageLoader from "@/components/ui/FullPageLoader";
 import { toast } from "react-hot-toast";
 import PaymentStatus from "@/components/ui/PaymentStatus";
 import BillingForm from "@/components/ui/BillingForm";
+import { useRouter } from "next/navigation";
 
 const PRICING = {
   monthly: {
@@ -55,6 +56,7 @@ const PRICING = {
 
 const PricingPage = () => {
   const { user, isLoaded: isUserLoaded } = useUser();
+  const router = useRouter();
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [billingPeriod, setBillingPeriod] = useState("yearly");
@@ -135,6 +137,12 @@ const PricingPage = () => {
     fetchSubscriptionInfo();
   }, [user, isUserLoaded]);
 
+  useEffect(() => {
+    if (isUserLoaded && !user) {
+      router.replace("/");
+    }
+  }, [isUserLoaded, user, router]);
+
   // Fetch billing info from user profile if available
   useEffect(() => {
     if (user) {
@@ -199,12 +207,8 @@ const PricingPage = () => {
     document.getElementById("real-subscribe-btn").click();
   };
 
-  if (!isUserLoaded || loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+  if (!isUserLoaded || loading || (!user && isUserLoaded)) {
+    return <FullPageLoader />;
   }
 
   const renderPlans = () => {
@@ -428,7 +432,7 @@ const PricingPage = () => {
                             Subscribe Now
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="sm:mx-auto max-w-xs sm:max-w-md w-full rounded-xl">
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               Billing Information
