@@ -12,7 +12,7 @@
   "crons": [
     {
       "path": "/api/process-grace-periods",
-      "schedule": "0 * * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 } 
