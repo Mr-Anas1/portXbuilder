@@ -8,5 +8,11 @@
       "src": "package.json",
       "use": "@vercel/next"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/process-grace-periods",
+      "schedule": "0 2 * * *"
+    }
   ]
 } 
