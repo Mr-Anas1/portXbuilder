@@ -9,7 +9,7 @@
       "use": "@vercel/next"
     }
   ],
-  "cron": [
+  "crons": [
     {
       "path": "/api/process-grace-periods",
       "schedule": "0 * * * *"
