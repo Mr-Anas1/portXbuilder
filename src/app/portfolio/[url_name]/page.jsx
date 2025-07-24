@@ -186,7 +186,7 @@ const Page = () => {
       </section>
 
       {/* Google AdSense for free users */}
-      {portfolio.plan && portfolio.plan !== "pro" && showAd && (
+      {/* {portfolio.plan && portfolio.plan !== "pro" && showAd && (
         <>
           <Script
             id="adsense-script"
@@ -268,7 +268,7 @@ const Page = () => {
             `}
           </Script>
         </>
-      )}
+      )} */}
 
       {/* Watermark for free users */}
       {portfolio.plan && portfolio.plan !== "pro" && (

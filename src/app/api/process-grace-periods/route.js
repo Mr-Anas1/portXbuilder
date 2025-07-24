@@ -41,7 +41,15 @@ export async function POST(request) {
           .update({
             plan: "free",
             subscription_status: "cancelled",
-            grace_period_end: null, // Clear grace period
+            grace_period_end: null,
+            components: {
+              home: "Hero 1",
+              about: "About 1",
+              footer: "Footer 1",
+              navbar: "Navbar 1",
+              contact: "Contact 1",
+              projects: "Project 1",
+            },
           })
           .eq("clerk_id", user.clerk_id);
 
