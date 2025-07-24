@@ -26,6 +26,13 @@ const TextInput = ({
         rows={rows}
         onChange={onChange}
       />
+      {/* Character counter for bio or any field with value */}
+      {typeof value === "string" && name && (
+        <div className="text-xs text-gray-500 mt-1 ml-auto w-full text-right">
+          {value.length}
+          {name === "bio" ? "/160" : null}
+        </div>
+      )}
     </div>
   );
 };
