@@ -11,7 +11,7 @@ const Preview = () => {
         {/* Iframe wrapper with 16:9 aspect ratio */}
         <div className="relative w-full aspect-[1.6666]">
           <iframe
-            src="https://app.supademo.com/embed/cmbltuiuu00fsyw0i1dfperla?embed_v=2"
+            src="https://app.supademo.com/embed/cmbltuiuu00fsyw0i1dfperla?v_email=EMAIL&embed_v="
             loading="lazy"
             title="www.portxbuilder.com"
             allow="clipboard-write"
