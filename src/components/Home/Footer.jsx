@@ -53,12 +53,27 @@ const Footer = () => {
         </div>
 
         <div className="flex justify-center item-center gap-6 py-5 md:py-0">
-          <Linkedin className="h-6 w-6 cursor-pointer  hover:text-secondary-500 transition-colors" />
-          <Instagram className="h-6 w-6 cursor-pointer  hover:text-secondary-500 transition-colors" />
-          <TwitterIcon className="h-6 w-6 cursor-pointer  hover:text-secondary-500 transition-colors" />
+          <a
+            href="https://www.linkedin.com/company/portxbuilder/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-pointer hover:text-secondary-500 transition-colors"
+          >
+            <Linkedin className="h-6 w-6" />
+          </a>
+          <a
+            href="https://x.com/portxbuilder"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="cursor-pointer hover:text-secondary-500 transition-colors"
+          >
+            <TwitterIcon className="h-6 w-6" />
+          </a>
         </div>
 
-        <div className="copyright-content">© Copyright {year} PortXBuilder</div>
+        <div className="copyright-content">
+          © Copyright {year} PortXBuilder
+        </div>
       </div>
     </section>
   );
